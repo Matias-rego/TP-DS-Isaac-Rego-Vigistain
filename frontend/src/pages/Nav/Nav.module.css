@@ -1,0 +1,68 @@
+/* Variables de color según tu preferencia */
+:root {
+  --blanco: #ffffff;
+  --beige-claro: #fcfaf2;
+  --celeste: #00a8e8;
+  --celeste-oscuro: #007ea7;
+  --gris-texto: #444444;
+}
+
+.navContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 2rem;
+  background-color: var(--blanco);
+  border-bottom: 2px solid var(--beige-claro);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.logoText {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--gris-texto);
+}
+
+.logoHighlight {
+  color: var(--celeste);
+}
+
+.navLinks {
+  display: flex;
+  list-style: none;
+  gap: 2rem;
+}
+
+.link {
+  text-decoration: none;
+  color: var(--gris-texto);
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.link:hover {
+  color: var(--celeste);
+}
+
+.buttonPrimary {
+  background-color: var(--celeste);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.buttonPrimary:hover {
+  background-color: var(--celeste-oscuro);
+}
+
+/* Responsivo básico */
+@media (max-width: 768px) {
+  .navLinks {
+    display: none; /* Idealmente aquí implementarías un menú hamburguesa */
+  }
+}

@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-
+import { useEffect, useState } from "react";
+import Nav from "../Nav/Nav"; 
 
 function parseJwt(token: string) {
   try {
@@ -24,34 +24,31 @@ function parseJwt(token: string) {
   }
 }
 
-const verifyUse = () =>{
+const verifyUse = async (): Promise<string | null> => {
     const token = localStorage.getItem('token');
     const dataUser = token ? parseJwt(token) : null;
-    if(dataUser){
-        fetch(`http://localhost:3000/verifica/${dataUser.username}`,{
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            
-        })
-        .then(response => response.json())
-        .then(data => {
-            if(data.mensaje){
-                console.log(data.mensaje);
-            }else{
-                console.log("Usuario no encontrado");
-            }   
-    });
+
+    if (!dataUser) return null;
+
+    try {
+        const response = await fetch(`http://localhost:3000/verifica/${dataUser.username}`);
+        const data = await response.json();
+        return data.mensaje || null;
+    } catch (error) {
+        console.error("Error en la verificación", error);
+        return null;
+    }
 };
-}
 
 const Home = () => {
+    const [tipoUsuario, setTipoUsuario] = useState<string>('');
         useEffect(() => {
-        verifyUse();
-    }, []);
+            verifyUse().then(res => {
+                if (res) setTipoUsuario(res);
+            });
+        }, []);
     return (
-        <div>Te logueaste correctamente</div>
+        <><Nav /><div>Te logueaste correctamente, {tipoUsuario}</div></>
     );
 }   
 export default Home;
