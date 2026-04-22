@@ -19,7 +19,7 @@
 }
 
 .title {
-  font-size: 1.5rem;
+  font-size: 2 rem;
   font-weight: bold;
   margin-bottom: 1.5rem;
   text-align: center;
@@ -75,4 +75,24 @@
 
 .button:active {
   transform: scale(0.98);
+}
+.footerText {
+  display: block;
+  text-align: center;
+  margin-top: 20px;
+  color: #64748b; /* Un gris azulado suave */
+  font-size: 0.9rem;
+}
+
+.link {
+  color: #2563eb; /* Azul corporativo */
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  margin-left: 5px;
+}
+
+.link:hover {
+  color: #1d4ed8; /* Un azul un poco más oscuro al pasar el mouse */
+  text-decoration: underline;
 }

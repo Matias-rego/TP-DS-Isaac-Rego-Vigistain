@@ -7,11 +7,11 @@ use taller_mecanico;
     email VARCHAR(100) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
     rol ENUM('admin', 'tecnico') NOT NULL DEFAULT 'tecnico',
-    activo BOOLEAN DEFAULT TRUE
+    activo BOOLEAN DEFAULT FALSE
 );
  
  INSERT INTO Usuario (nombre_usuario, email, password_hash, rol, activo) 
 VALUES 
-('Tomas Admin', 'admin@taller.com', '1234', 'admin', TRUE),
-('Juan Tecnico', 'juan.t@taller.com', '1234', 'tecnico', TRUE),
-('Pedro Tecnico', 'pedro.t@taller.com', '1234', 'tecnico', TRUE);
+('Tomas Admin', 'admin@taller.com', '1234', 'admin', FALSE),
+('Juan Tecnico', 'juan.t@taller.com', '1234', 'tecnico', FALSE),
+('Pedro Tecnico', 'pedro.t@taller.com', '1234', 'tecnico', FALSE);
