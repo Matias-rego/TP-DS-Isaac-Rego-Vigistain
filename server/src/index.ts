@@ -7,7 +7,7 @@ const port = 3000;
 
 app.use(cors(
     {
-        origin: 'http://localhost:5173', // Cambia esto si tu frontend corre en otro puerto
+        origin: `http://${process.env.FRONTEND_HOST}:${process.env.FRONTEND_PORT}`,
         methods: ['GET', 'POST'], // Métodos permitidos
     }
 ));        // ← sin {} adentro si no pasás opciones
