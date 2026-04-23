@@ -12,3 +12,6 @@ dist/
 
 # Logs
 *.log
+
+#volumenes de los contenedores
+.volumes
