@@ -4,6 +4,7 @@ import express from 'express';
 import { getUser, registerUser } from "../controllers/userController.js";
 import { loginUser } from "../controllers/loginController.js";
 import { validaUser } from "../controllers/userController.js";
+import { upload } from '../middlewares/upload.middleware.js';
 
 const router = express.Router();
 
@@ -11,7 +12,7 @@ router.get('/verifica/:username', getUser);
 
 router.post('/Login', loginUser);
 
-router.post('/Register', registerUser)
+router.post('/Register', upload.single('foto'), registerUser);
 
 router.get('/validaCuenta/:token', validaUser) 
 

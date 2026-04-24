@@ -14,7 +14,7 @@ export const getUser = async (req: Request, res: Response) => {
         const [results] = await connection.query(consult, [req.params.username]);
         const rows = results as RowDataPacket[];
         if(rows.length > 0){
-            res.json({mensaje : `Sos un ${rows[0].rol}`}); // ← respondés al cliente
+            res.json(rows); // ← respondés al cliente
         } else {
             res.status(404).json({ error: 'Usuario no encontrado' });
         }
@@ -26,18 +26,27 @@ export const getUser = async (req: Request, res: Response) => {
 
 export const registerUser = async (req: Request, res: Response) => {
     const { username, email, password } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10); 
-    const consult = 'INSERT INTO usuario (nombre_usuario, email, password_hash) VALUES (?, ?, ?)';
-    try{
-        await connection.query(consult, [username, email, hashedPassword]);
-        const tokenVerificacion = jwt.sign({username}, "Stack", {expiresIn: '24h'});
+ 
+    // Si el usuario subió foto, multer ya la mandó a Cloudinary y dejó la URL en req.file.path
+    // Si no subió nada, req.file es undefined → guardamos null
+    const fotoUrl = (req.file as any)?.path ?? null;
+ 
+    const hashedPassword = await bcrypt.hash(password, 10);
+ 
+    const consult = 'INSERT INTO usuario (nombre_usuario, email, password_hash, foto_url) VALUES (?, ?, ?, ?)';
+ 
+    try {
+        await connection.query(consult, [username, email, hashedPassword, fotoUrl]);
+ 
+        const tokenVerificacion = jwt.sign({ username }, "Stack", { expiresIn: '24h' });
         await enviarMailVerificador(email, tokenVerificacion);
+ 
         res.json({ message: 'Usuario registrado exitosamente, valida tu cuenta a través del enlace enviado a tu correo electrónico' });
-    }catch(e){
-        console.log('Error en registerUser:', e)
+    } catch (e) {
+        console.log('Error en registerUser:', e);
         res.status(500).json({ error: 'Error al registrar usuario' });
     }
-}
+};
 
 export const validaUser = async (req: Request, res: Response) => {
     const { token } = req.params;

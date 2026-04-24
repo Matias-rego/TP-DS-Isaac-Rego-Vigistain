@@ -1,47 +1,67 @@
+// App.tsx
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import type { ReactNode } from "react";
 import Home from "../Home/Home";
 import Login from "../Login/Login";
 import Register from "../Register/Register";
+import Perfil from "../Perfil/Perfil";
 
-function parseJwt(token: string) {
+// ── parseJwt ─────────────────────────────────────────────────────
+export function parseJwt(token: string) {
   try {
-    // 1. Obtenemos el payload (la segunda parte del token)
     const base64Url = token.split('.')[1];
-    
-    // 2. Ajustamos los caracteres especiales de Base64Url a Base64 estándar
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    
-    // 3. Decodificamos y manejamos caracteres especiales (como tildes o eñes)
     const jsonPayload = decodeURIComponent(
       window.atob(base64)
         .split('')
         .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
         .join('')
     );
-
     return JSON.parse(jsonPayload);
   } catch (error) {
     console.error("Error al parsear el JWT:", error);
     return null;
   }
 }
- 
-const esTokenValido: boolean = !!localStorage.getItem('token') && (parseJwt(localStorage.getItem('token')!)?.exp * 1000 > Date.now());  
-const App = () => {
-  
-  return (
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={esTokenValido ? <Navigate to="/home" /> : <Navigate to="/login" />} />
-            <Route path="/login" element={!esTokenValido ? <Login /> : <Navigate to="/home" />} />
-            <Route path="/home" element={esTokenValido ? <Home /> : <Navigate to="/login" />} />
-            <Route path="/register" element={!esTokenValido ? <Register /> : <Navigate to="/home" />} />
 
-            <Route path="*" element={<h1>404 - Página no encontrada</h1>} />{/* Ruta para errores 404 (opcional) */}
-          </Routes>
-        </BrowserRouter>
-    );
+// ── Helper — se llama en cada render, nunca se cachea ────────────
+function tokenEsValido(): boolean {
+  const token = localStorage.getItem('token');
+  if (!token) return false;
+  const payload = parseJwt(token);
+  return !!payload && payload.exp * 1000 > Date.now();
 }
+
+// ── Rutas protegidas ─────────────────────────────────────────────
+// Se evalúa tokenEsValido() cada vez que React renderiza la ruta
+const RutaPrivada = ({ children }: { children: ReactNode }) => {
+  return tokenEsValido() ? <>{children}</> : <Navigate to="/login" replace />;
+};
+
+const RutaPublica = ({ children }: { children: ReactNode }) => {
+  return !tokenEsValido() ? <>{children}</> : <Navigate to="/home" replace />;
+};
+
+// ── App ──────────────────────────────────────────────────────────
+const App = () => {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/"
+          element={tokenEsValido() ? <Navigate to="/home" /> : <Navigate to="/login" />}
+        />
+
+        <Route path="/login"    element={<RutaPublica><Login /></RutaPublica>} />
+        <Route path="/register" element={<RutaPublica><Register /></RutaPublica>} />
+
+        <Route path="/home"   element={<RutaPrivada><Home /></RutaPrivada>} />
+        <Route path="/perfil" element={<RutaPrivada><Perfil /></RutaPrivada>} />
+
+        <Route path="*" element={<h1>404 - Página no encontrada</h1>} />
+      </Routes>
+    </BrowserRouter>
+  );
+};
+
 export default App;
-
-
