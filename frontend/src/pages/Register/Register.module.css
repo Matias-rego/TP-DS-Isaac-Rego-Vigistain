@@ -96,3 +96,11 @@
 .link:hover {
   text-decoration: underline;
 }
+.preview {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 8px;
+  border: 2px solid #E0F2FE;
+}

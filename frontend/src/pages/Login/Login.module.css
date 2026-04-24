@@ -46,10 +46,12 @@
 
 .input {
   padding: 0.5rem 1rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid #191a1b;
   border-radius: 4px;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
+  background-color: white;
+  color: #1f2937;
 }
 
 .input:focus {

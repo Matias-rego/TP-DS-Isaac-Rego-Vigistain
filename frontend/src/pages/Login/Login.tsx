@@ -4,6 +4,7 @@ import Home from '../Home/Home';
 import Alert from '../../components/Alert/Alert';
 import { useSearchParams } from 'react-router-dom';
 import AlertSuccess from '../../components/Alert/AlertSuccess';
+import {PasswordInput,PasswordStrengthMeter} from "../../components/ui/password-input";
 
 const Login = () => {
     
@@ -69,22 +70,13 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
               id="username" 
               name="username" 
               className={styles.input} 
-              placeholder="Usuario" 
-              required 
+              required
             />
           </div>
 
           <div className={styles.group}>
             <label htmlFor="password" className={styles.label}>Password:</label>
-            <input 
-              onChange={(e): void => setPassword(e.target.value)}         
-              type="password" 
-              id="password" 
-              name="password" 
-              className={styles.input} 
-              placeholder="••••••••" 
-              required 
-            />
+            <PasswordInput onChange={(e): void => setPassword(e.target.value)} value={password} required color={'black'}/>
           </div>
 
           <button type="submit" className={styles.button} >Login</button>
