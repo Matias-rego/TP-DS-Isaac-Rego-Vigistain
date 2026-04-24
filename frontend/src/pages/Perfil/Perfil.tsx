@@ -4,7 +4,6 @@ import { parseJwt } from '../App/App';
 import { useEffect, useState } from 'react';
 import { Avatar, Badge } from '@chakra-ui/react';
 import styles from './Perfil.module.css';
-import EditarPerfil from "../EditorPerfil/EditorPerfil";
 
 
 interface UserProfile {
