@@ -24,7 +24,7 @@ const Nav = () => {
             if (!decoded?.username) throw new Error('Token inválido');
     
             const response = await fetch(
-              `http://localhost:3000/verifica/${decoded.username}`,
+              `http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}/verifica/${decoded.username}`,
               { headers: { Authorization: `Bearer ${token}` } }
             );
     
