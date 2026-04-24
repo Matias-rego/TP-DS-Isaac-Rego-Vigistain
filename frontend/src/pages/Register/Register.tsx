@@ -48,7 +48,7 @@ const Register = () => {
         }
 
         try {
-            const response = await fetch('http://localhost:3000/Register', {
+            const response = await fetch(`http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}/Register`, {
                 method: 'POST',
                 body: formData,
                 // ⚠️ Sin Content-Type — el browser lo setea solo con el boundary correcto
