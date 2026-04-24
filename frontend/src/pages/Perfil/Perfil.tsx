@@ -6,6 +6,8 @@ import { Avatar, Badge } from '@chakra-ui/react';
 import styles from './Perfil.module.css';
 import TarjetaTrabajos from "../../components/Tarjetas/TarjetaTrabajos";
 import TarjetaMetrica from "../../components/Tarjetas/TarjetaMetrica";
+import EditarPerfil from "../EditorPerfil/EditorPerfil";
+
 
 interface UserProfile {
   nombre_usuario: string;
@@ -18,6 +20,7 @@ interface UserProfile {
 const Perfil = () => {
   const [usuario, setUsuario] = useState<UserProfile | null>(null);
   const [error, setError]     = useState<string | null>(null);
+  const [comienzaEdicion, setComienzaEdicion] = useState<boolean>(false);
 
   useEffect(() => {
     const cargarPerfil = async () => {
@@ -46,15 +49,20 @@ const Perfil = () => {
       }
     };
 
+    const comienzaEdicion = async () =>{
+    
+    }
+
     cargarPerfil();
   }, []);
 
 
   if (error)    return <p className={styles.error}>Error: {error}</p>;
   if (!usuario) return <p className={styles.loading}>Cargando perfil...</p>;
-
+  
 
   return (
+    <>{comienzaEdicion ? <EditarPerfil/> :
     <div className={styles.page}>
       <Nav />
 
@@ -80,17 +88,19 @@ const Perfil = () => {
                 <p className={styles.fieldLabel}>NOMBRE DE USUARIO</p>
                 <div className={styles.fieldRow}>
                   <span className={styles.nameText}>{usuario.nombre_usuario}</span>
-                  <button className={styles.editButton}>Editar</button>
+                  <button className={styles.editButton} onClick={() => setComienzaEdicion(true)}>
+                    Editar
+                  </button>
                 </div>
               </div>
 
               {/* Email */}
               <div className={styles.fieldBox}>
                 <p className={styles.fieldLabel}>CORREO ELECTRÓNICO</p>
-                <div className={styles.fieldRow}>
+                {/*<div className={styles.fieldRow}>
                   <span className={styles.emailText}>{usuario.email}</span>
                   <button className={styles.changeButton}>Cambiar</button>
-                </div>
+                </div> */}
               </div>
 
               {/* Rol — Badge de Chakra, estilos inline mínimos */}
@@ -125,6 +135,7 @@ const Perfil = () => {
         <TarjetaMetrica label="Facturado"             valor="$148k" sub="Este mes" />
         </div> */}
     </div>
+}</>
   );
 };
 

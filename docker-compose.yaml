@@ -29,6 +29,9 @@ services:
     build: ./frontend
     ports:
       - "5173:5173"
+    environment:
+      BACKEND_HOST: ${BACKEND_HOST}
+      BACKEND_PORT: ${BACKEND_PORT}
     depends_on:
       - server
     restart: unless-stopped
@@ -49,6 +52,6 @@ services:
       retries: 5
       start_period: 30s
     ports:
-      - "3306:3306"
+      - "3308:3306"
     volumes:
       - .volumes/mysql:/var/lib/mysql
