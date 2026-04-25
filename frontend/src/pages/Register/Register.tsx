@@ -13,8 +13,7 @@ const Register = () => {
     const [foto, setFoto]                       = useState<File | null>(null);
     const [preview, setPreview]                 = useState<string | null>(null);
     const [error, setError]                     = useState<string | null>(null);
-    const [success, setSuccess]                 = useState<string | null>(null);
-    const [isRegistered, setIsRegistered]       = useState<boolean>(false);
+    const [, setSuccess]                        = useState<string | null>(null);    const [isRegistered, setIsRegistered]       = useState<boolean>(false);
 
     // Cuando el usuario elige una imagen, generamos preview local
     const handleFoto = (e: React.ChangeEvent<HTMLInputElement>) => {

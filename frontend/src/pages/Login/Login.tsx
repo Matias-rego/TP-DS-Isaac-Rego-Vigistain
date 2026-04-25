@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 import styles from './Login.module.css';
 import Home from '../Home/Home';
 import Alert from '../../components/Alert/Alert';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import AlertSuccess from '../../components/Alert/AlertSuccess';
-import {PasswordInput,PasswordStrengthMeter} from "../../components/ui/password-input";
-
+import { PasswordInput } from "../../components/ui/password-input";
 const Login = () => {
-    
+  const navigate = useNavigate();  
+
     const [password, setPassword] = useState<string>('');
     const [username, setUsername] = useState<string>('');
     const [login, setLogin] = useState<boolean>(false);
@@ -36,7 +36,8 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 
         // Acá solo llega si fue 200
         localStorage.setItem('token', result.token);
-        setLogin(true);
+        sessionStorage.setItem('showLoginToast', 'true');
+        navigate('/home', { replace: true });
 
     } catch (error) {
         console.error('Error:', error);

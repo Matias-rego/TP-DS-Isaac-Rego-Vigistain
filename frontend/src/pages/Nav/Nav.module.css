@@ -1,10 +1,14 @@
 /* Variables de color según tu preferencia */
 :root {
-  --blanco: #ffffff;
-  --beige-claro: #fcfaf2;
-  --celeste: #00a8e8;
-  --celeste-oscuro: #007ea7;
-  --gris-texto: #444444;
+  --azul: #1565C0;
+  --azul-oscuro: #0D47A1;
+  --azul-suave: #E3F2FD;
+  --amarillo: #FFC107;
+  --amarillo-suave: #FFF8E1;
+  --blanco: #FFFFFF;
+  --gris-texto: #1E293B;
+  --gris-suave: #64748B;
+  --borde: #E2E8F0;
 }
 
 .navContainer {
@@ -65,4 +69,305 @@
   .navLinks {
     display: none; /* Idealmente aquí implementarías un menú hamburguesa */
   }
+}
+
+.logoutButton {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: linear-gradient(135deg, var(--azul) 0%, var(--azul-oscuro) 100%);
+  color: var(--blanco);
+  border: none;
+  padding: 0.65rem 1.15rem;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 12px 28px rgba(21, 101, 192, 0.28);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.logoutButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 36px rgba(21, 101, 192, 0.36);
+  filter: brightness(1.04);
+}
+
+.logoutButton:active {
+  transform: translateY(0);
+}
+
+.logoutIcon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--amarillo);
+  color: #1E293B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+}
+
+/* Fondo oscuro translúcido */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.48);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: overlayFadeIn 0.18s ease-out;
+}
+
+/* Tarjeta modal */
+.modalCard {
+  width: min(92vw, 430px);
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(224, 242, 254, 0.9);
+  border-radius: 28px;
+  padding: 2rem;
+  text-align: center;
+  box-shadow:
+    0 24px 80px rgba(15, 23, 42, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  animation: modalPopIn 0.22s ease-out;
+}
+
+.modalIcon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+  color: #007ea7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.7rem;
+  box-shadow: 0 12px 28px rgba(0, 168, 232, 0.22);
+}
+
+.modalTitle {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.45rem;
+  font-weight: 800;
+}
+
+.modalText {
+  margin: 0.85rem 0 1.5rem;
+  color: #64748b;
+  font-size: 0.96rem;
+  line-height: 1.5;
+}
+
+.modalActions {
+  display: flex;
+  gap: 0.8rem;
+  justify-content: center;
+}
+
+.cancelButton,
+.confirmButton {
+  border: none;
+  border-radius: 999px;
+  padding: 0.75rem 1.1rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.cancelButton {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.cancelButton:hover {
+  background: #e2e8f0;
+  transform: translateY(-1px);
+}
+
+.confirmButton {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  color: #ffffff;
+  box-shadow: 0 10px 24px rgba(14, 165, 233, 0.3);
+}
+
+.confirmButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(14, 165, 233, 0.38);
+}
+
+@keyframes overlayFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalPopIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 640px) {
+  .logoutButton {
+    padding: 0.55rem 0.8rem;
+    font-size: 0.85rem;
+  }
+
+  .modalCard {
+    padding: 1.5rem;
+    border-radius: 22px;
+  }
+
+  .modalActions {
+    flex-direction: column;
+  }
+
+  .cancelButton,
+  .confirmButton {
+    width: 100%;
+  }
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logoMark {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--azul) 0%, var(--azul-oscuro) 100%);
+  color: var(--blanco);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  box-shadow: 0 10px 24px rgba(21, 101, 192, 0.28);
+  position: relative;
+}
+
+.logoMark::after {
+  content: "";
+  position: absolute;
+  right: -3px;
+  bottom: -3px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--amarillo);
+  border: 2px solid var(--blanco);
+}
+
+.logoCopy {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.logoText {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: var(--gris-texto);
+  letter-spacing: -0.4px;
+}
+
+.logoSubtitle {
+  font-size: 0.72rem;
+  color: var(--gris-suave);
+  font-weight: 600;
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+}
+
+.navButton {
+  position: relative;
+  border: none;
+  background: transparent;
+  color: var(--gris-texto);
+  font-size: 0.95rem;
+  font-weight: 800;
+  padding: 0.72rem 1rem;
+  border-radius: 999px;
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.navButton::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(21, 101, 192, 0.10), rgba(255, 193, 7, 0.16));
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.navButton::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 6px;
+  width: 24px;
+  height: 3px;
+  border-radius: 999px;
+  background: #ffc107;
+  transform: translateX(-50%) scaleX(0);
+  transform-origin: center;
+  transition: transform 0.22s ease;
+}
+
+.navButton:hover {
+  color: var(--azul);
+  transform: translateY(-1px);
+}
+
+.navButton:hover::before {
+  opacity: 1;
+}
+
+.navButton:hover::after {
+  transform: translateX(-50%) scaleX(1);
+}
+
+.navButton:active {
+  transform: translateY(0);
+}
+
+.navButton {
+  z-index: 1;
+}
+
+.navButton span,
+.navButton {
+  position: relative;
 }
