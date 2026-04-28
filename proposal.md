@@ -25,10 +25,10 @@ classDiagram
   class Cliente {
     - id_cliente: int PK AI
     - id_tipo_cliente: int FK
-    - nombre: varchar(100)
-    - dni_cuit: varchar(20) UNIQUE
-    - telefono: varchar(20)
-    - mail: varchar(100)
+    - nombre: varchar[100]
+    - dni_cuit: varchar[20] UNIQUE
+    - telefono: varchar[20]
+    - mail: varchar[100]
     - fecha_registro: DATETIME
     - activo: boolean
     + altaCliente()
@@ -39,7 +39,7 @@ classDiagram
 
   class Tipo_Cliente {
     - id_tipo_cliente: int PK AI
-    - pteDescuento: DECIMAL(5,2)
+    - pteDescuento: DECIMAL[5,2]
     - cantOrdenesPara: int
   }
 
@@ -57,16 +57,16 @@ classDiagram
     - id_falla: int PK AI
     - id_equipo: int FK
     - id_tipo_falla: int FK
-    - descripcion: VARCHAR(200)
-    - tipo_falla: VARCHAR(100)
-    - estado: ENUM('resuelta','diagnosticada')
+    - descripcion: VARCHAR[200]
+    - tipo_falla: VARCHAR[100]
+    - estado: ENUM['resuelta','diagnosticada']
     + cargaFalla()
   }
 
   class Tipo_falla {
     - id_tipo_falla: int PK AI
-    - descripcion: VARCHAR(200)
-    - importe_estimado: DECIMAL(10,2)
+    - descripcion: VARCHAR[200]
+    - importe_estimado: DECIMAL[10,2]
     + altaTipoFalla()
     + bajaTipoFalla()
     + modificacionTipoFalla()
@@ -82,7 +82,7 @@ classDiagram
     - fecha_ingreso: DATETIME
     - fecha_estimada: DATE NULL
     - fecha_entrega: DATETIME
-    - total_cobrado: DECIMAL(10,2)
+    - total_cobrado: DECIMAL[10,2]
     + altaOrden()
     + modificacionOrden()
     + bajaOrden()
@@ -93,8 +93,8 @@ classDiagram
   class Historial_estados {
     - id_historial: int PK AI
     - id_orden: int FK
-    - estado_anterior: VARCHAR(30)
-    - estado_nuevo: VARCHAR(30)
+    - estado_anterior: VARCHAR[30]
+    - estado_nuevo: VARCHAR[30]
     - id_usuario: int FK
     - fecha_cambio: DATETIME
     - comentario: TEXT
@@ -104,9 +104,9 @@ classDiagram
   class Presupuesto {
     - id_presupuesto: int PK AI
     - id_orden: int FK UNIQUE
-    - mano_de_obra: DECIMAL(10,2)
-    - descuento: DECIMAL(10,2)
-    - total_estimado: DECIMAL(10,2)
+    - mano_de_obra: DECIMAL[10,2]
+    - descuento: DECIMAL[10,2]
+    - total_estimado: DECIMAL[10,2]
     - estado: ENUM***
     + altaPresupuesto()
     + modificacionPresupuesto()
@@ -118,22 +118,22 @@ classDiagram
     - id_tipo_pago: int FK
     - id_presupuesto: int FK
     - fecha_pago: DATETIME
-    - monto: DECIMAL(10,2)
+    - monto: DECIMAL[10,2]
   }
 
   class Tipo_Pago {
     - id_tipo_pago: int PK AI
-    - pteDescuento: DECIMAL(5,2)
-    - pteRecargo: DECIMAL(5,2)
+    - pteDescuento: DECIMAL[5,2]
+    - pteRecargo: DECIMAL[5,2]
     - medioPago: ENUM****
   }
 
   class Usuario {
     - id_usuario: int PK AI
-    - nombre_usuario: VARCHAR(100)
-    - email: VARCHAR(100)
-    - password_hash: VARCHAR(255)
-    - rol: ENUM('admin','tecnico')
+    - nombre_usuario: VARCHAR[100]
+    - email: VARCHAR[100]
+    - password_hash: VARCHAR[255]
+    - rol: ENUM['admin','tecnico']
     - activo: BOOLEAN
     + altaUsuario()
     + modificacionUsuario()
