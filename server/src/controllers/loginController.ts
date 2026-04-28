@@ -23,7 +23,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
                 res.status(403).json({ message: 'Usuario inactivo. Revise su email para activar su cuenta.' });
                 return;
             }else{         
-            const token = jwt.sign({username}, "Stack", {expiresIn: '2m'});
+            const token = jwt.sign({username}, "Stack", {expiresIn: '20m'});
             res.json({ token });
             }
         }else{

@@ -4,6 +4,8 @@ import { parseJwt } from '../App/App';
 import { useEffect, useState } from 'react';
 import { Avatar, Badge } from '@chakra-ui/react';
 import styles from './Perfil.module.css';
+//import TarjetaTrabajos from "../../components/Tarjetas/TarjetaTrabajos";
+//import TarjetaMetrica from "../../components/Tarjetas/TarjetaMetrica";
 
 
 interface UserProfile {
