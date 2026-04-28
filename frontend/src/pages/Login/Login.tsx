@@ -19,7 +19,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const data = { username, password };
 
     try {
-        const response = await fetch('http://localhost:3000/login', {
+        const response = await fetch(`http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)

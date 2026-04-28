@@ -54,6 +54,41 @@ const Nav = () => {
   return (
     <>
       <nav className={styles.navContainer}>
+      const [usuario, setUsuario] = useState<UserProfile | null>(null);
+      const [error, setError]     = useState<string | null>(null);
+    useEffect(() => {
+        const cargarPerfil = async () => {
+          try {
+            const token = localStorage.getItem('token');
+            if (!token) throw new Error('No hay token');
+    
+            const decoded = parseJwt(token);
+            if (!decoded?.username) throw new Error('Token inválido');
+    
+            const response = await fetch(
+              `http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}/verifica/${decoded.username}`,
+              { headers: { Authorization: `Bearer ${token}` } }
+            );
+    
+            if (!response.ok) throw new Error(`Error ${response.status}`);
+    
+            // El backend devuelve un ARRAY → tomamos el primer elemento
+            const data: UserProfile[] = await response.json();
+            if (!data.length) throw new Error('Usuario no encontrado');
+    
+            setUsuario(data[0]);
+          } catch (e) {
+            console.error('Error al cargar perfil:', e);
+            setError(e instanceof Error ? e.message : 'Error desconocido');
+          }
+        };
+    
+        cargarPerfil();
+      }, []);
+    
+    const navigate = useNavigate();
+    return(
+    <nav className={styles.navContainer}>
         <div className={styles.logo}>
           <span className={styles.logoMark}>TF</span>
           <div className={styles.logoCopy}>
@@ -151,4 +186,8 @@ const Nav = () => {
   );
 };
 
+export default Nav;
+    </nav>
+    );
+}
 export default Nav;
