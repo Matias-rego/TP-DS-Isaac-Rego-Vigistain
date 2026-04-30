@@ -4,7 +4,7 @@ import Home from '../Home/Home';
 import Alert from '../../components/Alert/Alert';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import AlertSuccess from '../../components/Alert/AlertSuccess';
-import { PasswordInput } from "../../components/ui/password-input";
+import { PasswordInput } from '@/components/ui/PasswordInput';
 const Login = () => {
   const navigate = useNavigate();  
 
@@ -77,7 +77,9 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 
           <div className={styles.group}>
             <label htmlFor="password" className={styles.label}>Password:</label>
-            <PasswordInput onChange={(e): void => setPassword(e.target.value)} value={password} required color={'black'}/>
+            <div className={styles.caja_password}>
+              <PasswordInput onChange={(e): void => setPassword(e.target.value)} value={password} required className={styles.input} />
+            </div>
           </div>
 
           <button type="submit" className={styles.button} >Login</button>

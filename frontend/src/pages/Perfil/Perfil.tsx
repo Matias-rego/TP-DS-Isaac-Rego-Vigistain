@@ -2,10 +2,10 @@
 import Nav from '../Nav/Nav';
 import { parseJwt } from '../App/App';
 import { useEffect, useState } from 'react';
-import { Avatar, Badge } from '@chakra-ui/react';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import  { Badge } from '@/components/ui/badge';
 import styles from './Perfil.module.css';
-//import TarjetaTrabajos from "../../components/Tarjetas/TarjetaTrabajos";
-//import TarjetaMetrica from "../../components/Tarjetas/TarjetaMetrica";
+import EditorPerfil from "./../EditorPerfil/EditorPerfil";
 
 
 interface UserProfile {
@@ -61,7 +61,7 @@ const Perfil = () => {
   
 
   return (
-    <>{comienzaEdicion ? <EditarPerfil/> :
+    <>{comienzaEdicion ? <EditorPerfil /> :
     <div className={styles.page}>
       <Nav />
 
@@ -71,13 +71,18 @@ const Perfil = () => {
         <div className={styles.card}>
           <div className={styles.cardFlex}>
 
-            {/* Avatar — size viene de Chakra, borde del CSS module */}
-            <Avatar.Root size="2xl" className={styles.avatarRoot}>
-              <Avatar.Image src={usuario?.foto_url} />
-              <Avatar.Fallback bg="#1A202C" color="white">
-                {usuario?.nombre_usuario?.[0]?.toUpperCase() ?? '?'}
-              </Avatar.Fallback>
-            </Avatar.Root>
+        {/*<Avatar className={styles.avatarRoot}>*/}
+                    <img
+            src={usuario?.foto_url}
+            alt={usuario?.nombre_usuario}
+            className={styles.avatarRoot}
+          />
+        {/*  <AvatarFallback className="bg-[#1A202C] text-white">
+            {usuario?.nombre_usuario?.[0]?.toUpperCase() ?? '?'}
+          </AvatarFallback>
+        </Avatar> */}
+            
+
 
             {/* Datos */}
             <div className={styles.dataStack}>
@@ -93,7 +98,6 @@ const Perfil = () => {
                 </div>
               </div>
 
-              {/* Email */}
               <div className={styles.fieldBox}>
                 <p className={styles.fieldLabel}>CORREO ELECTRÓNICO</p>
                 {/*<div className={styles.fieldRow}>
@@ -102,10 +106,9 @@ const Perfil = () => {
                 </div> */}
               </div>
 
-              {/* Rol — Badge de Chakra, estilos inline mínimos */}
-              <Badge colorPalette="blue" variant="surface" borderRadius="lg" px="3">
-                {usuario.rol}
-              </Badge>
+            <Badge variant="secondary" className="rounded-lg px-3">
+              {usuario.rol}
+            </Badge>
 
             </div>
           </div>

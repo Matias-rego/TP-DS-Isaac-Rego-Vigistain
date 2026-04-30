@@ -45,18 +45,45 @@
 }
 
 .input {
-  padding: 0.5rem 1rem;
-  border: 1px solid #191a1b;
-  border-radius: 4px;
-  outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  background-color: white;
-  color: #1f2937;
+  padding: 0.5rem 1rem !important;
+  border: 1px solid #191a1b !important;
+  border-radius: 4px !important;
+  outline: none !important;
+  background-color: white !important;
+  color: #1f2937 !important;
+  width: 100% !important;
+  padding: 0.5rem 2.5rem 0.5rem 1rem !important;
 }
 
 .input:focus {
   border-color: #2563eb;
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.caja_password {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.caja_password input {
+  width: 100%;
+  padding-right: 2.5rem;
+
+}
+
+.caja_password button {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
 }
 
 .button {

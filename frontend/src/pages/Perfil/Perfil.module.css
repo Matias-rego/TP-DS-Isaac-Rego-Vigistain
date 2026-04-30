@@ -132,3 +132,13 @@
     text-align: center;
     margin-top: 2rem;
 }
+.avatarRoot {
+  width: 8rem;
+  height: 8rem;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center;
+  border: 3px solid #1A202C;
+  display: block;
+  overflow: hidden;
+}
