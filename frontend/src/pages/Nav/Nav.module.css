@@ -71,43 +71,7 @@
   }
 }
 
-.logoutButton {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  background: linear-gradient(135deg, var(--azul) 0%, var(--azul-oscuro) 100%);
-  color: var(--blanco);
-  border: none;
-  padding: 0.65rem 1.15rem;
-  border-radius: 999px;
-  font-weight: 800;
-  font-size: 0.95rem;
-  cursor: pointer;
-  box-shadow: 0 12px 28px rgba(21, 101, 192, 0.28);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
-}
 
-.logoutButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 16px 36px rgba(21, 101, 192, 0.36);
-  filter: brightness(1.04);
-}
-
-.logoutButton:active {
-  transform: translateY(0);
-}
-
-.logoutIcon {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--amarillo);
-  color: #1E293B;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.85rem;
-}
 
 /* Fondo oscuro translúcido */
 .modalOverlay {
@@ -370,4 +334,56 @@
 .navButton span,
 .navButton {
   position: relative;
+}
+.avatar {
+  width: 2.8rem;
+  height: 2.8rem;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.logoutButton {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: linear-gradient(135deg, var(--azul) 0%, var(--azul-oscuro) 100%);
+  color: var(--blanco);
+  border: none;
+  padding: 0.65rem 1.15rem;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 12px 28px rgba(21, 101, 192, 0.28);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  width: fit-content;   
+  flex-shrink: 0;
+}
+
+.logoutButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 36px rgba(21, 101, 192, 0.36);
+  filter: brightness(1.04);
+}
+
+.logoutButton:active {
+  transform: translateY(0);
+}
+
+.logoutIcon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--amarillo);
+  color: #1E293B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+}
+.navActions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }

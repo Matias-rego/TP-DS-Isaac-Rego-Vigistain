@@ -6,7 +6,6 @@ import Login from "../Login/Login";
 import Register from "../Register/Register";
 import Perfil from "../Perfil/Perfil";
 
-// ── parseJwt ─────────────────────────────────────────────────────
 export function parseJwt(token: string) {
   try {
     const base64Url = token.split('.')[1];
