@@ -2,8 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import routes from './api/endPoints.js';
 import dotenv from 'dotenv';
-dotenv.config({ path: '.env.development' }); // ← al inicio de todo
-
+dotenv.config();
 
 const app = express();
 const port = 3000;
