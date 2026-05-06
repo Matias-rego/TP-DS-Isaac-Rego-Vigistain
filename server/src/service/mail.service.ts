@@ -1,6 +1,4 @@
 import nodemailer from 'nodemailer';
-import dotenv from 'dotenv';
-dotenv.config();
 import parseJwt from '../utils/toke.utils.js';
 
 
