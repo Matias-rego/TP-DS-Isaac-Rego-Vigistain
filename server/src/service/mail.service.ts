@@ -26,9 +26,6 @@ async function enviarMailVerificador(direccionEmail: string, tokenVerificacion: 
     }
 }
 
-
-
-
 function crearMailVerificacion(tokenVerificacion: string) {
     const dataToken= parseJwt(tokenVerificacion);
     const username = dataToken ? dataToken.username : "Usuario";
@@ -66,7 +63,7 @@ function crearMailVerificacion(tokenVerificacion: string) {
                                 <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate;">
                                     <tr>
                                         <td align="center" bgcolor="#2563eb" style="border-radius: 6px;">
-                                            <a href="http://localhost:3000/validaCuenta/${tokenVerificacion}" target="_blank" style="display: inline-block; padding: 14px 28px; color: #ffffff; text-decoration: none; font-weight: bold; font-size: 16px;">Valida cuenta</a>
+                                            <a href="http://localhost:3000/auth/validateCuenta/${tokenVerificacion}" target="_blank" style="display: inline-block; padding: 14px 28px; color: #ffffff; text-decoration: none; font-weight: bold; font-size: 16px;">Valida cuenta</a>
                                         </td>
                                     </tr>
                                 </table>
@@ -83,7 +80,7 @@ function crearMailVerificacion(tokenVerificacion: string) {
 
             <tr>
                 <td bgcolor="#f8fafc" style="padding: 20px 30px 20px 30px; text-align: center; color: #94a3b8; font-size: 12px;">
-                    &copy; 2026 PlayonSur Fc - Sistema de Gestión Técnica.<br>
+                    &copy; 2026 TechFix - Sistema de Gestión Técnica.<br>
                     Rosario, Santa Fe, Argentina.
                 </td>
             </tr>
@@ -93,4 +90,7 @@ function crearMailVerificacion(tokenVerificacion: string) {
     ` 
 }
 
-export default enviarMailVerificador;
+
+
+
+export default  enviarMailVerificador;

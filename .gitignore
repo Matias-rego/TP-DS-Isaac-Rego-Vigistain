@@ -17,3 +17,5 @@ dist/
 
 #volumenes de los contenedores
 .volumes
+
+server/src/generated/

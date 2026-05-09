@@ -3,13 +3,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { useNavigate } from 'react-router-dom';
 import { parseJwt } from '../App/App';
 import { useEffect, useState } from 'react';
-
-interface UserProfile {
-  nombre_usuario: string;
-  email: string;
-  rol: string;
-  foto_url?: string;
-}
+import  type {UserProfile}  from "../../types/types";
 
 const Nav = () => {
   const [usuario, setUsuario] = useState<UserProfile | null>(null);
@@ -23,19 +17,19 @@ const Nav = () => {
         if (!token) throw new Error('No hay token');
 
         const decoded = parseJwt(token);
-        if (!decoded?.username) throw new Error('Token inválido');
+        if (!decoded?.id_user) throw new Error('Token inválido');
 
         const response = await fetch(
-          `http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}/verifica/${decoded.username}`,
+          `http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}/users/verifica/${decoded.id_user}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
         if (!response.ok) throw new Error(`Error ${response.status}`);
 
-        const data: UserProfile[] = await response.json();
-        if (!data.length) throw new Error('Usuario no encontrado');
+        const data: UserProfile = await response.json();
+        if (!data) throw new Error('Usuario no encontrado');
 
-        setUsuario(data[0]);
+        setUsuario(data);
       } catch (e) {
         console.error('Error al cargar perfil:', e);
       }
@@ -111,8 +105,8 @@ const Nav = () => {
             </button>
 
             <img
-              src={usuario?.foto_url}
-              alt={usuario?.nombre_usuario}
+              src={usuario?.urlPicture}
+              alt={usuario?.userName}
               className={styles.avatar}
               onClick={() => navigate('/perfil')}
             />
