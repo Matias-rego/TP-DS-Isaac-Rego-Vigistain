@@ -2,13 +2,7 @@ import { useEffect, useState } from "react";
 import Nav from "../Nav/Nav";
 import { parseJwt } from "../App/App";
 import styles from "./Home.module.css";
-
-interface UserProfile {
-  nombre_usuario: string;
-  email: string;
-  rol: string;
-  foto_url?: string;
-}
+import  type {UserProfile}  from "../../types/types";
 
 const Home = () => {
   const [usuario, setUsuario] = useState<UserProfile | null>(null);
@@ -26,17 +20,17 @@ const [toastSaliendo, setToastSaliendo] = useState<boolean>(false);
         if (!token) return;
 
         const decoded = parseJwt(token);
-        if (!decoded?.username) return;
+        if (!decoded?.id_user) return;
 
         const response = await fetch(
-          `http://localhost:3000/verifica/${decoded.username}`,
+          `http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}/users/verifica/${decoded.id_user}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
         if (!response.ok) return;
 
-        const data: UserProfile[] = await response.json();
-        setUsuario(data[0]);
+        const data: UserProfile = await response.json();
+        setUsuario(data);
       } catch (error) {
         console.error("Error al cargar usuario:", error);
       }
@@ -98,7 +92,7 @@ const [toastSaliendo, setToastSaliendo] = useState<boolean>(false);
             <div className={styles.badge}>TechFix · Taller de Reparaciones</div>
 
             <h1 className={styles.title}>
-              Bienvenido{usuario?.nombre_usuario ? `, ${usuario.nombre_usuario}` : ""}.
+              Bienvenido{usuario?.userName ? `, ${usuario.userName}` : ""}.
             </h1>
 
             <p className={styles.description}>

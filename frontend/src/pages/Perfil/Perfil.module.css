@@ -73,6 +73,11 @@
     color: #4a5568;
 }
 
+.roleText {
+    font-size: 1.2rem;
+    color: #718096;
+}
+
 /* ── Botones ── */
 .editButton {
     font-size: 0.8rem;

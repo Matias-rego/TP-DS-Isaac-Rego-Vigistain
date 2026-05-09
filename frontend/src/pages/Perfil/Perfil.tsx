@@ -1,19 +1,12 @@
 // Perfil.tsx
 import Nav from '../Nav/Nav';
-import { parseJwt } from '../App/App';
+import { parseJwt, capitalize } from '../App/App';
 import { useEffect, useState } from 'react';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import { Navigate } from 'react-router-dom';
 import  { Badge } from '@/components/ui/badge';
 import styles from './Perfil.module.css';
-import EditorPerfil from "./../EditorPerfil/EditorPerfil";
+import  type {UserProfile}  from "../../types/types"; 
 
-
-interface UserProfile {
-  nombre_usuario: string;
-  email: string;
-  rol: string;
-  foto_url?: string;
-}
 
 
 const Perfil = () => {
@@ -23,34 +16,29 @@ const Perfil = () => {
 
   useEffect(() => {
     const cargarPerfil = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) throw new Error('No hay token');
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('No hay token');
 
-        const decoded = parseJwt(token);
-        if (!decoded?.username) throw new Error('Token inválido');
+    const decoded = parseJwt(token);
+    if (!decoded?.id_user) throw new Error('Token inválido');
 
-        const response = await fetch(
-          `http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}/verifica/${decoded.username}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+    const response = await fetch(
+      `http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}/users/verifica/${decoded.id_user}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
 
-        if (!response.ok) throw new Error(`Error ${response.status}`);
+    if (!response.ok) throw new Error(`Error ${response.status}`);
 
-        // El backend devuelve un ARRAY → tomamos el primer elemento
-        const data: UserProfile[] = await response.json();
-        if (!data.length) throw new Error('Usuario no encontrado');
+    const data: UserProfile = await response.json();
+    if (!data) throw new Error('Usuario no encontrado');
 
-        setUsuario(data[0]);
-      } catch (e) {
-        console.error('Error al cargar perfil:', e);
-        setError(e instanceof Error ? e.message : 'Error desconocido');
-      }
-    };
-
-    const comienzaEdicion = async () =>{
-    
-    }
+    setUsuario(data);
+  } catch (e) {
+    console.error('Error al cargar perfil:', e);
+    setError(e instanceof Error ? e.message : 'Error desconocido');
+  }
+};
 
     cargarPerfil();
   }, []);
@@ -61,7 +49,7 @@ const Perfil = () => {
   
 
   return (
-    <>{comienzaEdicion ? <EditorPerfil /> :
+    <>{comienzaEdicion ? <Navigate to="/editor-perfil" /> :
     <div className={styles.page}>
       <Nav />
 
@@ -73,12 +61,12 @@ const Perfil = () => {
 
         {/*<Avatar className={styles.avatarRoot}>*/}
                     <img
-            src={usuario?.foto_url}
-            alt={usuario?.nombre_usuario}
+            src={usuario?.urlPicture}
+            alt={usuario?.userName}
             className={styles.avatarRoot}
           />
         {/*  <AvatarFallback className="bg-[#1A202C] text-white">
-            {usuario?.nombre_usuario?.[0]?.toUpperCase() ?? '?'}
+            {usuario?.userName?.[0]?.toUpperCase() ?? '?'}
           </AvatarFallback>
         </Avatar> */}
             
@@ -91,7 +79,7 @@ const Perfil = () => {
               <div className={styles.fieldBox}>
                 <p className={styles.fieldLabel}>NOMBRE DE USUARIO</p>
                 <div className={styles.fieldRow}>
-                  <span className={styles.nameText}>{usuario.nombre_usuario}</span>
+                  <span className={styles.nameText}>{usuario.userName}</span>
                   <button className={styles.editButton} onClick={() => setComienzaEdicion(true)}>
                     Editar
                   </button>
@@ -100,6 +88,7 @@ const Perfil = () => {
 
               <div className={styles.fieldBox}>
                 <p className={styles.fieldLabel}>CORREO ELECTRÓNICO</p>
+                <span className={styles.emailText}>{usuario.email}</span>
                 {/*<div className={styles.fieldRow}>
                   <span className={styles.emailText}>{usuario.email}</span>
                   <button className={styles.changeButton}>Cambiar</button>
@@ -107,7 +96,7 @@ const Perfil = () => {
               </div>
 
             <Badge variant="secondary" className="rounded-lg px-3">
-              {usuario.rol}
+              Rol: <span className={styles.roleText}>{capitalize(usuario.rol)}</span>
             </Badge>
 
             </div>

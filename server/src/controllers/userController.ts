@@ -1,28 +1,26 @@
-//import connection from "../models/db.js";
-import connection from "../models/db.js";
 import { Request, Response } from 'express';
-import { RowDataPacket } from 'mysql2';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import enviarMailVerificador from '../service/mail.service.js';
 import parseJwt from '../utils/toke.utils.js';
+import prisma from "../database/prisma.js";
+import { EnumRol } from "../generated/prisma/browser.js";
 
 
 export const getUser = async (req: Request, res: Response) => {
-    const consult = 'SELECT * FROM usuario WHERE nombre_usuario = ?';
     try {
-        const [results] = await connection.query(consult, [req.params.username]);
-        const rows = results as RowDataPacket[];
-        if(rows.length > 0){
-            res.json(rows); // ← respondés al cliente
-        } else {
-            res.status(404).json({ error: 'Usuario no encontrado' });
-        }
-    } catch(e) {
-        console.log('Error en getUser:', e)
-        res.status(500).json({ error: e });
-    }
-}
+    const user = await prisma.user.findUnique({
+      where: { id_user: Number(req.params.id_user) }
+    });
+
+    if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
+
+    res.json(user); // ← objeto directo, sin array
+  } catch (e) {
+    console.error('Error en getUser:', e);
+    res.status(500).json({ error: 'Error interno' });
+  }
+};
 
 export const registerUser = async (req: Request, res: Response) => {
     const { username, email, password } = req.body;
@@ -33,12 +31,15 @@ export const registerUser = async (req: Request, res: Response) => {
  
     const hashedPassword = await bcrypt.hash(password, 10);
  
-    const consult = 'INSERT INTO usuario (nombre_usuario, email, password_hash, foto_url) VALUES (?, ?, ?, ?)';
+    const data = { userName: username, email: email, password_hash: hashedPassword, urlPicture: fotoUrl , rol: EnumRol.tecnico, status: false};
+
+    //const consult = 'INSERT INTO usuario (nombre_usuario, email, password_hash, foto_url) VALUES (?, ?, ?, ?)';
  
+
     try {
-        await connection.query(consult, [username, email, hashedPassword, fotoUrl]);
+        await prisma.user.create({ data });
  
-        const tokenVerificacion = jwt.sign({ username }, "Stack", { expiresIn: '24h' });
+        const tokenVerificacion = jwt.sign({ userName: username }, "Stack", { expiresIn: '24h' });
         await enviarMailVerificador(email, tokenVerificacion);
  
         res.json({ message: 'Usuario registrado exitosamente, valida tu cuenta a través del enlace enviado a tu correo electrónico' });
@@ -46,7 +47,7 @@ export const registerUser = async (req: Request, res: Response) => {
         console.log('Error en registerUser:', e);
         res.status(500).json({ error: 'Error al registrar usuario' });
     }
-};
+};  
 
 export const validaUser = async (req: Request, res: Response) => {
     const { token } = req.params;
@@ -54,12 +55,14 @@ export const validaUser = async (req: Request, res: Response) => {
     if (!dataToken) {
         return res.status(400).json({ error: 'Token inválido' });
     }
-    const { username } = dataToken;
-    const consult = 'UPDATE usuario SET activo = ? WHERE nombre_usuario = ?';
+    const { userName } = dataToken;
     try {
-        const [result]: any = await connection.query(consult, ['1', username]);
+        const rta= await prisma.user.update({
+            where:({userName: userName}),
+            data:({status: true})
+        })
 
-        if (result.affectedRows === 0) {
+        if (!rta) {
             return res.redirect('http://localhost:5173/login?error=Usuario no encontrado');
         }
         res.redirect('http://localhost:5173/login?success=Cuenta validada exitosamente. Ya puedes iniciar sesión.');
@@ -69,3 +72,31 @@ export const validaUser = async (req: Request, res: Response) => {
         res.redirect('http://localhost:5173/login?error=Error interno al validar la cuenta');
     }
 }
+
+
+export const modifyUser = async (req: Request, res: Response) => {
+  const fotoUrl = (req.file as any)?.path ?? null;
+
+  const data: any = {};
+  if (req.body.username) data.userName = req.body.username;
+  if (req.body.email)    data.email    = req.body.email;
+  if (fotoUrl)           data.urlPicture = fotoUrl;
+
+  if (Object.keys(data).length === 0) {
+    return res.status(400).json({ error: 'No hay datos para actualizar' });
+  }
+
+  try {
+    const rta = await prisma.user.update({
+      where: { id_user: Number(req.params.id_user) },
+      data
+    });
+    res.json({
+        user: rta,
+        success: 'Usuario modificado exitosamente'
+    });
+  } catch (e) {
+    console.error('Error en modifyUser:', e);
+    res.status(500).json({ error: 'Error al modificar usuario' });
+  }
+};

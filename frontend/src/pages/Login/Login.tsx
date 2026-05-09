@@ -19,7 +19,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const data = { username, password };
 
     try {
-        const response = await fetch(`http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}/login`, {
+        const response = await fetch(`http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}/auth/loginUser`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
@@ -78,7 +78,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
           <div className={styles.group}>
             <label htmlFor="password" className={styles.label}>Password:</label>
             <div className={styles.caja_password}>
-              <PasswordInput onChange={(e): void => setPassword(e.target.value)} value={password} required className={styles.input} />
+              <PasswordInput onChange={(e): void => setPassword(e.target.value)} value={password} required className={styles.input} placeholder="••••••••"/>
             </div>
           </div>
 

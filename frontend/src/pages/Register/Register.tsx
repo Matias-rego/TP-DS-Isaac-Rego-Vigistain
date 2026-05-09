@@ -4,6 +4,7 @@ import { useState } from "react";
 import Alert from "../../components/Alert/Alert";
 import AlertSuccess from "../../components/Alert/AlertSuccess";
 import CustomButton1 from "../../components/Buttons/Button1";
+import { PasswordInput } from "../../components/ui/PasswordInput";
 
 const Register = () => {
     const [username, setUsername]               = useState<string>('');
@@ -13,19 +14,19 @@ const Register = () => {
     const [foto, setFoto]                       = useState<File | null>(null);
     const [preview, setPreview]                 = useState<string | null>(null);
     const [error, setError]                     = useState<string | null>(null);
-    const [, setSuccess]                        = useState<string | null>(null);    const [isRegistered, setIsRegistered]       = useState<boolean>(false);
+    const [, setSuccess]                        = useState<string | null>(null);    
+    const [isRegistered, setIsRegistered]       = useState<boolean>(false);
+
 
     // Cuando el usuario elige una imagen, generamos preview local
     const handleFoto = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const archivo = e.target.files?.[0] ?? null;
-        setFoto(archivo);
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setPreview(URL.createObjectURL(file));
+    };
 
-        if (archivo) {
-            const url = URL.createObjectURL(archivo);
-            setPreview(url);
-        } else {
-            setPreview(null);
-        }
+    const removePhoto = () => {
+    setPreview(null);
     };
 
     const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -37,20 +38,20 @@ const Register = () => {
             return;
         }
 
-        // ⚠️ FormData en lugar de JSON porque enviamos un archivo
+        //  FormData en lugar de JSON porque enviamos un archivo
         const formData = new FormData();
         formData.append('username', username);
         formData.append('email', email);
         formData.append('password', password);
         if (foto) {
-            formData.append('foto', foto); // mismo nombre que upload.single('foto') en el back
+            formData.append('foto', foto); 
         }
 
         try {
-            const response = await fetch(`http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}/Register`, {
+            const response = await fetch(`http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}/auth/Register`, {
                 method: 'POST',
                 body: formData,
-                // ⚠️ Sin Content-Type — el browser lo setea solo con el boundary correcto
+                //  Sin Content-Type — el browser lo setea solo con el boundary correcto
             });
 
             const result = await response.json();
@@ -88,25 +89,32 @@ const Register = () => {
                     <form className={styles.form} onSubmit={handleRegister}>
 
                         {/* ── Foto de perfil ── */}
-                        <div className={styles.group}>
-                            <label className={styles.label}>Foto de perfil (opcional)</label>
+                            <div className={styles.group}>
+                                <label className={styles.label}>
+                                    Foto de perfil <span style={{ fontWeight: 400, color: '#9ca3af' }}>(opcional)</span>
+                                </label>
 
-                            {/* Preview si eligió imagen */}
-                            {preview && (
-                                <img
-                                    src={preview}
-                                    alt="Preview"
-                                    className={styles.preview}
+                                {preview ? (
+                                    <div className={styles.previewWrap}>
+                                    <img src={preview} alt="Preview foto de perfil" className={styles.preview} />
+                                    <button type="button" className={styles.removeBtn} onClick={removePhoto}>✕</button>
+                                    </div>
+                                ) : (
+                                    <label className={styles.dropZone} htmlFor="file-input">
+                                    <span className={styles.dropZoneIcon}>📷</span>
+                                    <span className={styles.dropZoneText}>Hacé clic o arrastrá una imagen</span>
+                                    <span className={styles.dropZoneHint}>JPG, PNG o WEBP · máx. 2 MB</span>
+                                    </label>
+                                )}
+
+                                <input
+                                    type="file"
+                                    id="file-input"
+                                    accept="image/jpeg,image/png,image/webp"
+                                    className={styles.fileInput}
+                                    onChange={handleFoto}
                                 />
-                            )}
-
-                            <input
-                                type="file"
-                                accept="image/jpeg,image/png,image/webp"
-                                className={styles.input}
-                                onChange={handleFoto}
-                            />
-                        </div>
+                            </div>
 
                         <div className={styles.group}>
                             <label htmlFor="username" className={styles.label}>Usuario</label>
@@ -134,26 +142,30 @@ const Register = () => {
 
                         <div className={styles.group}>
                             <label htmlFor="password" className={styles.label}>Contraseña</label>
-                            <input
-                                type="password"
-                                id="password"
-                                className={styles.input}
-                                placeholder="••••••••"
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                            />
+                            <div className={styles.caja_password}>
+                                <PasswordInput
+                                    id="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className={styles.input}
+                                    required
+                                    placeholder="••••••••"
+                                    />
+                            </div>
                         </div>
 
                         <div className={styles.group}>
                             <label htmlFor="confirmPassword" className={styles.label}>Confirmar Contraseña</label>
-                            <input
-                                type="password"
-                                id="confirmPassword"
-                                className={styles.input}
-                                placeholder="••••••••"
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                required
-                            />
+                            <div className={styles.caja_password}>
+                                <PasswordInput
+                                    id="confirmPassword"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    className={styles.input}
+                                    required
+                                    placeholder="••••••••"
+                                    />
+                            </div>
                         </div>
 
                         <button type="submit" className={styles.button}>Registrarse</button>

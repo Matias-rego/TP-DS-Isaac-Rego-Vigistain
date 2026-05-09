@@ -5,6 +5,14 @@ import Home from "../Home/Home";
 import Login from "../Login/Login";
 import Register from "../Register/Register";
 import Perfil from "../Perfil/Perfil";
+import EditorPerfil from "../EditorPerfil/EditorPerfil";
+import ForgotPassword from "@/components/Password/ForgotPasswor";
+import ResetPassword from "@/components/Password/ResetPassword";
+
+export const capitalize = (text: string): string => {
+  if (!text) return ""; // Validación por si viene vacío
+  return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+};
 
 export function parseJwt(token: string) {
   try {
@@ -56,6 +64,12 @@ const App = () => {
 
         <Route path="/home"   element={<RutaPrivada><Home /></RutaPrivada>} />
         <Route path="/perfil" element={<RutaPrivada><Perfil /></RutaPrivada>} />
+        <Route path="/editor-perfil" element={<RutaPrivada><EditorPerfil /></RutaPrivada>} />
+
+        <Route  path="/forgot-password"  element={<ForgotPassword />}/>
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
+        {/*<Route path="/reset-password/:token" element={<ResetPassword />} />*/}
+
 
         <Route path="*" element={<h1>404 - Página no encontrada</h1>} />
       </Routes>

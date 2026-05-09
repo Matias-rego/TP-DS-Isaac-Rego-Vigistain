@@ -1,9 +1,15 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
-
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
 :root {
   /* TechFix branding */
+  width: 100%;
+  min-height: 100vh;
   --color-primary: #1565C0;
   --color-primary-dark: #0D47A1;
   --color-primary-soft: #E3F2FD;
@@ -261,4 +267,7 @@ a {
   html {
     @apply font-sans;
   }
+}
+[data-radix-popper-content-wrapper] {
+  z-index: 99999 !important;
 }
