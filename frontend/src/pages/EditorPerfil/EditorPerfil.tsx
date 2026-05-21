@@ -56,7 +56,6 @@ const EditorPerfil = () =>{
           {
             method: 'PUT',
             body: formData,
-            // ← sin headers, el browser lo maneja solo
           }
         );
 
