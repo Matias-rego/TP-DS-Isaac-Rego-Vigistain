@@ -1,13 +1,13 @@
 import styles from './Nav.module.css';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { useNavigate } from 'react-router-dom';
 import { parseJwt } from '../App/App';
 import { useEffect, useState } from 'react';
-import  type {UserProfile}  from "../../types/types";
+import type { UserProfile } from '../../types/types';
 
 const Nav = () => {
   const [usuario, setUsuario] = useState<UserProfile | null>(null);
   const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
+  const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,93 +38,199 @@ const Nav = () => {
     cargarPerfil();
   }, []);
 
+  // Cierra el menú al redimensionar a desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) setMenuOpen(false);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Bloquea el scroll del body cuando el menú está abierto
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [menuOpen]);
+
   const confirmarLogout = () => {
     localStorage.removeItem('token');
     setShowLogoutModal(false);
     window.location.replace('/login');
   };
 
+  const handleNavClick = (path: string) => {
+    setMenuOpen(false);
+    navigate(path);
+  };
+
   return (
     <>
       <nav className={styles.navContainer}>
-        <div className={styles.logo}>
-          <span className={styles.logoMark}>TF</span>
-          <div className={styles.logoCopy}>
-            <span className={styles.logoText}>TechFix</span>
-            <span className={styles.logoSubtitle}>
-              Reparamos lo que te conecta
-            </span>
+        {/* Logo */}
+          <div className={styles.logo} onClick={() => navigate('/home')}
+>
+            <span className={styles.logoMark}>TF</span>
+            <div className={styles.logoCopy}>
+              <span className={styles.logoText}>TechFix</span>
+              <span className={styles.logoSubtitle}>Reparamos lo que te conecta</span>
+            </div>
           </div>
-        </div>
+
 
         <ul className={styles.navLinks}>
           <li>
-            <button
-              type="button"
-              className={styles.navButton}
-              onClick={() => navigate('/home')}
-            >
+            <button type="button" className={styles.navButton} onClick={() => navigate('/home')}>
               Inicio
             </button>
           </li>
-
           <li>
             <button
               type="button"
               className={styles.navButton}
-              onClick={() =>
-                alert('La sección Servicios todavía está en desarrollo.')
-              }
+              onClick={() => alert('La sección Servicios todavía está en desarrollo.')}
             >
               Servicios
             </button>
           </li>
-
           <li>
-            <button
-              type="button"
-              className={styles.navButton}
-              onClick={() =>
-                alert('La sección Proyectos todavía está en desarrollo.')
-              }
-            >
-              Proyectos
+            <button type="button" className={styles.navButton} onClick={() => navigate('/gestion')}>
+              Gestión
             </button>
           </li>
         </ul>
 
-            {/* Avatar del usuario MANUAL */}
-          <div className={styles.navActions}>
-            <button
-              type="button"
-              className={styles.logoutButton}
-              onClick={() => setShowLogoutModal(true)}
-            >
-              <span className={styles.logoutIcon}>⏻</span>
-              Cerrar sesión
-            </button>
+        {/* Acciones desktop */}
+        <div className={styles.navActions}>
+          <button
+            type="button"
+            className={styles.logoutButton}
+            onClick={() => setShowLogoutModal(true)}
+          >
+            <span className={styles.logoutIcon}>⏻</span>
+            Cerrar sesión
+          </button>
+          <img
+            src={usuario?.urlPicture}
+            alt={usuario?.userName}
+            className={styles.avatar}
+            onClick={() => navigate('/perfil')}
+          />
+        </div>
 
+
+        <div className={styles.mobileRight}>
+          <img
+            src={usuario?.urlPicture}
+            alt={usuario?.userName}
+            className={styles.avatarMobile}
+            onClick={() => navigate('/perfil')}
+          />
+          <button
+            type="button"
+            className={`${styles.hamburger} ${menuOpen ? styles.hamburgerOpen : ''}`}
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Abrir menú"
+            aria-expanded={menuOpen}
+          >
+            <span className={styles.bar} />
+            <span className={styles.bar} />
+            <span className={styles.bar} />
+          </button>
+        </div>
+      </nav>
+
+
+      {menuOpen && (
+        <div
+          className={styles.drawerOverlay}
+          onClick={() => setMenuOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+
+      <aside className={`${styles.drawer} ${menuOpen ? styles.drawerOpen : ''}`}>
+
+        <div className={styles.drawerHeader}>
+          <div className={styles.drawerUser}>
             <img
               src={usuario?.urlPicture}
               alt={usuario?.userName}
-              className={styles.avatar}
-              onClick={() => navigate('/perfil')}
+              className={styles.drawerAvatar}
             />
+            <div>
+              <p className={styles.drawerUserName}>{usuario?.userName ?? 'Usuario'}</p>
+              <p className={styles.drawerUserSub}>Mi cuenta</p>
+            </div>
           </div>
-      </nav>
+          <button
+            type="button"
+            className={styles.drawerClose}
+            onClick={() => setMenuOpen(false)}
+            aria-label="Cerrar menú"
+          >
+            ✕
+          </button>
+        </div>
 
+
+        <nav className={styles.drawerNav}>
+          <button
+            type="button"
+            className={styles.drawerLink}
+            onClick={() => handleNavClick('/home')}
+          >
+            <span className={styles.drawerLinkIcon}>🏠</span>
+            Inicio
+          </button>
+          <button
+            type="button"
+            className={styles.drawerLink}
+            onClick={() => { setMenuOpen(false); alert('La sección Servicios todavía está en desarrollo.'); }}
+          >
+            <span className={styles.drawerLinkIcon}>🔧</span>
+            Servicios
+          </button>
+          <button
+            type="button"
+            className={styles.drawerLink}
+            onClick={() => handleNavClick('/gestion')}
+          >
+            <span className={styles.drawerLinkIcon}>📋</span>
+            Gestión
+          </button>
+          <button
+            type="button"
+            className={styles.drawerLink}
+            onClick={() => handleNavClick('/perfil')}
+          >
+            <span className={styles.drawerLinkIcon}>👤</span>
+            Mi perfil
+          </button>
+        </nav>
+
+        <div className={styles.drawerFooter}>
+          <button
+            type="button"
+            className={styles.drawerLogout}
+            onClick={() => { setMenuOpen(false); setShowLogoutModal(true); }}
+          >
+            <span className={styles.logoutIcon}>⏻</span>
+            Cerrar sesión
+          </button>
+        </div>
+      </aside>
+
+      {/* Modal logout */}
       {showLogoutModal && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalCard}>
             <div className={styles.modalIcon}>⏻</div>
-
             <h2 className={styles.modalTitle}>¿Cerrar sesión?</h2>
-
             <p className={styles.modalText}>
-              Vas a salir de tu cuenta actual. Para volver a ingresar, tendrás
-              que iniciar sesión nuevamente.
+              Vas a salir de tu cuenta actual. Para volver a ingresar, tendrás que iniciar sesión nuevamente.
             </p>
-
             <div className={styles.modalActions}>
               <button
                 type="button"
@@ -133,7 +239,6 @@ const Nav = () => {
               >
                 Cancelar
               </button>
-
               <button
                 type="button"
                 className={styles.confirmButton}

@@ -1,6 +1,15 @@
+@import "tailwindcss";
 @import "tw-animate-css";
-@import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
+
+@source "../node_modules/embla-carousel";
+@source inline("{bg,text,border,ring,shadow}-{slate,zinc,neutral,stone,gray,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-{50,100,200,300,400,500,600,700,800,900,950}");
+@source inline("{p,px,py,pt,pb,pl,pr,m,mx,my,mt,mb,ml,mr}-{0,1,2,3,4,5,6,7,8,9,10,11,12,14,16,20,24,28,32}");
+@source inline("{w,h,max-w,min-w}-{full,screen,auto,fit,max,min,0,1,2,3,4,5,6,7,8,9,10,11,12,14,16,20,24,28,32,36,40,48,56,64,72,80,96}");
+@source inline("flex flex-col flex-row flex-wrap items-{start,end,center,baseline,stretch} justify-{start,end,center,between,around,evenly}");
+@source inline("rounded{,-sm,-md,-lg,-xl,-2xl,-full} border{,-t,-b,-l,-r} font-{thin,light,normal,medium,semibold,bold,extrabold,black}");
+@source inline("opacity-{0,5,10,20,25,30,40,50,60,70,75,80,90,95,100} shadow{,-sm,-md,-lg,-xl,-2xl} overflow-{hidden,auto,scroll,visible}");
+
 body {
   margin: 0;
   padding: 0;
@@ -8,29 +17,31 @@ body {
 }
 :root {
   /* TechFix branding */
-  width: 100%;
+  /* width: 100%; */
+  /* TechFix branding - renombradas para no chocar con Tailwind/shadcn */
   min-height: 100vh;
-  --color-primary: #1565C0;
-  --color-primary-dark: #0D47A1;
-  --color-primary-soft: #E3F2FD;
+  --tf-primary: #1565C0;        /* antes: --color-primary */
+  --tf-primary-dark: #0D47A1;   /* antes: --color-primary-dark */
+  --tf-primary-soft: #E3F2FD;   /* antes: --color-primary-soft */
 
-  --color-accent: #FFC107;
-  --color-accent-dark: #F9A825;
-  --color-accent-soft: #FFF8E1;
+  --tf-accent: #FFC107;         /* antes: --color-accent */
+  --tf-accent-dark: #F9A825;    /* antes: --color-accent-dark */
+  --tf-accent-soft: #FFF8E1;    /* antes: --color-accent-soft */
 
-  --color-white: #FFFFFF;
-  --color-bg: #F5F7FA;
-  --color-card: #FFFFFF;
+  --tf-white: #FFFFFF;          /* antes: --color-white */
+  --tf-bg: #F5F7FA;             /* antes: --color-bg */
+  --tf-card: #FFFFFF;           /* antes: --color-card */
 
-  --color-text: #1E293B;
-  --color-muted: #64748B;
-  --color-border: #E2E8F0;
+  --tf-text: #1E293B;           /* antes: --color-text */
+  --tf-muted: #64748B;          /* antes: --color-muted */
+  --tf-border: #E2E8F0;         /* antes: --color-border */
 
-  --color-success: #43A047;
-  --color-success-dark: #2E7D32;
-  --color-danger: #E53935;
-  --color-neutral: #9E9E9E;
+  --tf-success: #43A047;        /* antes: --color-success */
+  --tf-success-dark: #2E7D32;   /* antes: --color-success-dark */
+  --tf-danger: #E53935;         /* antes: --color-danger */
+  --tf-neutral: #9E9E9E;        /* antes: --color-neutral */
 
+  /* Estos no chocan, los podés dejar igual */
   --radius-sm: 8px;
   --radius-md: 14px;
   --radius-lg: 22px;
@@ -44,6 +55,10 @@ body {
 
   --transition-fast: 0.18s ease;
   --transition-normal: 0.25s ease;
+
+  /* shadcn — no tocar */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -270,4 +285,13 @@ a {
 }
 [data-radix-popper-content-wrapper] {
   z-index: 99999 !important;
+}
+[data-side="bottom-center"] {
+  bottom: 0 !important;
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+[data-side="bottom-center"] ~ * {
+  padding-bottom: 0 !important;
 }

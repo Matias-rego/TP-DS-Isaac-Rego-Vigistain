@@ -32,7 +32,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
             const token = jwt.sign(
                 { id_user: user.id_user },
                 process.env.JWT_SECRET ?? "Stack",
-                { expiresIn: '20m' }
+                { expiresIn: '1h' }
             );
 
             res.json({ token });
