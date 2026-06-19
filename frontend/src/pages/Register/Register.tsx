@@ -147,7 +147,7 @@ const Register = () => {
                                     id="password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className={styles.input}
+                                    className={password.length >=8 ? styles.input_green : styles.input_red}
                                     required
                                     placeholder="••••••••"
                                     />
@@ -161,7 +161,7 @@ const Register = () => {
                                     id="confirmPassword"
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
-                                    className={styles.input}
+                                    className={confirmPassword === password ? styles.input_green : styles.input_red}
                                     required
                                     placeholder="••••••••"
                                     />
