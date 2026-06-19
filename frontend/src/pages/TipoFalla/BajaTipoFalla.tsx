@@ -1,138 +1,60 @@
-import { useEffect, useState } from 'react';
-import useDebounce from '@/components/useDebounce';
-import styles from './TipoFalla.module.css';
+import BajaForm from "./../CRUDS/Baja/BajaForm";
+import type { DetailFieldConfig } from "./../CRUDS/Baja/BajaForm";
+import { EVENTS } from '../../lib/eventBus';
 
 interface FailureType {
-    id_failure_type: number;
-    failureDescription: string;
-    estimatedImport: number;
+  id_failure_type: number;
+  failureDescription: string;
+  estimatedImport: number;
 }
 
-const BajaTipoFalla = () => {
-    const [query, setQuery] = useState('');
-    const deboncedQuery = useDebounce(query, 800);
-    const [res, setResult] = useState<FailureType[]>([]);
-    const [selected, setSelected] = useState<FailureType | null>(null); // 👈
-    const [deleted, setDeleted] = useState(false); // 👈 feedback post-eliminacion
+const FIELDS: DetailFieldConfig[] = [
+  {
+    name: 'failureDescription',
+    label: 'Descripción',
+  },
+  {
+    name: 'estimatedImport',
+    label: 'Importe Estimado',
+    format: (value) => `$${Number(value).toLocaleString('es-AR')}`,
+  },
+];
 
-    useEffect(() => {
-        if (!deboncedQuery) {
-            setResult([]);
-            return;
-        }
-        const obtenResult = async () => {
-            try {
-                const result = await fetch(
-                    `http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}/failures/getPartialTypes/${deboncedQuery}`,
-                    { method: 'GET' }
-                );
-                if (result.status === 404) {
-                    setResult([]);
-                    return;
-                }
-                const data = await result.json();
-                setResult(data);
-            } catch (e) {
-                console.error(e);
-            }
-        }
-        obtenResult();
-    }, [deboncedQuery]);
+const ICON = (
+  <svg
+    width="22"
+    height="22"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <circle cx="11" cy="11" r="8" />
+    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+  </svg>
+);
 
-    const handleSelect = (item: FailureType) => {
-        setSelected(item);
-        setDeleted(false);
-    };
-
-    const handleDelete = async () => {
-        if (!selected) return;
-        try {
-            const token = localStorage.getItem('token');
-            const result = await fetch(
-                `http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}/failures/deleteType/${selected.id_failure_type}`,
-                {
-                    method: 'DELETE',
-                    headers: { Authorization: `Bearer ${token}` },
-                }
-            );
-            if (!result.ok) throw new Error('Error al eliminar');
-
-            // Sacar el eliminado de la lista y limpiar seleccion
-            setResult(prev => prev.filter(r => r.id_failure_type !== selected.id_failure_type));
-            setSelected(null);
-            setDeleted(true);
-        } catch (e) {
-            console.error(e);
-        }
-    };
-
-    return (
-        <div style={{ width: '100%' }} className={styles.bajaTipoFallaWrapper}>
-
-            {/* Input de busqueda */}
-            <div className={styles.searchWrapper} style={{ width: '100%' }}>
-                <input
-                    className={styles.searchInput}
-                    type="text"
-                    placeholder='Buscar tipo de falla...'
-                    value={query}
-                    onChange={e => {
-                        setQuery(e.target.value);
-                        setSelected(null); // limpia seleccion al escribir de nuevo
-                        setDeleted(false);
-                    }}
-                />
-            </div>
-
-            {/* Lista de resultados */}
-            {res.length > 0 && !selected && (
-                <ul className={styles.resultsList}>
-                    {res.map((r: FailureType) => (
-                        <li
-                            key={r.id_failure_type}
-                            className={styles.resultItem}
-                            onClick={() => handleSelect(r)} // 👈
-                        >
-                            <span className={styles.resultId}>#{r.id_failure_type}</span>
-                            <span className={styles.resultDesc}>{r.failureDescription}</span>
-                        </li>
-                    ))}
-                </ul>
-            )}
-
-            {/* Detalle del seleccionado */}
-            {selected && (
-                <div className={styles.detailCard}>
-                    <div className={styles.detailHeader}>
-                        <span className={styles.resultId}>#{selected.id_failure_type}</span>
-                        <button
-                            className={styles.backButton}
-                            onClick={() => setSelected(null)}
-                        >
-                            ← Volver
-                        </button>
-                    </div>
-                    <div className={styles.detailRow}>
-                        <span className={styles.detailLabel}>Descripción</span>
-                        <span className={styles.detailValue}>{selected.failureDescription}</span>
-                    </div>
-                    <div className={styles.detailRow}>
-                        <span className={styles.detailLabel}>Costo estimado</span>
-                        <span className={styles.detailValue}>${selected.estimatedImport.toLocaleString('es-AR')}</span>
-                    </div>
-                    <button className={styles.deleteButton} onClick={handleDelete}>
-                        Eliminar tipo de falla
-                    </button>
-                </div>
-            )}
-
-            {/* Feedback eliminacion */}
-            {deleted && (
-                <p className={styles.successMsg}>✓ Tipo de falla eliminado correctamente.</p>
-            )}
-
-        </div>
-    );
+interface BajaTipoFallaProps {
+  onSuccess?: () => void;
 }
 
-export default BajaTipoFalla;
+export default function BajaTipoFalla({ onSuccess }: BajaTipoFallaProps) {
+  return (
+    <BajaForm<FailureType>
+      title="Eliminar Tipo de Falla"
+      subtitle="Buscá el tipo de falla que querés eliminar"
+      searchPlaceholder="Busca tu falla por descripción..."
+      searchEndpoint="/failures/getPartialTypes"
+      deleteEndpoint="/failures/deleteType"
+      entityEvent={EVENTS.failureTypeChanged}
+      successMessage="Tipo de falla eliminado correctamente."
+      icon={ICON}
+      detailFields={FIELDS}
+      idField="id_failure_type"
+      previewField="failureDescription"
+      onSuccess={onSuccess}
+    />
+  );
+}

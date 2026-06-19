@@ -4,7 +4,7 @@ import { empty } from '@prisma/client/runtime/library';
 
 export const getPartialTypes = async (req: Request, res: Response) => {
     try {
-        console.log('Query recibida:', req.params.query); 
+        //console.log('Query recibida:', req.params.query); 
 
         const result = await prisma.failure_Type.findMany({
             where: {
@@ -24,7 +24,7 @@ export const getPartialTypes = async (req: Request, res: Response) => {
 };
 export const createTypeFail = async (req:Request, res:Response) => {
     try{
-        console.log('Data recibida:', req.body);
+        //console.log('Data recibida:', req.body);
         const { failureDescription, estimatedImport } = req.body;
         const newTypeFailure = await prisma.failure_Type.create({      
             data: {
@@ -52,16 +52,32 @@ export const getAllTypes = async (req: Request, res: Response) => {
         return res.status(500).json({ message: 'Error al obtener los tipos de falla' });
     }
 }
-export const deleteType = async (req:Request, res:Response) => {
-    try{
-        const result = await prisma.failure_Type.delete({
-            where: {id_failure_type : Number(req.params.id)}
-        })
+export const deleteType = async (req: Request, res: Response) => {
+    try {
+        const id = Number(req.params.id);
+ 
+        // 1. Verificar si hay fallas usando este tipo
+        const failuresUsingType = await prisma.failure.count({
+            where: { id_failure_type: id }
+        });
+ 
+        if (failuresUsingType > 0) {
+            return res.status(409).json({
+                message: `No se puede eliminar: hay ${failuresUsingType} falla(s) registrada(s) con este tipo.`
+            });
+        }
+ 
+        // 2. Si no hay dependencias, eliminar
+        await prisma.failure_Type.delete({
+            where: { id_failure_type: id }
+        });
+ 
         return res.status(200).json({ message: 'Tipo de falla eliminado correctamente' });
-    }catch(e){
+ 
+    } catch (e) {
         return res.status(500).json({ message: 'Error al eliminar un tipo de falla' });
     }
-} 
+}
 export const modifyType = async (req:Request, res:Response) => {
     const data: any = {};
     if (req.body.failureDescription) data.failureDescription = req.body.failureDescription;

@@ -21,16 +21,18 @@ interface FailureType {
 
 interface TableRtlProps {
   data: FailureType[];
+  showTotal: boolean;
+  object: "Tipo Falla" | "Tipo Cliente";
 }
 
-function TableRtl({ data }: TableRtlProps) {
+function TableRtl({ data, showTotal, object }: TableRtlProps) {
   const total = data.reduce((acc, item) => acc + item.estimatedImport, 0);
 
   return (
     <div className={styles.tableContainer}>
       <Table className={styles.table}>
         <TableCaption className={styles.caption}>
-          Lista de tipos de falla registrados.
+          Lista de tipos de {object} registrados.
         </TableCaption>
         <TableHeader className={styles.header}>
           <TableRow className={styles.headerRow}>
@@ -43,7 +45,7 @@ function TableRtl({ data }: TableRtlProps) {
           {data.length === 0 ? (
             <TableRow>
               <TableCell colSpan={3} className={styles.cell} style={{ textAlign: "center" }}>
-                No hay tipos de falla para mostrar.
+                No hay tipos de {object} para mostrar.
               </TableCell>
             </TableRow>
           ) : (
@@ -56,6 +58,7 @@ function TableRtl({ data }: TableRtlProps) {
             ))
           )}
         </TableBody>
+        {showTotal && (
         <TableFooter className={styles.footer}>
           <TableRow className={styles.footerRow}>
             <TableCell colSpan={2} className={styles.footerCell}>Total</TableCell>
@@ -64,6 +67,7 @@ function TableRtl({ data }: TableRtlProps) {
             </TableCell>
           </TableRow>
         </TableFooter>
+        )}
       </Table>
     </div>
   )
