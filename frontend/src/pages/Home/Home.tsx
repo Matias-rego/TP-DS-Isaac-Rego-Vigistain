@@ -3,6 +3,7 @@ import Nav from "../Nav/Nav";
 import { parseJwt } from "../App/App";
 import styles from "./Home.module.css";
 import  type {UserProfile}  from "../../types/types";
+import Footer from "./../../components/Footer/Footer";
 
 const Home = () => {
   const [usuario, setUsuario] = useState<UserProfile | null>(null);
@@ -265,6 +266,7 @@ const [toastSaliendo, setToastSaliendo] = useState<boolean>(false);
         */}
 
       </main>
+      <Footer />
     </div>
   );
 };

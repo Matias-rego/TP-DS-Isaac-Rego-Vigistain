@@ -6,6 +6,15 @@ import { Navigate } from 'react-router-dom';
 import  { Badge } from '@/components/ui/badge';
 import styles from './Perfil.module.css';
 import  type {UserProfile}  from "../../types/types"; 
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 
 
 
@@ -107,24 +116,23 @@ const Perfil = () => {
         <div className={styles.sectionWrapper}>
             <h2 className={styles.sectionTitle}>...Tarjetas...</h2>
         </div>
+      
+      <Card className={styles.cardBodyPerfil}>
+        <CardHeader>
+          <CardTitle>Card Title</CardTitle>
+          <CardDescription>Card Description</CardDescription>
+          <CardAction>Card Action</CardAction>
+        </CardHeader>
+        <CardContent>
+          <p>Card Content</p>
+        </CardContent>
+        <CardFooter>
+          <p>Card Footer</p>
+        </CardFooter>
+      </Card>
 
       </div>
-          {/* Forma para usar la tarjeta de Reparaciones,
-        <Tarjeta
-        titulo="Cantidad de reparaciones"
-        subtitulo="Toyota Corolla — ABC 123"
-        estado="reparado"
-        footerLabel="Finalizado"
-        footerValue="12 may 2025"
-        onClick={() => navigate('/detalle/123')}
-        />*/}
-    {/* Forma para usar la tarjeta métrica,
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px' }}>
-        <TarjetaMetrica label="Reparaciones totales" valor={10} />
-        <TarjetaMetrica label="Pendientes"           valor={3}  sub="Esta semana" />
-        <TarjetaMetrica label="Tiempo promedio"       valor="2.4" sub="días por servicio" />
-        <TarjetaMetrica label="Facturado"             valor="$148k" sub="Este mes" />
-        </div> */}
+
     </div>
 }</>
   );

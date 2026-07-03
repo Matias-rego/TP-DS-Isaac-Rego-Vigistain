@@ -4,6 +4,7 @@ import routes from './api/endPoints.js';
 import dotenv from 'dotenv';
 import userRoutes from './api/routes/user.routes.js'; 
 import authRoutes from './api/routes/auth.routes.js';
+import failRoutes from './api/routes/fail.routes.js'
 dotenv.config();
 
 const app = express();
@@ -20,6 +21,7 @@ app.use(express.urlencoded({ extended: true })); // ← necesario para leer el b
 app.use('/', routes);
 app.use('/users', userRoutes);
 app.use('/auth', authRoutes); 
+app.use('/failures', failRoutes)
 
 
 app.listen(port, () => {
