@@ -27,11 +27,21 @@ export const registerUser = async (req: Request, res: Response) => {
  
     // Si el usuario subió foto, multer ya la mandó a Cloudinary y dejó la URL en req.file.path
     // Si no subió nada, req.file es undefined → guardamos null
-    const fotoUrl = (req.file as any)?.path ?? null;
+    const fotoUrl = (req.file as any)?.path;
  
     const hashedPassword = await bcrypt.hash(password, 10);
  
-    const data = { userName: username, email: email, password_hash: hashedPassword, urlPicture: fotoUrl , rol: EnumRol.tecnico, status: false};
+    const data: any = {
+        userName: username,
+        email: email,
+        password_hash: hashedPassword,
+        rol: EnumRol.tecnico,
+        status: false,
+    };
+
+    if (fotoUrl) {
+        data.urlPicture = fotoUrl;
+    }
 
     //const consult = 'INSERT INTO usuario (nombre_usuario, email, password_hash, foto_url) VALUES (?, ?, ?, ?)';
  

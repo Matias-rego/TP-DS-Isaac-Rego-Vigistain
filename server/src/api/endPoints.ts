@@ -10,6 +10,10 @@ const router = express.Router();
 
 router.get('/verifica/:username', getUser);
 
+router.get('/status', (_req, res) => {
+    res.send('ok');
+});
+
 router.post('/Login', loginUser);
 
 router.post('/Register', upload.single('foto'), registerUser);

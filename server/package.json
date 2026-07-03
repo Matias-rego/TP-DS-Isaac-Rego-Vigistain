@@ -7,8 +7,8 @@
   "type": "module",
   "main": "src/index.ts",
   "scripts": {
-    "dev": "npx tsx watch --env-file=.env src/index.ts",
-    "dev:docker": "npx tsx watch src/index.ts",
+    "dev": "pnpx tsx watch --env-file=.env src/index.ts",
+    "dev:docker": "pnpx tsx watch src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {

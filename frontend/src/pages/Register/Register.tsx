@@ -14,7 +14,7 @@ const Register = () => {
     const [foto, setFoto]                       = useState<File | null>(null);
     const [preview, setPreview]                 = useState<string | null>(null);
     const [error, setError]                     = useState<string | null>(null);
-    const [, setSuccess]                        = useState<string | null>(null);    
+    const [success, setSuccess]                 = useState<string | null>(null);    
     const [isRegistered, setIsRegistered]       = useState<boolean>(false);
 
 
@@ -22,11 +22,13 @@ const Register = () => {
     const handleFoto = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
+        setFoto(file);
         setPreview(URL.createObjectURL(file));
     };
 
     const removePhoto = () => {
-    setPreview(null);
+        setFoto(null);
+        setPreview(null);
     };
 
     const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -85,6 +87,7 @@ const Register = () => {
                     <p className={styles.subtitle}>Regístrate para gestionar el taller</p>
 
                     {error && <Alert message={error} />}
+                    {success && <AlertSuccess message={success} />}
 
                     <form className={styles.form} onSubmit={handleRegister}>
 
