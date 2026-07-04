@@ -121,11 +121,12 @@ classDiagram
     - monto: DECIMAL[10,2]
   }
 
-  class Tipo_Pago {
-    - id_tipo_pago: int PK AI
-    - pteDescuento: DECIMAL[5,2]
-    - pteRecargo: DECIMAL[5,2]
-    - medioPago: ENUM****
+  class Payment_Type {
+    - id_payment_type: int PK AI
+    - paymentTypeName: VARCHAR[100]
+    - paymentMethod: ENUM****
+    - type_of_payment: ENUM*****
+    - percentaje: DECIMAL[5,2]
   }
 
   class Usuario {
@@ -155,6 +156,7 @@ classDiagram
   note for Orden "ENUM**: ('recibido','diagnostico','presupuestado','aprobado','reparacion','listo','entregado','cancelado')"
   note for Presupuesto "ENUM***: ('pendiente','aprobado','rechazado')"
   note for Tipo_Pago "ENUM****: ('DEBITO','MP','EFECTIVO','CREDITO')"
+  note for Payment_Type "ENUM*****: ('Descuento', 'Recargo')"
 ```
 
 ## Alcance Funcional
