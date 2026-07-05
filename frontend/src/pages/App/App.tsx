@@ -9,6 +9,7 @@ import EditorPerfil from "../EditorPerfil/EditorPerfil";
 import ForgotPassword from "@/components/Password/ForgotPasswor";
 import ResetPassword from "@/components/Password/ResetPassword";
 import Gestion from "../Gestion/Gestion";
+import Clientes from "../Clientes/Clientes";
 
 export const capitalize = (text: string): string => {
   if (!text) return ""; // Validación por si viene vacío
@@ -67,6 +68,7 @@ const App = () => {
         <Route path="/perfil" element={<RutaPrivada><Perfil /></RutaPrivada>} />
         <Route path="/editor-perfil" element={<RutaPrivada><EditorPerfil /></RutaPrivada>} />
         <Route path="/gestion" element={<RutaPrivada><Gestion /></RutaPrivada>} />
+        <Route path="/clientes" element={<RutaPrivada><Clientes /></RutaPrivada>} />
 
         <Route  path="/forgot-password"  element={<ForgotPassword />}/>
         <Route path="/reset-password/:token" element={<ResetPassword />} />

@@ -5,6 +5,8 @@ import dotenv from 'dotenv';
 import userRoutes from './api/routes/user.routes.js'; 
 import authRoutes from './api/routes/auth.routes.js';
 import failRoutes from './api/routes/fail.routes.js'
+import paymentsRoutes from './api/routes/payment.routes.js';
+import clientRoutes from './api/routes/client.routes.js';
 dotenv.config();
 
 const app = express();
@@ -22,6 +24,8 @@ app.use('/', routes);
 app.use('/users', userRoutes);
 app.use('/auth', authRoutes); 
 app.use('/failures', failRoutes)
+app.use('/clients', clientRoutes);
+app.use('/payments', paymentsRoutes); 
 
 
 app.listen(port, () => {

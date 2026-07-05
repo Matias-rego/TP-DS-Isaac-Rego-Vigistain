@@ -98,6 +98,11 @@ const Nav = () => {
               Gestión
             </button>
           </li>
+          <li>
+            <button type="button" className={styles.navButton} onClick={() => navigate('/clientes')}>
+              Clientes
+            </button>
+          </li>
         </ul>
 
         {/* Acciones desktop */}
@@ -203,11 +208,20 @@ const Nav = () => {
           <button
             type="button"
             className={styles.drawerLink}
+            onClick={() => handleNavClick('/clientes')}
+          >
+            <span className={styles.drawerLinkIcon}>👥</span>
+            Clientes
+          </button>
+          <button
+            type="button"
+            className={styles.drawerLink}
             onClick={() => handleNavClick('/perfil')}
           >
             <span className={styles.drawerLinkIcon}>👤</span>
             Mi perfil
           </button>
+
         </nav>
 
         <div className={styles.drawerFooter}>
