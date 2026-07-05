@@ -2,9 +2,15 @@ import { useState } from 'react';
 import { eventBus } from './../../../lib/eventBus';
 import styles from './AltaForm.module.css';
 
+
 // ─── Field config ────────────────────────────────────────────────────────────
 
-export type FieldType = 'text' | 'email' | 'number' | 'tel' | 'password';
+export type FieldType = 'text' | 'email' | 'number' | 'tel' | 'password' | 'select';
+
+export interface SelectOption {
+  value: string;
+  label: string;
+}
 
 export interface FieldConfig {
   name: string;
@@ -17,6 +23,7 @@ export interface FieldConfig {
   step?: number;
   minLength?: number;
   maxLength?: number;
+  options?: SelectOption[];
   validate?: (value: string) => string | undefined; 
 }
 
@@ -150,7 +157,7 @@ export default function AltaForm({
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     if (errors[name]) {
@@ -267,38 +274,54 @@ export default function AltaForm({
                 {field.required && <span className={styles.required}>*</span>}
               </label>
 
-              {field.prefix ? (
-                <div className={styles.inputWrapper}>
-                  <span className={styles.prefix}>{field.prefix}</span>
-                  <input
-                    id={field.name}
-                    name={field.name}
-                    type={field.type ?? 'text'}
-                    min={field.min}
-                    step={field.step}
-                    className={`${styles.input} ${styles.inputWithPrefix}`}
-                    placeholder={field.placeholder ?? ''}
-                    value={formData[field.name]}
-                    onChange={handleChange}
-                    disabled={loading}
-                    autoComplete="off"
-                  />
-                </div>
-              ) : (
+            {field.type === 'select' ? (
+              <select
+                id={field.name}
+                name={field.name}
+                className={styles.input}
+                value={formData[field.name]}
+                onChange={handleChange}
+                disabled={loading}
+              >
+                <option value="">{field.placeholder ?? 'Seleccioná una opción...'}</option>
+                {field.options?.map(opt => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            ) : field.prefix ? (
+              <div className={styles.inputWrapper}>
+                <span className={styles.prefix}>{field.prefix}</span>
                 <input
                   id={field.name}
                   name={field.name}
                   type={field.type ?? 'text'}
                   min={field.min}
                   step={field.step}
-                  className={styles.input}
+                  className={`${styles.input} ${styles.inputWithPrefix}`}
                   placeholder={field.placeholder ?? ''}
                   value={formData[field.name]}
                   onChange={handleChange}
                   disabled={loading}
                   autoComplete="off"
                 />
-              )}
+              </div>
+            ) : (
+              <input
+                id={field.name}
+                name={field.name}
+                type={field.type ?? 'text'}
+                min={field.min}
+                step={field.step}
+                className={styles.input}
+                placeholder={field.placeholder ?? ''}
+                value={formData[field.name]}
+                onChange={handleChange}
+                disabled={loading}
+                autoComplete="off"
+              />
+            )}
 
               {errors[field.name] && (
                 <span className={styles.errorMsg}>{errors[field.name]}</span>

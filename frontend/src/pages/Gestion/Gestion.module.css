@@ -95,3 +95,12 @@
 .buttonGestion{
   background-color: aqua;
 }
+.nextButton{
+  display: none;
+}
+@media (min-width:768px){
+  .nextButton{
+    display: block;
+  }
+}
+

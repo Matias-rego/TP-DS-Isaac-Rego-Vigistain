@@ -19,5 +19,4 @@ const CustomButton1 = ({ text, onClick, type = "button", disabled }: Props) => {
     </button>
   );
 };
-
 export default CustomButton1;

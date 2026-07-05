@@ -1,45 +1,23 @@
 import AltaForm from './../CRUDS/Alta/AltaForm';
 import type { FieldConfig } from './../CRUDS/Alta/AltaForm';
+import { EVENTS } from '../../lib/eventBus';
 
 // Ajustá los campos que necesites para tu entidad Client
 const FIELDS: FieldConfig[] = [
   {
-    name: 'clientName',
-    label: 'Nombre / Razón Social',
+    name: 'categoryClientName',
+    label: 'Nombre/Descripcion',
     type: 'text',
-    placeholder: 'Ej: Juan Pérez o Mi Empresa S.A.',
+    placeholder: 'Ej: Normal, Premium...',
     required: true,
     minLength: 2,
   },
   {
-    name: 'email',
-    label: 'Email',
-    type: 'email',
-    placeholder: 'Ej: cliente@email.com',
+    name: 'amountForCategoryUp',
+    label: 'Cantidad de ordenes para subir a esta categoria:',
+    type: 'number',
+    placeholder: '1, 5, 10...',
     required: true,
-  },
-  {
-    name: 'phone',
-    label: 'Teléfono',
-    type: 'tel',
-    placeholder: 'Ej: +54 341 4000000',
-    required: false,
-  },
-  {
-    name: 'taxId',
-    label: 'CUIT / DNI',
-    type: 'text',
-    placeholder: 'Ej: 20-12345678-9',
-    required: false,
-    minLength: 7,
-    maxLength: 13,
-  },
-  {
-    name: 'address',
-    label: 'Dirección',
-    type: 'text',
-    placeholder: 'Ej: Av. Pellegrini 1234, Rosario',
-    required: false,
   },
 ];
 
@@ -50,21 +28,23 @@ const ICON = (
   </svg>
 );
 
-interface AltaClienteProps {
+interface AltaCategoryClientProps {
   onSuccess?: () => void;
 }
 
-export default function AltaCliente({ onSuccess }: AltaClienteProps) {
+export default function AltaCategoryClient({ onSuccess }: AltaCategoryClientProps) {
   return (
     <AltaForm
-      title="Nuevo Cliente"
-      subtitle="Completá los datos para registrar el cliente"
+      title="Nueva Categoria de Cliente"
+      subtitle="Completá los datos para registrar la Categoria de cliente"
       icon={ICON}
       fields={FIELDS}
-      endpoint="/clients/createClient"
-      submitLabel="Crear Cliente"
-      successMessage="Cliente creado correctamente."
+      endpoint="/clients/createCategoryClient"
+      submitLabel="Crear Categoria de Cliente"
+      successMessage="Categoria Cliente creada correctamente."
+      entityEvent={EVENTS.clientCategoryChanged}  
       onSuccess={onSuccess}
+      
     />
   );
 }

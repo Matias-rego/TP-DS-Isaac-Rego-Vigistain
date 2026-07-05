@@ -224,23 +224,41 @@ export default function ModForm<T extends object>({
             </button>
           </div>
 
-          {fields.map(field => (
-            <div className={styles.detailRow} key={field.name}>
-              <label className={styles.detailLabel} htmlFor={field.name}>
-                {field.label}
-              </label>
-              <input
-                id={field.name}
-                type={field.type ?? 'text'}
-                className={styles.input}
-                min={field.min}
-                step={field.step}
-                value={String((selected as Record<string, unknown>)[field.name] ?? '')}
-                onChange={e => handleFieldChange(field, e.target.value)}
-                disabled={saving}
-              />
-            </div>
-          ))}
+      {fields.map((field: FieldConfig) => (
+        <div className={styles.detailRow} key={field.name}>
+          <label className={styles.detailLabel} htmlFor={field.name}>
+            {field.label}
+          </label>
+
+          {field.type === 'select' ? (
+            <select
+              id={field.name}
+              className={styles.input}
+              value={String((selected as Record<string, unknown>)[field.name] ?? '')}
+              onChange={e => handleFieldChange(field, e.target.value)}
+              disabled={saving}
+            >
+              <option value="">{field.placeholder ?? 'Seleccioná una opción...'}</option>
+              {field.options?.map(opt => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <input
+              id={field.name}
+              type={field.type ?? 'text'}
+              className={styles.input}
+              min={field.min}
+              step={field.step}
+              value={String((selected as Record<string, unknown>)[field.name] ?? '')}
+              onChange={e => handleFieldChange(field, e.target.value)}
+              disabled={saving}
+            />
+          )}
+        </div>
+      ))}
 
           <div className={styles.actions}>
             <button className={styles.cancelButton} onClick={() => setSelected(null)} disabled={saving}>
