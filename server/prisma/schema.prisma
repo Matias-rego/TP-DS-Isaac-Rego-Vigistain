@@ -49,6 +49,10 @@ enum EnumPaymentMethod {
   EFECTIVO
   CREDITO
 }
+enum EnumPaymentType {
+  Descuento
+  Recargo
+}
 
 enum EnumFailureStatus {
   resuelta
@@ -86,7 +90,7 @@ model Client {
 model Category_Client {
   id_category_client    Int     @id @default(autoincrement())
   categoryClientName    String  @unique
-  amountForCategoryUp   String
+  amountForCategoryUp   Int
   clients               Client[]
 }
 
@@ -157,9 +161,10 @@ model Budget {
 }
 model Payment_Type {
   id_payment_type  Int               @id @default(autoincrement())
-  discountRate     Float             @default(0)
-  surchargeRate    Float             @default(0)
-  paymentMethod   EnumPaymentMethod @unique
+  paymentTypeName String            @unique
+  paymentMethod   EnumPaymentMethod 
+  type_of_payment EnumPaymentType  
+  percentaje     Float             @default(0)
   payments        Payment[]
 }
 

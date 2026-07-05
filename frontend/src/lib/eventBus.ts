@@ -38,6 +38,8 @@ export const eventBus = new EventBus();
 
 export const EVENTS = {
   clientChanged: 'client:changed',
+  clientCategoryChanged: 'clientCategory:changed',
+  paymentTypeChanged: 'paymentType:changed',
   failureTypeChanged: 'failureType:changed',
   failureTypeDeleted: 'failureType:deleted',
   // agregá acá nuevas entidades a medida que las necesites
