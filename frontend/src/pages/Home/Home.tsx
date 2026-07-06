@@ -4,6 +4,7 @@ import { parseJwt } from "../App/App";
 import styles from "./Home.module.css";
 import  type {UserProfile}  from "../../types/types";
 import Footer from "./../../components/Footer/Footer";
+import { BACKEND_URL } from '@/lib/config';
 
 const Home = () => {
   const [usuario, setUsuario] = useState<UserProfile | null>(null);
@@ -23,10 +24,8 @@ const [toastSaliendo, setToastSaliendo] = useState<boolean>(false);
         const decoded = parseJwt(token);
         if (!decoded?.id_user) return;
 
-        const response = await fetch(
-          `http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}/users/verifica/${decoded.id_user}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        const response = await fetch(`${BACKEND_URL}/users/verifica/${decoded.id_user}`, 
+        { headers: { Authorization: `Bearer ${token}` } });
 
         if (!response.ok) return;
 

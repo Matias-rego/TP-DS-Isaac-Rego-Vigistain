@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import useDebounce from '@/components/useDebounce';
+import { BACKEND_URL } from '@/lib/config';
 import styles from './SearchBar.module.css';
 
 // ─── Filter config ────────────────────────────────────────────────────────────
@@ -54,7 +55,7 @@ export default function SearchBar({
 
   const debouncedQuery = useDebounce(query, debounceMs);
 
-  const baseUrl = `http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}`;
+  const baseUrl = BACKEND_URL;
 
   // Cerrar dropdown al clickear afuera
   useEffect(() => {

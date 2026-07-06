@@ -10,11 +10,10 @@ import clientRoutes from './api/routes/client.routes.js';
 dotenv.config();
 
 const app = express();
-const port = 3000;
 
 app.use(cors(
     {
-        origin: `http://${process.env.FRONTEND_HOST}:${process.env.FRONTEND_PORT}`,
+        origin: process.env.FRONTEND_URL,
         methods: ['GET', 'PUT', 'POST', 'PATCH', 'DELETE'], // Métodos permitidos
     }
 ));        // ← sin {} adentro si no pasás opciones
@@ -28,6 +27,6 @@ app.use('/clients', clientRoutes);
 app.use('/payments', paymentsRoutes); 
 
 
-app.listen(port, () => {
-    console.log(`Servidor corriendo en http://techtix.rego.net.ar:${port}`);
+app.listen(process.env.PORT, () => {
+    console.log(`Servidor corriendo en http://techtix.rego.net.ar:${process.env.PORT}`);
 });

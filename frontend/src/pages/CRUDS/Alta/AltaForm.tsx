@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { eventBus } from './../../../lib/eventBus';
+import { BACKEND_URL } from '@/lib/config';
 import styles from './AltaForm.module.css';
 
 
@@ -18,13 +19,13 @@ export interface FieldConfig {
   type?: FieldType;
   placeholder?: string;
   required?: boolean;
-  prefix?: string;          
+  prefix?: string;
   min?: number;
   step?: number;
   minLength?: number;
   maxLength?: number;
   options?: SelectOption[];
-  validate?: (value: string) => string | undefined; 
+  validate?: (value: string) => string | undefined;
 }
 
 
@@ -33,7 +34,7 @@ export interface AltaFormProps {
   title: string;
   subtitle?: string;
   icon?: React.ReactNode;
-  fields: FieldConfig[];  
+  fields: FieldConfig[];
   endpoint: string;
   method?: 'POST' | 'PUT' | 'PATCH';
   submitLabel?: string;
@@ -184,7 +185,7 @@ export default function AltaForm({
       const decoded = parseJwt(token);
       if (!decoded?.id_user) throw new Error('Token inválido o expirado.');
 
-      const baseUrl = `http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}`;
+      const baseUrl = BACKEND_URL;
 
       const response = await fetch(`${baseUrl}${endpoint}`, {
         method,
@@ -246,7 +247,7 @@ export default function AltaForm({
         {errors._general && (
           <div className={styles.alertError}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+              <circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" />
             </svg>
             {errors._general}
           </div>
@@ -256,7 +257,7 @@ export default function AltaForm({
         {success && (
           <div className={styles.alertSuccess}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="20 6 9 17 4 12"/>
+              <polyline points="20 6 9 17 4 12" />
             </svg>
             {successMessage}
           </div>
@@ -274,54 +275,54 @@ export default function AltaForm({
                 {field.required && <span className={styles.required}>*</span>}
               </label>
 
-            {field.type === 'select' ? (
-              <select
-                id={field.name}
-                name={field.name}
-                className={styles.input}
-                value={formData[field.name]}
-                onChange={handleChange}
-                disabled={loading}
-              >
-                <option value="">{field.placeholder ?? 'Seleccioná una opción...'}</option>
-                {field.options?.map(opt => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-            ) : field.prefix ? (
-              <div className={styles.inputWrapper}>
-                <span className={styles.prefix}>{field.prefix}</span>
+              {field.type === 'select' ? (
+                <select
+                  id={field.name}
+                  name={field.name}
+                  className={styles.input}
+                  value={formData[field.name]}
+                  onChange={handleChange}
+                  disabled={loading}
+                >
+                  <option value="">{field.placeholder ?? 'Seleccioná una opción...'}</option>
+                  {field.options?.map(opt => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              ) : field.prefix ? (
+                <div className={styles.inputWrapper}>
+                  <span className={styles.prefix}>{field.prefix}</span>
+                  <input
+                    id={field.name}
+                    name={field.name}
+                    type={field.type ?? 'text'}
+                    min={field.min}
+                    step={field.step}
+                    className={`${styles.input} ${styles.inputWithPrefix}`}
+                    placeholder={field.placeholder ?? ''}
+                    value={formData[field.name]}
+                    onChange={handleChange}
+                    disabled={loading}
+                    autoComplete="off"
+                  />
+                </div>
+              ) : (
                 <input
                   id={field.name}
                   name={field.name}
                   type={field.type ?? 'text'}
                   min={field.min}
                   step={field.step}
-                  className={`${styles.input} ${styles.inputWithPrefix}`}
+                  className={styles.input}
                   placeholder={field.placeholder ?? ''}
                   value={formData[field.name]}
                   onChange={handleChange}
                   disabled={loading}
                   autoComplete="off"
                 />
-              </div>
-            ) : (
-              <input
-                id={field.name}
-                name={field.name}
-                type={field.type ?? 'text'}
-                min={field.min}
-                step={field.step}
-                className={styles.input}
-                placeholder={field.placeholder ?? ''}
-                value={formData[field.name]}
-                onChange={handleChange}
-                disabled={loading}
-                autoComplete="off"
-              />
-            )}
+              )}
 
               {errors[field.name] && (
                 <span className={styles.errorMsg}>{errors[field.name]}</span>
@@ -338,7 +339,7 @@ export default function AltaForm({
             ) : (
               <>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                  <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
                 </svg>
                 {submitLabel}
               </>

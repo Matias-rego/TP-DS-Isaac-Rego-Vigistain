@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import useDebounce from '@/components/useDebounce';
 import { eventBus } from '@/lib/eventBus';
+import { BACKEND_URL } from '@/lib/config';
 import styles from './BajaForm.module.css';
 
 // ─── Field config para el detalle ────────────────────────────────────────────
@@ -84,7 +85,7 @@ export default function BajaForm<T extends object>({
   const [deleted, setDeleted] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const baseUrl = `http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}`;
+  const baseUrl = BACKEND_URL;
 
   useEffect(() => {
     if (!debouncedQuery) {

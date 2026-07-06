@@ -3,6 +3,7 @@ import styles from "./Register.module.css";
 import { useState } from "react";
 import Alert from "../../components/Alert/Alert";
 import AlertSuccess from "../../components/Alert/AlertSuccess";
+import { BACKEND_URL } from '@/lib/config';
 import CustomButton1 from "../../components/Buttons/Button1";
 import { PasswordInput } from "../../components/ui/PasswordInput";
 
@@ -46,11 +47,11 @@ const Register = () => {
         formData.append('email', email);
         formData.append('password', password);
         if (foto) {
-            formData.append('foto', foto); 
+            formData.append('foto', foto);
         }
 
         try {
-            const response = await fetch(`http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}/auth/Register`, {
+            const response = await fetch(`${BACKEND_URL}/auth/Register`, {
                 method: 'POST',
                 body: formData,
                 //  Sin Content-Type — el browser lo setea solo con el boundary correcto
@@ -92,32 +93,32 @@ const Register = () => {
                     <form className={styles.form} onSubmit={handleRegister}>
 
                         {/* ── Foto de perfil ── */}
-                            <div className={styles.group}>
-                                <label className={styles.label}>
-                                    Foto de perfil <span style={{ fontWeight: 400, color: '#9ca3af' }}>(opcional)</span>
-                                </label>
+                        <div className={styles.group}>
+                            <label className={styles.label}>
+                                Foto de perfil <span style={{ fontWeight: 400, color: '#9ca3af' }}>(opcional)</span>
+                            </label>
 
-                                {preview ? (
-                                    <div className={styles.previewWrap}>
+                            {preview ? (
+                                <div className={styles.previewWrap}>
                                     <img src={preview} alt="Preview foto de perfil" className={styles.preview} />
                                     <button type="button" className={styles.removeBtn} onClick={removePhoto}>✕</button>
-                                    </div>
-                                ) : (
-                                    <label className={styles.dropZone} htmlFor="file-input">
+                                </div>
+                            ) : (
+                                <label className={styles.dropZone} htmlFor="file-input">
                                     <span className={styles.dropZoneIcon}>📷</span>
                                     <span className={styles.dropZoneText}>Hacé clic o arrastrá una imagen</span>
                                     <span className={styles.dropZoneHint}>JPG, PNG o WEBP · máx. 2 MB</span>
-                                    </label>
-                                )}
+                                </label>
+                            )}
 
-                                <input
-                                    type="file"
-                                    id="file-input"
-                                    accept="image/jpeg,image/png,image/webp"
-                                    className={styles.fileInput}
-                                    onChange={handleFoto}
-                                />
-                            </div>
+                            <input
+                                type="file"
+                                id="file-input"
+                                accept="image/jpeg,image/png,image/webp"
+                                className={styles.fileInput}
+                                onChange={handleFoto}
+                            />
+                        </div>
 
                         <div className={styles.group}>
                             <label htmlFor="username" className={styles.label}>Usuario</label>
@@ -150,10 +151,10 @@ const Register = () => {
                                     id="password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className={password.length >=8 ? styles.input_green : styles.input_red}
+                                    className={password.length >= 8 ? styles.input_green : styles.input_red}
                                     required
                                     placeholder="••••••••"
-                                    />
+                                />
                             </div>
                         </div>
 
@@ -167,7 +168,7 @@ const Register = () => {
                                     className={confirmPassword === password ? styles.input_green : styles.input_red}
                                     required
                                     placeholder="••••••••"
-                                    />
+                                />
                             </div>
                         </div>
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import useDebounce from '@/components/useDebounce';
 import { eventBus } from '@/lib/eventBus';
+import { BACKEND_URL } from '@/lib/config';
 import type { FieldConfig } from './../Alta/AltaForm';
 import styles from './ModForm.module.css';
 
@@ -63,7 +64,7 @@ export default function ModForm<T extends object>({
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const baseUrl = `http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}`;
+  const baseUrl = BACKEND_URL;
 
   useEffect(() => {
     if (!debouncedQuery) {
@@ -224,41 +225,41 @@ export default function ModForm<T extends object>({
             </button>
           </div>
 
-      {fields.map((field: FieldConfig) => (
-        <div className={styles.detailRow} key={field.name}>
-          <label className={styles.detailLabel} htmlFor={field.name}>
-            {field.label}
-          </label>
+          {fields.map((field: FieldConfig) => (
+            <div className={styles.detailRow} key={field.name}>
+              <label className={styles.detailLabel} htmlFor={field.name}>
+                {field.label}
+              </label>
 
-          {field.type === 'select' ? (
-            <select
-              id={field.name}
-              className={styles.input}
-              value={String((selected as Record<string, unknown>)[field.name] ?? '')}
-              onChange={e => handleFieldChange(field, e.target.value)}
-              disabled={saving}
-            >
-              <option value="">{field.placeholder ?? 'Seleccioná una opción...'}</option>
-              {field.options?.map(opt => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          ) : (
-            <input
-              id={field.name}
-              type={field.type ?? 'text'}
-              className={styles.input}
-              min={field.min}
-              step={field.step}
-              value={String((selected as Record<string, unknown>)[field.name] ?? '')}
-              onChange={e => handleFieldChange(field, e.target.value)}
-              disabled={saving}
-            />
-          )}
-        </div>
-      ))}
+              {field.type === 'select' ? (
+                <select
+                  id={field.name}
+                  className={styles.input}
+                  value={String((selected as Record<string, unknown>)[field.name] ?? '')}
+                  onChange={e => handleFieldChange(field, e.target.value)}
+                  disabled={saving}
+                >
+                  <option value="">{field.placeholder ?? 'Seleccioná una opción...'}</option>
+                  {field.options?.map(opt => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  id={field.name}
+                  type={field.type ?? 'text'}
+                  className={styles.input}
+                  min={field.min}
+                  step={field.step}
+                  value={String((selected as Record<string, unknown>)[field.name] ?? '')}
+                  onChange={e => handleFieldChange(field, e.target.value)}
+                  disabled={saving}
+                />
+              )}
+            </div>
+          ))}
 
           <div className={styles.actions}>
             <button className={styles.cancelButton} onClick={() => setSelected(null)} disabled={saving}>
