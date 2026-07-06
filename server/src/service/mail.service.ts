@@ -15,10 +15,10 @@ const transporter = nodemailer.createTransport({
 async function enviarMailVerificador(direccionEmail: string, tokenVerificacion: string) {
     try {
         await transporter.sendMail({
-        from: `"Gestión Taller" <${process.env.EMAIL_USER}>`,
-        to: direccionEmail,
-        subject: "Verificación de cuenta",
-        html: crearMailVerificacion(tokenVerificacion)
+            from: `"Gestión Taller" <${process.env.EMAIL_USER}>`,
+            to: direccionEmail,
+            subject: "Verificación de cuenta",
+            html: crearMailVerificacion(tokenVerificacion)
         });
         console.log("Mail enviado con éxito");
     } catch (error) {
@@ -29,6 +29,7 @@ async function enviarMailVerificador(direccionEmail: string, tokenVerificacion: 
 function crearMailVerificacion(tokenVerificacion: string) {
     const dataToken= parseJwt(tokenVerificacion);
     const username = dataToken ? dataToken.username : "Usuario";
+    const validationLink = `${process.env.FRONTEND_URL}/auth/validateCuenta/${tokenVerificacion}`;
     return `
     <!DOCTYPE html>
     <html>
@@ -63,7 +64,7 @@ function crearMailVerificacion(tokenVerificacion: string) {
                                 <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate;">
                                     <tr>
                                         <td align="center" bgcolor="#2563eb" style="border-radius: 6px;">
-                                            <a href="http://localhost:3000/auth/validateCuenta/${tokenVerificacion}" target="_blank" style="display: inline-block; padding: 14px 28px; color: #ffffff; text-decoration: none; font-weight: bold; font-size: 16px;">Valida cuenta</a>
+                                            <a href="${validationLink}" target="_blank" style="display: inline-block; padding: 14px 28px; color: #ffffff; text-decoration: none; font-weight: bold; font-size: 16px;">Valida cuenta</a>
                                         </td>
                                     </tr>
                                 </table>
@@ -87,10 +88,10 @@ function crearMailVerificacion(tokenVerificacion: string) {
         </table>
     </body>
     </html>
-    ` 
+    `
 }
 
 
 
 
-export default  enviarMailVerificador;
+export default enviarMailVerificador;

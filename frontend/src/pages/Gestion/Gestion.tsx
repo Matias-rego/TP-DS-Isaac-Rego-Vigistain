@@ -17,9 +17,10 @@ import AltaTipoCliente from "../TipoCliente/AltaTipoCliente";
 import BajaTipoCliente from "../TipoCliente/BajaClientCategory";
 import ModifyClientCategory from "../TipoCliente/ModifyClientCategory";
 import { eventBus, EVENTS } from "@/lib/eventBus";
+import { BACKEND_URL } from '@/lib/config';
 import RegisterPaymentType from "../TipoPago/RegisterPaymentType";
 import DeletePaymentType from "../TipoPago/DeletePaymentType";
-import ModifyPaymentType from "../TipoPago/modifyPaymentType";
+import ModifyPaymentType from "../TipoPago/ModifyPaymentType";
 
 
 // ─── Tipos y columnas ─────────────────────────────────────────────────────────
@@ -31,7 +32,7 @@ interface FailureType {
 }
 
 const COLUMNS_TF: ColumnConfig<FailureType>[] = [
-  { key: 'id_failure_type',    label: 'ID' },
+  { key: 'id_failure_type', label: 'ID' },
   { key: 'failureDescription', label: 'Descripción' },
   {
     key: 'estimatedImport',
@@ -48,8 +49,8 @@ interface ClientType {
 }
 
 const COLUMNS_TC: ColumnConfig<ClientType>[] = [
-  { key: 'id_category_client',  label: 'ID' },
-  { key: 'categoryClientName',  label: 'Nombre' },
+  { key: 'id_category_client', label: 'ID' },
+  { key: 'categoryClientName', label: 'Nombre' },
   { key: 'amountForCategoryUp', label: 'Órdenes requeridas' },
 ];
 
@@ -64,7 +65,7 @@ interface PaymentType {
 const COLUMNS_PT: ColumnConfig<PaymentType>[] = [
   { key: 'id_payment_type', label: 'ID' },
   { key: 'paymentTypeName', label: 'Nombre' },
-  { key: 'percentaje', label: 'Porcentaje', format: (value) => `${(Number(value)*100).toLocaleString('es-AR')}%` },
+  { key: 'percentaje', label: 'Porcentaje', format: (value) => `${(Number(value) * 100).toLocaleString('es-AR')}%` },
   { key: 'paymentMethod', label: 'Método de Pago' },
 ];
 
@@ -80,10 +81,8 @@ const Gestion = () => {
       const decoded = parseJwt(token);
       if (!decoded?.id_user) throw new Error('Token inválido');
 
-      const result = await fetch(
-        `http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}/failures/getAllTypes`,
-        { headers: { Authorization: `Bearer ${token}` }, method: 'GET' }
-      );
+      const result = await fetch(`${BACKEND_URL}/failures/getAllTypes`, 
+        { headers: { Authorization: `Bearer ${token}` }, method: 'GET' });
 
       if (result.status === 404) { setDataTF([]); return; }
       const data = await result.json();
@@ -100,10 +99,8 @@ const Gestion = () => {
       const decoded = parseJwt(token);
       if (!decoded?.id_user) throw new Error('Token inválido');
 
-      const result = await fetch(
-        `http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}/clients/getAllCategoryClients`,
-        { headers: { Authorization: `Bearer ${token}` }, method: 'GET' }
-      );
+      const result = await fetch(`${BACKEND_URL}/clients/getAllCategoryClients`, 
+        { headers: { Authorization: `Bearer ${token}` }, method: 'GET' });
 
       if (result.status === 404) { setDataTC([]); return; }
       const data = await result.json();
@@ -120,10 +117,8 @@ const Gestion = () => {
       const decoded = parseJwt(token);
       if (!decoded?.id_user) throw new Error('Token inválido');
 
-      const result = await fetch(
-        `http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}/payments/getAllPaymentTypes`,
-        { headers: { Authorization: `Bearer ${token}` }, method: 'GET' }
-      );
+      const result = await fetch(`${BACKEND_URL}/payments/getAllPaymentTypes`, 
+        { headers: { Authorization: `Bearer ${token}` }, method: 'GET' });
 
       if (result.status === 404) { setDataPT([]); return; }
       const data = await result.json();
@@ -228,21 +223,21 @@ const Gestion = () => {
             </div>
             <div className="keen-slider__slide">
               <TarjetaGestion
-              titulo="Tipo Pago"
-              descripcion="Administra los tipos de pago que tus clientes pueden utilizar. Agrega, edita o elimina métodos de pago para ofrecer flexibilidad y conveniencia en las transacciones."
-              imagen={imagenTarjetaTipoPago}
-              childrenTable={
-                <TableRtl
-                  data={dataPT}
-                  idField="id_payment_type"
-                  columns={COLUMNS_PT}
-                  caption="Tabla de Tipos de Pago"
-                  showTotal={false}
-                />
-              }
-              childrenFuncionAlta={<RegisterPaymentType />}
-              childrenFuncionBaja={<DeletePaymentType />}
-              childrenFuncionModify={<ModifyPaymentType />} 
+                titulo="Tipo Pago"
+                descripcion="Administra los tipos de pago que tus clientes pueden utilizar. Agrega, edita o elimina métodos de pago para ofrecer flexibilidad y conveniencia en las transacciones."
+                imagen={imagenTarjetaTipoPago}
+                childrenTable={
+                  <TableRtl
+                    data={dataPT}
+                    idField="id_payment_type"
+                    columns={COLUMNS_PT}
+                    caption="Tabla de Tipos de Pago"
+                    showTotal={false}
+                  />
+                }
+                childrenFuncionAlta={<RegisterPaymentType />}
+                childrenFuncionBaja={<DeletePaymentType />}
+                childrenFuncionModify={<ModifyPaymentType />}
               />
             </div>
           </div>
@@ -255,7 +250,7 @@ const Gestion = () => {
               background: 'white', border: '1px solid #e5e7eb', borderRadius: '50%',
               width: 36, height: 36, cursor: 'pointer', fontSize: '18px',
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)', zIndex: 10,
-              }}
+            }}
           >›</button>
         </div>
       </div>

@@ -19,3 +19,5 @@ dist/
 .volumes
 
 server/src/generated/
+
+.vscode/

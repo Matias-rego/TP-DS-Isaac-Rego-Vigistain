@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { PasswordInput } from '../../components/ui/PasswordInput';
 import styles from './ResetPassword.module.css';
+import { BACKEND_URL } from '@/lib/config';
 
 const ResetPassword = () => {
   const { token } = useParams();
@@ -23,14 +24,11 @@ const ResetPassword = () => {
 
 
     try {
-      const response = await fetch(
-        `http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}/users/reset-password/${token}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ password })
-        }
-      );
+      const response = await fetch(`${BACKEND_URL}/users/reset-password/${token}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      });
 
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Error al restablecer la contraseña');

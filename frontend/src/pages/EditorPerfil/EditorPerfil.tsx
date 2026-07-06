@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import AlertSuccess from "@/components/Alert/AlertSuccess";
 import Alert from "@/components/Alert/Alert";
 import { useNavigate } from "react-router-dom";
+import { BACKEND_URL } from '@/lib/config';
 
 
 
@@ -51,13 +52,10 @@ const EditorPerfil = () =>{
       }
 
       try {
-        const response = await fetch(
-          `http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}/users/update/${usuario?.id_user}`,
-          {
-            method: 'PUT',
-            body: formData,
-          }
-        );
+        const response = await fetch(`${BACKEND_URL}/users/update/${usuario?.id_user}`, {
+          method: 'PUT',
+          body: formData,
+        });
 
         const {user, success} = await response.json();
         if (!response.ok) {
@@ -81,10 +79,8 @@ const EditorPerfil = () =>{
             const decoded = parseJwt(token);
             if (!decoded?.id_user) throw new Error('Token inválido');
     
-            const response = await fetch(
-              `http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}/users/verifica/${decoded.id_user}`,
-              { headers: { Authorization: `Bearer ${token}` } }
-            );
+            const response = await fetch(`${BACKEND_URL}/users/verifica/${decoded.id_user}`, 
+              { headers: { Authorization: `Bearer ${token}` } });
     
             if (!response.ok) throw new Error(`Error ${response.status}`);
     
