@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import styles from './ForgotPassword.module.css';
+import { BACKEND_URL } from '@/lib/config';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -9,14 +10,11 @@ const ForgotPassword = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await fetch(
-        `http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}/users/forgot-password`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email })
-        }
-      );
+      const response = await fetch(`${BACKEND_URL}/users/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
       setSuccess('Te enviamos un mail para restablecer tu contraseña.');

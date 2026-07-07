@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { parseJwt } from '../App/App';
 import { useEffect, useState } from 'react';
 import type { UserProfile } from '../../types/types';
+import { BACKEND_URL } from '@/lib/config';
 
 const Nav = () => {
   const [usuario, setUsuario] = useState<UserProfile | null>(null);
@@ -19,10 +20,8 @@ const Nav = () => {
         const decoded = parseJwt(token);
         if (!decoded?.id_user) throw new Error('Token inválido');
 
-        const response = await fetch(
-          `http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}/users/verifica/${decoded.id_user}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        const response = await fetch(`${BACKEND_URL}/users/verifica/${decoded.id_user}`, 
+          { headers: { Authorization: `Bearer ${token}` } });
 
         if (!response.ok) throw new Error(`Error ${response.status}`);
 
