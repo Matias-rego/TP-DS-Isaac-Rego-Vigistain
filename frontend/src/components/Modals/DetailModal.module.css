@@ -1,0 +1,305 @@
+/* ============================================================================
+   CONTENEDORES PRINCIPALES Y ESTRUCTURA
+   ============================================================================ */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(15, 23, 42, 0.4); /* slate-900/40 */
+  padding: 1rem;
+}
+
+.modal {
+  width: 100%;
+  border-radius: 1.5rem; /* rounded-3xl */
+  background-color: #ffffff;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); /* shadow-xl */
+  overflow: hidden;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.maxW-lg {
+  max-width: 32rem; /* max-w-lg */
+}
+
+.maxW-md {
+  max-width: 28rem; /* max-w-md */
+}
+
+/* ============================================================================
+   HEADER
+   ============================================================================ */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem; /* px-6 py-5 */
+  border-bottom: 1px solid #f1f5f9; /* border-slate-100 */
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.headerIcon {
+  color: #172554; /* text-blue-950 */
+}
+
+.title {
+  font-size: 1.25rem; /* text-xl */
+  font-weight: 700;
+  color: #172554; /* text-blue-950 */
+  line-height: 1.25;
+}
+
+.subtitle {
+  font-size: 0.875rem; /* text-sm */
+  color: #94a3b8; /* text-slate-400 */
+}
+
+.closeButton {
+  color: #94a3b8; /* text-slate-400 */
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.closeButton:hover {
+  color: #475569; /* hover:text-slate-600 */
+}
+
+/* ============================================================================
+   BODY & SECCIONES
+   ============================================================================ */
+
+.body {
+  padding: 1.25rem 1.5rem; /* px-6 py-5 */
+  overflow-y: auto;
+}
+
+/* Usamos un contenedor con margen en vez de space-y-6 para modularidad */
+.bodySection {
+  margin-bottom: 1.5rem;
+}
+
+.bodySection:last-child {
+  margin-bottom: 0;
+}
+
+.statusWrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: -0.5rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 2rem; /* gap-x-8 */
+  row-gap: 1.25rem; /* gap-y-5 */
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem; /* space-y-5 */
+}
+
+.fieldLabel {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: #94a3b8; /* text-slate-400 */
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+
+.fieldValue {
+  color: #334155; /* text-slate-800 */
+  font-size: 15px;
+  line-height: 1.375; /* leading-snug */
+}
+
+.fieldEmpty {
+  color: #cbd5e1; /* text-slate-300 */
+}
+
+/* ============================================================================
+   ELEMENTOS ASOCIADOS (LISTA)
+   ============================================================================ */
+
+.listTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: #172554; /* text-blue-950 */
+  margin-bottom: 0.75rem;
+}
+
+.divider {
+  height: 1px;
+  background-color: #f1f5f9; /* bg-slate-100 */
+  margin-bottom: 1rem;
+}
+
+.listWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem; /* space-y-2 */
+}
+
+.emptyLabel {
+  font-size: 0.875rem; /* text-sm */
+  color: #94a3b8; /* text-slate-400 */
+}
+
+/* Fila de Item */
+.itemRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 1rem; /* rounded-2xl */
+  background-color: rgba(239, 246, 255, 0.7); /* bg-blue-50/70 */
+  padding: 0.75rem 1rem; /* px-4 py-3 */
+}
+
+.itemRowClickable {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.itemRowClickable:hover {
+  background-color: rgba(219, 234, 254, 0.8); /* hover:bg-blue-100/80 */
+}
+
+.itemRowClickable:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #93c5fd; /* focus:ring-2 focus:ring-blue-300 */
+}
+
+.itemIconWrapper {
+  display: flex;
+  height: 2.25rem;
+  width: 2.25rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background-color: #e2e8f0; /* bg-slate-200 */
+  color: #64748b; /* text-slate-500 */
+}
+
+.itemContent {
+  min-width: 0;
+  flex-1: 1 1 0%;
+}
+
+.itemPrimary {
+  font-size: 14px;
+  font-weight: 500;
+  color: #334155; /* text-slate-800 */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap; /* truncate */
+}
+
+.itemSecondary {
+  font-size: 12px;
+  color: #94a3b8; /* text-slate-400 */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap; /* truncate */
+}
+
+.chevron {
+  color: #cbd5e1; /* text-slate-300 */
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+   FOOTER Y ACCIONES
+   ============================================================================ */
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1rem 1.5rem; /* px-6 py-4 */
+  border-top: 1px solid #f1f5f9; /* border-t */
+  background-color: rgba(248, 250, 252, 0.5); /* bg-slate-50/50 */
+}
+
+.cancelButton {
+  color: #64748b; /* text-slate-500 */
+  background: none;
+  border: none;
+  font-weight: 500;
+  font-size: 0.875rem; /* text-sm */
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.cancelButton:hover {
+  color: #334155; /* hover:text-slate-700 */
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.875rem; /* text-sm */
+  font-weight: 500;
+  padding: 0.625rem 1.25rem; /* px-5 py-2.5 */
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+/* Variantes de Botones */
+.actionPrimary {
+  background-color: #172554; /* bg-blue-950 */
+  color: #ffffff;
+}
+.actionPrimary:hover {
+  background-color: #1e3a8a; /* hover:bg-blue-900 */
+}
+
+.actionSecondary {
+  background-color: #f1f5f9; /* bg-slate-100 */
+  color: #334155; /* text-slate-700 */
+}
+.actionSecondary:hover {
+  background-color: #e2e8f0; /* hover:bg-slate-200 */
+}
+
+.actionDanger {
+  background-color: #dc2626; /* bg-red-600 */
+  color: #ffffff;
+}
+.actionDanger:hover {
+  background-color: #b91c1c; /* hover:bg-red-700 */
+}
+
+/* ============================================================================
+   BADGE (Se mantiene nativo con estilos inline como lo tenías)
+   ============================================================================ */
+.badgeBase {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}

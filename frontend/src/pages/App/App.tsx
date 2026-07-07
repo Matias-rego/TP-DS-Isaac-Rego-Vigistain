@@ -9,7 +9,7 @@ import EditorPerfil from "../EditorPerfil/EditorPerfil";
 import ForgotPassword from "@/components/Password/ForgotPasswor";
 import ResetPassword from "@/components/Password/ResetPassword";
 import Gestion from "../Gestion/Gestion";
-import Clientes from "../Clientes/Clientes";
+import Clientes from "../Clientes/Clients";
 
 export const capitalize = (text: string): string => {
   if (!text) return ""; // Validación por si viene vacío

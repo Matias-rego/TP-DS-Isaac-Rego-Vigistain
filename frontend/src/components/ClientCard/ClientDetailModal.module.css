@@ -1,0 +1,41 @@
+/* ============================================================================
+   ESTILOS COMPLEMENTARIOS PARA EL FORMULARIO DE EDICIÓN
+   ============================================================================ */
+
+.editFormGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem; /* gap-4 */
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.inputLabel {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8; /* text-slate-400 */
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+
+.formInput {
+  width: 100%;
+  border: 1px solid #e2e8f0; /* border-slate-200 */
+  padding: 0.625rem 0.75rem; /* p-2.5 */
+  border-radius: 0.75rem; /* rounded-xl */
+  font-size: 0.875rem; /* text-sm */
+  color: #334155;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.formInput:focus {
+  outline: none;
+  border-color: #3b82f6; /* focus:border-blue-500 */
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); /* focus:ring-2 */
+}

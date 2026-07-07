@@ -19,7 +19,8 @@ import ModifyClientCategory from "../TipoCliente/ModifyClientCategory";
 import { eventBus, EVENTS } from "@/lib/eventBus";
 import RegisterPaymentType from "../TipoPago/RegisterPaymentType";
 import DeletePaymentType from "../TipoPago/DeletePaymentType";
-import ModifyPaymentType from "../TipoPago/modifyPaymentType";
+import ModifyPaymentType from "../TipoPago/ModifyPaymentType";
+import Footer from "@/components/Footer/Footer";
 
 
 // ─── Tipos y columnas ─────────────────────────────────────────────────────────
@@ -259,6 +260,7 @@ const Gestion = () => {
           >›</button>
         </div>
       </div>
+      <Footer/>
     </>
   );
 };
