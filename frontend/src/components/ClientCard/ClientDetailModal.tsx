@@ -4,6 +4,7 @@ import type { DetailFieldConfig, DetailItemConfig } from "../Modals/DetailModal"
 import styles from './ClientDetailModal.module.css';
 import { parseJwt } from "@/pages/App/App";
 import { eventBus } from "@/lib/eventBus";
+import { BACKEND_URL } from "@/lib/config";
 
 interface Client {
   id_client: number;
@@ -84,7 +85,7 @@ const ClientDetailModal = ({
       if (!decoded?.id_user) throw new Error('Token inválido o expirado.');
 
       const response = await fetch(
-        `http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}/clients/modifyClient/${data.id_client}`,
+        `${BACKEND_URL}/clients/modifyClient/${data.id_client}`,
         {
           method: 'POST',
           headers: {

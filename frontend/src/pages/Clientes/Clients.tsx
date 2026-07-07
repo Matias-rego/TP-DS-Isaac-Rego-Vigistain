@@ -9,6 +9,7 @@ import styles from './Clients.module.css';
 import ClientRegister from './ClientRegister';
 import { eventBus, EVENTS } from '@/lib/eventBus';
 import ClientDetailModal from "@/components/ClientCard/ClientDetailModal";
+import { BACKEND_URL } from '@/lib/config';
 
 interface Client {
   id_client: number;
@@ -41,7 +42,7 @@ const Clientes = () => {
   const getAllClients = useCallback(async () => {
     try {
       const res = await fetch(
-        `http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}/clients/getAllClients`
+        `${BACKEND_URL}/clients/getAllClients`
       );
       setAllClients(await res.json());
     } catch (e) {
@@ -53,7 +54,7 @@ const Clientes = () => {
   const findCategoryClients = useCallback(async () => {
     try {
       const res = await fetch(
-        `http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}/clients/getAllCategoryClients`
+        `${BACKEND_URL}/clients/getAllCategoryClients`
       );
       setCategories(await res.json());
     } catch (e) {
@@ -64,7 +65,7 @@ const Clientes = () => {
   const fetchOneClient = useCallback(async (id: number): Promise<Client | null> => {
     try {
       const res = await fetch(
-        `http://${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}/clients/getOneClient/${id}`
+        `${BACKEND_URL}/clients/getOneClient/${id}`
       );
       return await res.json();
     } catch (e) {
