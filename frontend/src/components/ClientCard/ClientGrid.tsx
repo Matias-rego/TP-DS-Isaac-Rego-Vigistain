@@ -6,14 +6,15 @@ interface ClientGridProps {
   clients: ClientCardProps[];
   onCardClick?: (id: number) => void;
   onAddClick?: () => void;
+  columns?: 2 | 3 | 4;
 }
 
-export default function ClientGrid({ clients, onCardClick, onAddClick }: ClientGridProps) {
+export default function ClientGrid({ clients, onCardClick, onAddClick, columns }: ClientGridProps) {
   return (
-    <div className={styles.grid}>
+    <div className={`${styles.grid} ${styles[`cols${columns}`]}`}>
       {clients.map(client => (
         <ClientCard
-          key={client.id_cliente}
+          key={client.id_client}
           {...client}
           onClick={onCardClick}
         />

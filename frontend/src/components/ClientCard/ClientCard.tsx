@@ -3,18 +3,15 @@ import styles from './ClientCard.module.css';
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface ClientCardProps {
-  id_cliente: number;
-  nombre: string;
-  dni_cuit: string;
-  telefono: string;
-  mail: string;
-  fecha_registro: string;
-  activo: boolean;
-  /** Nombre de la categoría de cliente, ej: "VIP CLIENT" */
+  id_client: number;
+  clientName: string;
+  clientEmail: string;
+  clientPhone: string;
+  dniCuit: string;
+  dateOfRegistration: string;
+  status?: boolean;
   categoryClientName?: string;
-  /** Última reparación (fecha), viene de las órdenes */
   lastRepair?: string;
-  /** Tags adicionales (ej: dispositivos reparados) */
   tags?: string[];
   onClick?: (id: number) => void;
 }
@@ -51,23 +48,23 @@ function formatDate(dateStr: string): string {
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function ClientCard({
-  id_cliente,
-  nombre,
-  dni_cuit,
-  telefono,
+  id_client,
+  clientName,
+  clientPhone,
+  dniCuit,
   lastRepair,
   categoryClientName,
   tags = [],
-  activo,
+  status = true,
   onClick,
 }: ClientCardProps) {
-  const initials = getInitials(nombre);
-  const avatarColor = getAvatarColor(nombre);
+  const initials = getInitials(clientName);
+  const avatarColor = getAvatarColor(clientName);
 
   return (
     <div
-      className={`${styles.card} ${!activo ? styles.inactive : ''}`}
-      onClick={() => onClick?.(id_cliente)}
+      className={`${styles.card} ${!status ? styles.inactive : ''}`}
+      onClick={() => onClick?.(id_client)}
     >
       {/* ── Header ── */}
       <div className={styles.header}>
@@ -78,8 +75,8 @@ export default function ClientCard({
           {initials}
         </div>
         <div className={styles.identity}>
-          <h3 className={styles.nombre}>{nombre}</h3>
-          <span className={styles.dni}>DNI: {dni_cuit}</span>
+          <h3 className={styles.nombre}>{clientName}</h3>
+          <span className={styles.dni}>DNI: {dniCuit}</span>
         </div>
       </div>
 
@@ -100,7 +97,7 @@ export default function ClientCard({
             stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.06 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.71 2.81a2 2 0 0 1-.45 2.11L7.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.58 2.81.71A2 2 0 0 1 22 16.92z"/>
           </svg>
-          <span>{telefono}</span>
+          <span>{clientPhone}</span>
         </div>
       </div>
 

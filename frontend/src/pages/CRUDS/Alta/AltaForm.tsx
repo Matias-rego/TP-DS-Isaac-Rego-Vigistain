@@ -42,6 +42,7 @@ export interface AltaFormProps {
   entityEvent?: string;
   onSuccess?: (responseData?: unknown) => void;
   resetOnSuccess?: boolean;
+  compact?: boolean;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -150,6 +151,7 @@ export default function AltaForm({
   entityEvent,
   onSuccess,
   resetOnSuccess = true,
+  compact,
 }: AltaFormProps) {
   const [formData, setFormData] = useState<Record<string, string>>(
     buildInitialState(fields)
@@ -231,7 +233,7 @@ export default function AltaForm({
   );
 
   return (
-    <div className={styles.wrapper}>
+    <div className={compact ? '' : styles.wrapper}>
       <div className={styles.card}>
 
         {/* Header */}

@@ -21,6 +21,7 @@ import { BACKEND_URL } from '@/lib/config';
 import RegisterPaymentType from "../TipoPago/RegisterPaymentType";
 import DeletePaymentType from "../TipoPago/DeletePaymentType";
 import ModifyPaymentType from "../TipoPago/ModifyPaymentType";
+import Footer from "@/components/Footer/Footer";
 
 
 // ─── Tipos y columnas ─────────────────────────────────────────────────────────
@@ -254,6 +255,7 @@ const Gestion = () => {
           >›</button>
         </div>
       </div>
+      <Footer/>
     </>
   );
 };

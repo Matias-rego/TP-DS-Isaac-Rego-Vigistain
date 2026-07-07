@@ -3,8 +3,8 @@ import prisma from "../database/prisma.js";
 
 export const getAllCategoryClients = async (req: Request, res: Response) => {
   try {
-    const clients = await prisma.category_Client.findMany();
-    res.json(clients);
+    const clientCategories = await prisma.category_Client.findMany();
+    res.json(clientCategories);
   } catch (error) {
     console.error("Error fetching clients:", error);
     res.status(500).json({ error: "Internal server error" });
