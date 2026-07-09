@@ -67,7 +67,7 @@ export default function RegisterPaymentType({ onSuccess }: RegisterPaymentTypePr
             subtitle="Completá los datos para registrar el tipo de pago"
             icon={ICON}
             fields={FIELDS}
-            endpoint="/payments/createTypePayment"
+            endpoint="/api/payments/createTypePayment"
             submitLabel="Crear Tipo de Pago"
             successMessage="Tipo de pago creado correctamente."
             entityEvent={EVENTS.paymentTypeChanged}

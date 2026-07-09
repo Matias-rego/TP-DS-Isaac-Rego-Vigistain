@@ -82,7 +82,7 @@ const Gestion = () => {
       const decoded = parseJwt(token);
       if (!decoded?.id_user) throw new Error('Token inválido');
 
-      const result = await fetch(`${BACKEND_URL}/failures/getAllTypes`, 
+      const result = await fetch(`${BACKEND_URL}/api/failureType/getAllTypes`, 
         { headers: { Authorization: `Bearer ${token}` }, method: 'GET' });
 
       if (result.status === 404) { setDataTF([]); return; }
@@ -100,7 +100,7 @@ const Gestion = () => {
       const decoded = parseJwt(token);
       if (!decoded?.id_user) throw new Error('Token inválido');
 
-      const result = await fetch(`${BACKEND_URL}/clients/getAllCategoryClients`, 
+      const result = await fetch(`${BACKEND_URL}/api/clientCategories/getAllCategoryClients`, 
         { headers: { Authorization: `Bearer ${token}` }, method: 'GET' });
 
       if (result.status === 404) { setDataTC([]); return; }
@@ -118,7 +118,7 @@ const Gestion = () => {
       const decoded = parseJwt(token);
       if (!decoded?.id_user) throw new Error('Token inválido');
 
-      const result = await fetch(`${BACKEND_URL}/payments/getAllPaymentTypes`, 
+      const result = await fetch(`${BACKEND_URL}/api/payments/getAllPaymentTypes`, 
         { headers: { Authorization: `Bearer ${token}` }, method: 'GET' });
 
       if (result.status === 404) { setDataPT([]); return; }

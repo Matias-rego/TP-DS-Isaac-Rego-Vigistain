@@ -42,7 +42,7 @@ const Clientes = () => {
   const getAllClients = useCallback(async () => {
     try {
       const res = await fetch(
-        `${BACKEND_URL}/clients/getAllClients`
+        `${BACKEND_URL}/api/clients/getAllClients`
       );
       setAllClients(await res.json());
     } catch (e) {
@@ -54,7 +54,7 @@ const Clientes = () => {
   const findCategoryClients = useCallback(async () => {
     try {
       const res = await fetch(
-        `${BACKEND_URL}/clients/getAllCategoryClients`
+        `${BACKEND_URL}/api/clientCategories/getAllCategoryClients`
       );
       setCategories(await res.json());
     } catch (e) {
@@ -65,7 +65,7 @@ const Clientes = () => {
   const fetchOneClient = useCallback(async (id: number): Promise<Client | null> => {
     try {
       const res = await fetch(
-        `${BACKEND_URL}/clients/getOneClient/${id}`
+        `${BACKEND_URL}/api/clients/getOneClient/${id}`
       );
       return await res.json();
     } catch (e) {
@@ -151,7 +151,7 @@ const Clientes = () => {
         <div className={styles.searchRow}>
           <SearchBar
             filters={CLIENT_FILTERS}
-            searchEndpoint="/clients/getPartialClient"
+            searchEndpoint="/api/clients/getPartialClient"
             searchPlaceholder="Buscar clientes por nombre, apellido o correo electrónico"
             onResults={(data) => setResults(data as Client[])}
             onClear={() => setResults([])}

@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { loginUser } from "../../controllers/loginController.js";
-import { registerUser, validaUser } from "../../controllers/userController.js";
-import { upload } from '../../middlewares/upload.middleware.js';
+import { loginUser } from "./loginController.js";
+import { registerUser, validaUser } from "@/modules/users/userController.js";
+import { upload } from '@/middlewares/upload.middleware.js';
 const router = Router();
 
 router.post('/loginUser', loginUser);

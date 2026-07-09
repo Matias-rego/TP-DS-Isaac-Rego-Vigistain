@@ -36,8 +36,8 @@ export default function ModificacionTipoFalla({ onSuccess }: ModificacionTipoFal
       title="Modificar Tipo de Falla"
       subtitle="Buscá el tipo de falla que querés editar"
       searchPlaceholder="Buscar tipo de falla..."
-      searchEndpoint="/failures/getPartialTypes"
-      modifyEndpoint="/failures/modifyType"
+      searchEndpoint="/api/failureType/getPartialTypes"
+      modifyEndpoint="/api/failureType/modifyType"
       idField="id_failure_type"
       previewField="failureDescription"
       fields={FIELDS}

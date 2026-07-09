@@ -1,8 +1,7 @@
 import { Router } from 'express';
-import prisma from "./../../database/prisma.js";
-import { getUser, modifyUser  } from "../../controllers/userController.js";
+import { getUser, modifyUser } from "./userController.js";
 import { upload } from '../../middlewares/upload.middleware.js';
-import { forgotPassword, resetPassword } from '../../controllers/passwordController.js';
+import { forgotPassword, resetPassword } from '@/modules/auths/passwordController.js';
 
 
 const router = Router();

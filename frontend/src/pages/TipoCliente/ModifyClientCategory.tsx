@@ -35,8 +35,8 @@ export default function ModifyClientCategory({ onSuccess }: ModifyClientCategory
         title="Modificar Categoria de Cliente"
         subtitle="Buscá la categoría de cliente que querés editar"
         searchPlaceholder="Buscar categoría de cliente..."
-        searchEndpoint="/clients/getPartialCategoryClients"
-        modifyEndpoint="/clients/modifyCategoryClient"
+        searchEndpoint="/api/clientCategories/getPartialCategoryClients"
+        modifyEndpoint="/api/clientCategories/modifyCategoryClient"
         idField="id_category_client"
         previewField="categoryClientName"
         fields={FIELDS}

@@ -85,7 +85,7 @@ const ClientDetailModal = ({
       if (!decoded?.id_user) throw new Error('Token inválido o expirado.');
 
       const response = await fetch(
-        `${BACKEND_URL}/clients/modifyClient/${data.id_client}`,
+        `${BACKEND_URL}/api/clients/modifyClient/${data.id_client}`,
         {
           method: 'POST',
           headers: {

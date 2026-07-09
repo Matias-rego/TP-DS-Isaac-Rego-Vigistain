@@ -22,9 +22,9 @@ export interface BajaFormProps<T extends object> {
   subtitle?: string;
   icon?: React.ReactNode;
   searchPlaceholder: string;
-  /** Endpoint de búsqueda parcial, ej: "/failures/getPartialTypes" (se le agrega /:query) */
+  /** Endpoint de búsqueda parcial, ej: "/failureType/getPartialTypes" (se le agrega /:query) */
   searchEndpoint: string;
-  /** Endpoint de borrado, ej: "/failures/deleteType" (se le agrega /:id) */
+  /** Endpoint de borrado, ej: "/failureType/deleteType" (se le agrega /:id) */
   deleteEndpoint: string;
   /** Key del campo que identifica unívocamente al registro, ej: "id_failure_type" */
   idField: keyof T;

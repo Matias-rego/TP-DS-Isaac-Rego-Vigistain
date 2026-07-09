@@ -1,6 +1,6 @@
-import { Router }  from "express";
-import { createTypePayment, deleteTypePayment, getAllPaymentTypes, getPartialTypesPayment, modifyTypePayment } from "../../controllers/paymentControllers.js";
-    
+import { Router } from "express";
+import { createTypePayment, deleteTypePayment, getAllPaymentTypes, getPartialTypesPayment, modifyTypePayment } from "./paymentControllers.js";
+
 
 const route = Router();
 

@@ -46,8 +46,8 @@ export default function BajaTipoFalla({ onSuccess }: BajaTipoFallaProps) {
       title="Eliminar Tipo de Falla"
       subtitle="Buscá el tipo de falla que querés eliminar"
       searchPlaceholder="Busca tu falla por descripción..."
-      searchEndpoint="/failures/getPartialTypes"
-      deleteEndpoint="/failures/deleteType"
+      searchEndpoint="/api/failureType/getPartialTypes"
+      deleteEndpoint="/api/failureType/deleteType"
       entityEvent={EVENTS.failureTypeChanged}
       successMessage="Tipo de falla eliminado correctamente."
       icon={ICON}

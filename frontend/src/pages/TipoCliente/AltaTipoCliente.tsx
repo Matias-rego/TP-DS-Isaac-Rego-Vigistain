@@ -39,7 +39,7 @@ export default function AltaCategoryClient({ onSuccess }: AltaCategoryClientProp
       subtitle="Completá los datos para registrar la Categoria de cliente"
       icon={ICON}
       fields={FIELDS}
-      endpoint="/clients/createCategoryClient"
+      endpoint="/api/clientCategories/createCategoryClient"
       submitLabel="Crear Categoria de Cliente"
       successMessage="Categoria Cliente creada correctamente."
       entityEvent={EVENTS.clientCategoryChanged}  

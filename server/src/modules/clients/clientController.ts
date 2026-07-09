@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import prisma from "../database/prisma.js";
+import prisma from "@/database/prisma.js";
 
 async function getCategoryClientByOrders(orderCount: number) {
   try {
@@ -23,6 +23,7 @@ export const createNewClient = async (req: Request, res: Response) => {
     try{
         const { clientName, clientEmail, clientPhone, dniCuit } = req.body;
         const category = await getCategoryClientByOrders(0);
+        console.log(category);
         const newClient = await prisma.client.create({
             data:{
                 clientName,
@@ -38,7 +39,7 @@ export const createNewClient = async (req: Request, res: Response) => {
         })
         return res.status(201).json(newClient)
     }catch(error){
-        console.error('Error en el createNewClient')
+        console.error(`Error en el createNewClient, ${error}`);
         return res.status(500).json({message: "Error del servidor"})
     }
 }
@@ -48,7 +49,7 @@ export const getAllClients = async (req:Request, res: Response) => {
         const clients = await prisma.client.findMany();
         res.json(clients);
     }catch(error){
-        console.error("Error geting all clients:", error);
+        console.error(`Error getting all clients, ${error}`);
         res.status(500).json({error: "Error al obtener todos los clientes"})
     }
 }

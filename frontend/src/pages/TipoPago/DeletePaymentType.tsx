@@ -53,8 +53,8 @@ export default function DeletePaymentType({ onSuccess }: DeletePaymentTypeProps)
             title="Eliminar Tipo de Pago"
             subtitle="Buscá el tipo de pago que querés eliminar"
             searchPlaceholder="Busca tu tipo de pago por nombre..."
-            searchEndpoint="/payments/getPartialTypesPayment"
-            deleteEndpoint="/payments/deleteTypePayment"
+            searchEndpoint="/api/payments/getPartialTypesPayment"
+            deleteEndpoint="/api/payments/deleteTypePayment"
             entityEvent={EVENTS.paymentTypeChanged}
             successMessage="Tipo de pago eliminado correctamente."
             icon={ICON}

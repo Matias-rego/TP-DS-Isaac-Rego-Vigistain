@@ -1,6 +1,5 @@
-import { Router } from 'express'
-
-import { getPartialTypes, createTypeFail, getAllTypes, deleteType, modifyType} from '../../controllers/failController.js'
+import { Router } from "express";
+import { getPartialTypes, createTypeFail, getAllTypes, deleteType, modifyType } from './failureTypeController.js'
 
 const router = Router();
 

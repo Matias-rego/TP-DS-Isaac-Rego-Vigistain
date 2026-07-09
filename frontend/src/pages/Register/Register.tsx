@@ -51,7 +51,7 @@ const Register = () => {
         }
 
         try {
-            const response = await fetch(`${BACKEND_URL}/auth/Register`, {
+            const response = await fetch(`${BACKEND_URL}/api/auth/Register`, {
                 method: 'POST',
                 body: formData,
                 //  Sin Content-Type — el browser lo setea solo con el boundary correcto

@@ -20,7 +20,7 @@ const Login = () => {
     const data = { username, password };
 
     try {
-      const response = await fetch(`${BACKEND_URL}/auth/loginUser`, {
+      const response = await fetch(`${BACKEND_URL}/api/auth/loginUser`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)

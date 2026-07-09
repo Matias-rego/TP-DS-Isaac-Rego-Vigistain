@@ -12,9 +12,9 @@ export interface ModFormProps<T extends object> {
   subtitle?: string;
   icon?: React.ReactNode;
   searchPlaceholder: string;
-  /** Endpoint de búsqueda parcial, ej: "/failures/getPartialTypes" (se le agrega /:query) */
+  /** Endpoint de búsqueda parcial, ej: "/failureType/getPartialTypes" (se le agrega /:query) */
   searchEndpoint: string;
-  /** Endpoint de modificación, ej: "/failures/modifyType" (se le agrega /:id) */
+  /** Endpoint de modificación, ej: "/failureType/modifyType" (se le agrega /:id) */
   modifyEndpoint: string;
   /** Key del campo que identifica unívocamente al registro, ej: "id_failure_type" */
   idField: keyof T;

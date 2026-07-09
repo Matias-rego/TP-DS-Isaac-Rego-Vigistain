@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import enviarMailVerificador from '../service/mail.service.js';
-import parseJwt from '../utils/toke.utils.js';
-import prisma from "../database/prisma.js";
-import { EnumRol } from "../generated/prisma/browser.js";
+import enviarMailVerificador from '@/service/mail.service.js';
+import parseJwt from '@/utils/toke.utils.js';
+import prisma from "@/database/prisma.js";
+import { EnumRol } from "@/generated/prisma/browser.js";
 
 
 export const getUser = async (req: Request, res: Response) => {
@@ -73,7 +73,7 @@ export const validaUser = async (req: Request, res: Response) => {
             data: ({ status: true })
         })
 
-        
+
         if (!rta) {
             return res.redirect(`${loginPath}?error=Usuario no encontrado`);
         }

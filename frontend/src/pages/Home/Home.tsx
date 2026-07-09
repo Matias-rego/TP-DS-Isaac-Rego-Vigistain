@@ -24,7 +24,7 @@ const [toastSaliendo, setToastSaliendo] = useState<boolean>(false);
         const decoded = parseJwt(token);
         if (!decoded?.id_user) return;
 
-        const response = await fetch(`${BACKEND_URL}/users/verifica/${decoded.id_user}`, 
+        const response = await fetch(`${BACKEND_URL}/api/users/verifica/${decoded.id_user}`, 
         { headers: { Authorization: `Bearer ${token}` } });
 
         if (!response.ok) return;

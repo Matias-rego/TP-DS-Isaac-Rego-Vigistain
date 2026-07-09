@@ -26,7 +26,7 @@ export interface ActiveFilters {
 
 export interface SearchBarProps {
   searchPlaceholder?: string;
-  /** Endpoint de búsqueda, ej: "/clients/search" (recibe ?q=texto&filtro=valor) */
+  /** Endpoint de búsqueda, ej: "/clientCategories/search" (recibe ?q=texto&filtro=valor) */
   searchEndpoint: string;
   /** Filtros disponibles en el dropdown */
   filters?: FilterConfig[];

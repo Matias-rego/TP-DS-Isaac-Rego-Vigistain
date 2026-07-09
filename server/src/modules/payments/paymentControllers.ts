@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import prisma from "../database/prisma.js";
+import prisma from "@/database/prisma.js";
 
 export const createTypePayment = async (req: Request, res: Response) => {
     try{
@@ -14,6 +14,7 @@ export const createTypePayment = async (req: Request, res: Response) => {
         });
         res.status(201).json(newTypePayment);
     }catch(error){
+        console.error('Error en createTypePayment:', error);
         res.status(500).json({ error: "Error al crear el tipo de pago" });
     }
 };
