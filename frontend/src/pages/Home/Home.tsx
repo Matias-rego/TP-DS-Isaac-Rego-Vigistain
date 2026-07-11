@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import Nav from "../Nav/Nav";
-import { parseJwt } from "../App/App";
 import styles from "./Home.module.css";
-import  type {UserProfile}  from "../../types/types";
+import type { UserProfile } from "../../types/types";
 import Footer from "./../../components/Footer/Footer";
 import { BACKEND_URL } from '@/lib/config';
 
@@ -10,10 +9,10 @@ const Home = () => {
   const [usuario, setUsuario] = useState<UserProfile | null>(null);
   //const [mostrarToast, setMostrarToast] = useState<boolean>(true);
   const [mostrarToast, setMostrarToast] = useState<boolean>(() => {
-  return sessionStorage.getItem('showLoginToast') === 'true';
-});
+    return sessionStorage.getItem('showLoginToast') === 'true';
+  });
 
-const [toastSaliendo, setToastSaliendo] = useState<boolean>(false);
+  const [toastSaliendo, setToastSaliendo] = useState<boolean>(false);
 
   useEffect(() => {
     const cargarUsuario = async () => {
@@ -21,11 +20,8 @@ const [toastSaliendo, setToastSaliendo] = useState<boolean>(false);
         const token = localStorage.getItem("token");
         if (!token) return;
 
-        const decoded = parseJwt(token);
-        if (!decoded?.id_user) return;
-
-        const response = await fetch(`${BACKEND_URL}/api/users/verifica/${decoded.id_user}`, 
-        { headers: { Authorization: `Bearer ${token}` } });
+        const response = await fetch(`${BACKEND_URL}/api/auth/me`,
+          { headers: { Authorization: `Bearer ${token}` }, credentials: 'include' });
 
         if (!response.ok) return;
 
@@ -40,37 +36,37 @@ const [toastSaliendo, setToastSaliendo] = useState<boolean>(false);
   }, []);
 
   useEffect(() => {
-  if (!mostrarToast) return;
+    if (!mostrarToast) return;
 
-  sessionStorage.removeItem('showLoginToast');
+    sessionStorage.removeItem('showLoginToast');
 
-  const salidaTimer = window.setTimeout(() => {
-    setToastSaliendo(true);
-  }, 2800);
+    const salidaTimer = window.setTimeout(() => {
+      setToastSaliendo(true);
+    }, 2800);
 
-  const ocultarTimer = window.setTimeout(() => {
-    setMostrarToast(false);
-    setToastSaliendo(false);
-  }, 3400);
+    const ocultarTimer = window.setTimeout(() => {
+      setMostrarToast(false);
+      setToastSaliendo(false);
+    }, 3400);
 
-  return () => {
-    window.clearTimeout(salidaTimer);
-    window.clearTimeout(ocultarTimer);
-  };
-}, [mostrarToast]);
+    return () => {
+      window.clearTimeout(salidaTimer);
+      window.clearTimeout(ocultarTimer);
+    };
+  }, [mostrarToast]);
 
   const esTecnico = usuario?.rol === "tecnico" || usuario?.rol === "admin";
 
-    /*
-      TODO CLIENTE:
-      Reactivar cuando el backend tenga implementado el rol "cliente".
-      La idea es mostrar una experiencia distinta para clientes:
-      - Mis equipos
-      - Mis presupuestos
-      - Historial de arreglos
-      - Tipo de cliente
-    */
-    // const esCliente = usuario && !esTecnico;
+  /*
+    TODO CLIENTE:
+    Reactivar cuando el backend tenga implementado el rol "cliente".
+    La idea es mostrar una experiencia distinta para clientes:
+    - Mis equipos
+    - Mis presupuestos
+    - Historial de arreglos
+    - Tipo de cliente
+  */
+  // const esCliente = usuario && !esTecnico;
 
   return (
     <div className={styles.page}>
@@ -128,7 +124,7 @@ const [toastSaliendo, setToastSaliendo] = useState<boolean>(false);
                     este panel mostrará tus equipos, presupuestos e historial de reparaciones.
                   </span>
                 </div>
-                        
+
                 {/*
                   TODO CLIENTE:
                   Reactivar este bloque cuando exista el rol "cliente" en backend.
@@ -163,34 +159,34 @@ const [toastSaliendo, setToastSaliendo] = useState<boolean>(false);
             )}
           </div>
 
-            <div className={styles.heroVisual}>
-              <div className={styles.quickPanel}>
-                <div className={styles.quickPanelHeader}>
-                  <span className={styles.quickPanelIcon}>⚡</span>
-                  <div>
-                    <p className={styles.quickPanelTitle}>Accesos rápidos</p>
-                    <p className={styles.quickPanelText}>Gestioná el taller sin perder tiempo.</p>
-                  </div>
-                </div>
-
-                <div className={styles.quickPanelList}>
-                  <button type="button" className={styles.quickPanelItem}>
-                    <span>📋</span>
-                    <strong>Consultar órdenes</strong>
-                  </button>
-
-                  <button type="button" className={styles.quickPanelItem}>
-                    <span>➕</span>
-                    <strong>Crear nueva orden</strong>
-                  </button>
-
-                  <button type="button" className={styles.quickPanelItem}>
-                    <span>💰</span>
-                    <strong>Ver presupuestos</strong>
-                  </button>
+          <div className={styles.heroVisual}>
+            <div className={styles.quickPanel}>
+              <div className={styles.quickPanelHeader}>
+                <span className={styles.quickPanelIcon}>⚡</span>
+                <div>
+                  <p className={styles.quickPanelTitle}>Accesos rápidos</p>
+                  <p className={styles.quickPanelText}>Gestioná el taller sin perder tiempo.</p>
                 </div>
               </div>
+
+              <div className={styles.quickPanelList}>
+                <button type="button" className={styles.quickPanelItem}>
+                  <span>📋</span>
+                  <strong>Consultar órdenes</strong>
+                </button>
+
+                <button type="button" className={styles.quickPanelItem}>
+                  <span>➕</span>
+                  <strong>Crear nueva orden</strong>
+                </button>
+
+                <button type="button" className={styles.quickPanelItem}>
+                  <span>💰</span>
+                  <strong>Ver presupuestos</strong>
+                </button>
+              </div>
             </div>
+          </div>
         </section>
 
         {esTecnico && (
@@ -216,7 +212,7 @@ const [toastSaliendo, setToastSaliendo] = useState<boolean>(false);
             </div>
           </section>
         )}
-        
+
         {/*
           TODO CLIENTE:
           Reactivar esta sección cuando el backend tenga:

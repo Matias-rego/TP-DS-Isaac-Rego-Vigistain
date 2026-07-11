@@ -81,7 +81,6 @@ export default function SearchBar({
     const fetchResults = async () => {
       setLoading(true);
       try {
-        const token = localStorage.getItem('token');
         const params = new URLSearchParams();
 
         if (debouncedQuery.trim()) params.set('q', debouncedQuery.trim());
@@ -90,7 +89,7 @@ export default function SearchBar({
         });
 
         const res = await fetch(`${baseUrl}${searchEndpoint}?${params.toString()}`, {
-          headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include',
         });
 
         if (res.status === 404) { onResults([]); return; }

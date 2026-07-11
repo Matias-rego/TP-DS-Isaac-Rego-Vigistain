@@ -3,14 +3,14 @@ import { getPartialTypes, createTypeFail, getAllTypes, deleteType, modifyType } 
 
 const router = Router();
 
-router.get('/getPartialTypes/:query', getPartialTypes);
+router.get('/', getAllTypes);
 
-router.post('/createTypeFail', createTypeFail);
+router.get('/:query', getPartialTypes);
 
-router.get('/getAllTypes', getAllTypes);
+router.post('/', createTypeFail);
 
-router.delete('/deleteType/:id', deleteType);
+router.delete('/:id', deleteType);
 
-router.put('/modifyType/:id_failure_type', modifyType);
+router.put('/:id_failure_type', modifyType);
 
 export default router;

@@ -1,6 +1,6 @@
 // Perfil.tsx
 import Nav from '../Nav/Nav';
-import { parseJwt, capitalize } from '../App/App';
+import { capitalize } from '../App/App';
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
@@ -30,11 +30,8 @@ const Perfil = () => {
         const token = localStorage.getItem('token');
         if (!token) throw new Error('No hay token');
 
-        const decoded = parseJwt(token);
-        if (!decoded?.id_user) throw new Error('Token inválido');
-
-        const response = await fetch(`${BACKEND_URL}/api/users/verifica/${decoded.id_user}`,
-          { headers: { Authorization: `Bearer ${token}` } });
+        const response = await fetch(`${BACKEND_URL}/api/auth/me`,
+          { headers: { Authorization: `Bearer ${token}` }, credentials: 'include' });
 
         if (!response.ok) throw new Error(`Error ${response.status}`);
 

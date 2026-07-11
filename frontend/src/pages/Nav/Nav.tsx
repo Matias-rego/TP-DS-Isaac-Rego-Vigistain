@@ -1,12 +1,14 @@
 import styles from './Nav.module.css';
 import { useNavigate } from 'react-router-dom';
-import { parseJwt } from '../App/App';
+//import { parseJwt } from '../App/App';
 import { useEffect, useState } from 'react';
-import type { UserProfile } from '../../types/types';
+import type { User } from '../../types/types';
 import { BACKEND_URL } from '@/lib/config';
+import { useAuth } from '@/lib/AuthContext';
 
 const Nav = () => {
-  const [usuario, setUsuario] = useState<UserProfile | null>(null);
+  const {user, isAuth, loading: authLoading } = useAuth()
+  const [usuario, setUsuario] = useState<User | null>(null);
   const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const navigate = useNavigate();
@@ -14,18 +16,15 @@ const Nav = () => {
   useEffect(() => {
     const cargarPerfil = async () => {
       try {
-        const token = localStorage.getItem('token');
-        if (!token) throw new Error('No hay token');
+        //const decoded = parseJwt(token);
+        //if (!decoded?.id_user) throw new Error('Token inválido');
 
-        const decoded = parseJwt(token);
-        if (!decoded?.id_user) throw new Error('Token inválido');
-
-        const response = await fetch(`${BACKEND_URL}/api/users/verifica/${decoded.id_user}`, 
-          { headers: { Authorization: `Bearer ${token}` } });
+        const response = await fetch(`${BACKEND_URL}/api/auth/me`,
+          {method: 'GET' , credentials: 'include' });
 
         if (!response.ok) throw new Error(`Error ${response.status}`);
 
-        const data: UserProfile = await response.json();
+        const data: User = await response.json();
         if (!data) throw new Error('Usuario no encontrado');
 
         setUsuario(data);
@@ -35,7 +34,7 @@ const Nav = () => {
     };
 
     cargarPerfil();
-  }, []);
+  }, [authLoading, isAuth]);
 
   // Cierra el menú al redimensionar a desktop
   useEffect(() => {
@@ -52,10 +51,24 @@ const Nav = () => {
     return () => { document.body.style.overflow = ''; };
   }, [menuOpen]);
 
-  const confirmarLogout = () => {
-    localStorage.removeItem('token');
-    setShowLogoutModal(false);
-    window.location.replace('/login');
+  const confirmarLogout = async () => {
+    try{
+      const response = await fetch(
+        `${BACKEND_URL}/api/auth/logout`,
+        { 
+          method: "POST",
+          credentials : "include",
+        }
+      )
+      if (response){
+      setShowLogoutModal(false);
+      window.location.replace('/login');
+      }else{
+        console.log("Error en logout");
+      }
+    }catch(error){
+      console.error("Error al intentar logout: ", error);
+    }
   };
 
   const handleNavClick = (path: string) => {
@@ -67,14 +80,14 @@ const Nav = () => {
     <>
       <nav className={styles.navContainer}>
         {/* Logo */}
-          <div className={styles.logo} onClick={() => navigate('/home')}
->
-            <span className={styles.logoMark}>TF</span>
-            <div className={styles.logoCopy}>
-              <span className={styles.logoText}>TechFix</span>
-              <span className={styles.logoSubtitle}>Reparamos lo que te conecta</span>
-            </div>
+        <div className={styles.logo} onClick={() => navigate('/home')}
+        >
+          <span className={styles.logoMark}>TF</span>
+          <div className={styles.logoCopy}>
+            <span className={styles.logoText}>TechFix</span>
+            <span className={styles.logoSubtitle}>Reparamos lo que te conecta</span>
           </div>
+        </div>
 
 
         <ul className={styles.navLinks}>

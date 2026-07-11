@@ -28,7 +28,7 @@ export const getPartialCategoryClients = async (req: Request, res: Response) => 
     const result = await prisma.category_Client.findMany({
       where: {
         categoryClientName: {
-          contains: req.params.description as string,           
+          contains: req.params.description as string,
         }
       }
     });
@@ -40,25 +40,25 @@ export const getPartialCategoryClients = async (req: Request, res: Response) => 
     res.status(500).json({ error: "Internal server error" });
   }
 };
-export const createCategoryClient = async (req: Request, res:Response) => {
-  try{
-      const { categoryClientName, amountForCategoryUp} = req.body;
-      const newCategoryClient = await prisma.category_Client.create({
-        data: {
-          categoryClientName,
-          amountForCategoryUp
-        }
-      })
-      return res.status(201).json(newCategoryClient);
-  }catch(error){
+export const createCategoryClient = async (req: Request, res: Response) => {
+  try {
+    const { categoryClientName, amountForCategoryUp } = req.body;
+    const newCategoryClient = await prisma.category_Client.create({
+      data: {
+        categoryClientName,
+        amountForCategoryUp
+      }
+    })
+    return res.status(201).json(newCategoryClient);
+  } catch (error) {
     console.error('Error en el createCategoryClient', error)
-      return res.status(500).json({message:"Error interno del servidor"})
+    return res.status(500).json({ message: "Error interno del servidor" })
   }
 }
 export const modifyCategoryClient = async (req: Request, res: Response) => {
   const data: any = {};
-  if(req.body.categoryClientName) data.categoryClientName = req.body.categoryClientName;
-  if(req.body.amountForCategoryUp) data.amountForCategoryUp = req.body.amountForCategoryUp;
+  if (req.body.categoryClientName) data.categoryClientName = req.body.categoryClientName;
+  if (req.body.amountForCategoryUp) data.amountForCategoryUp = req.body.amountForCategoryUp;
   try {
     const updatedCategoryClient = await prisma.category_Client.update({
       where: { id_category_client: Number(req.params.id) },
