@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { PasswordInput } from '../../components/ui/PasswordInput';
 import styles from './ResetPassword.module.css';
 import { BACKEND_URL } from '@/lib/config';
 
 const ResetPassword = () => {
-  const { token } = useParams();
   const navigate = useNavigate();
 
   const [password, setPassword] = useState('');
@@ -24,10 +23,11 @@ const ResetPassword = () => {
 
 
     try {
-      const response = await fetch(`${BACKEND_URL}/api/users/reset-password/${token}`, {
+      const response = await fetch(`${BACKEND_URL}/api/auth/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password })
+        body: JSON.stringify({ password }),
+        credentials: 'include',
       });
 
       const data = await response.json();
@@ -41,49 +41,49 @@ const ResetPassword = () => {
   };
 
   return (
-  <div className={styles.container}>
-        <div className={styles.card}>
+    <div className={styles.container}>
+      <div className={styles.card}>
 
-        
+
         <h1 className={styles.title}>Nueva contraseña</h1>
         <p className={styles.subtitle}>
-            Elegí una contraseña segura para tu cuenta.
+          Elegí una contraseña segura para tu cuenta.
         </p>
 
         {success && <p className={styles.successMsg}>{success}</p>}
-        {error   && <p className={styles.errorMsg}>{error}</p>}
+        {error && <p className={styles.errorMsg}>{error}</p>}
 
         <form onSubmit={handleSubmit} className={styles.form}>
-            <div className={styles.group}>
+          <div className={styles.group}>
             <label className={styles.label}>Nueva contraseña</label>
             <PasswordInput
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            className={styles.input}
-            required
-            placeholder="••••••••"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              className={styles.input}
+              required
+              placeholder="••••••••"
             />
-            </div>
+          </div>
 
-            <div className={styles.group}>
+          <div className={styles.group}>
             <label className={styles.label}>Confirmar contraseña</label>
             <PasswordInput
-            value={confirmPassword}
-            onChange={e => setConfirmPassword(e.target.value)}
-            className={styles.input}
-            required
-            placeholder="••••••••"
+              value={confirmPassword}
+              onChange={e => setConfirmPassword(e.target.value)}
+              className={styles.input}
+              required
+              placeholder="••••••••"
             />
-            </div>
+          </div>
 
-            <button type="submit" className={styles.button}>
+          <button type="submit" className={styles.button}>
             Restablecer contraseña
-            </button>
+          </button>
         </form>
 
-        </div>
+      </div>
     </div>
-    );
+  );
 };
 
 export default ResetPassword;

@@ -56,7 +56,7 @@ const ClientRegister = ({onSuccess}:ClientRegisterProps) => {
         subtitle="Completa con los datos del cliente para registrarlo"
         icon={ICON}
         fields={FIELDS}
-        endpoint="/api/clients/createNewClient"
+        endpoint="/api/clients"
         onSuccess={onSuccess}
         submitLabel="Registrar nuevo cliente"
         compact

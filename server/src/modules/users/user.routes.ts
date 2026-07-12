@@ -1,20 +1,19 @@
 import { Router } from 'express';
-import { getUser, modifyUser } from "./userController.js";
+import { getUser, modifyUser, getAllUsers, createUser, deleteUser } from "./userController.js";
 import { upload } from '../../middlewares/upload.middleware.js';
-import { forgotPassword, resetPassword } from '@/modules/auths/passwordController.js';
-
 
 const router = Router();
 
-router.get('/verifica/:id_user', getUser)
+router.get('/', getAllUsers)
 
-router.put('/update/:id_user', upload.single('foto'), modifyUser);
+router.post('/', createUser);
 
-router.post('/forgot-password', forgotPassword);
+router.get('/:id', getUser)
 
-router.post('/reset-password/:token', resetPassword);
+router.put('/:id', upload.single('foto'), modifyUser);
 
+router.patch('/:id', upload.single('foto'), modifyUser);
 
-
+router.delete('/:id', deleteUser);
 
 export default router;

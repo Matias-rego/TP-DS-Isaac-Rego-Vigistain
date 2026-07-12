@@ -18,7 +18,7 @@ export type EnumPaymentMethod = 'DEBITO' | 'MP' | 'EFECTIVO' | 'CREDITO';
 
 export type EnumFailureStatus = 'resuelta' | 'diagnosticada';
 
-export interface UserProfile {
+export interface User {
   id_user:       number;
   userName:      string;
   email:         string;
@@ -86,7 +86,7 @@ export interface Order {
   deliveryDate:        string | null;
   totalCharged:        number | null;
   equipment?:          Equipment;
-  user?:               UserProfile;
+  user?:               User;
   statusHistory?:      Status_History[];
   budget?:             Budget;
 }
@@ -99,7 +99,7 @@ export interface Status_History {
   id_user:           number;
   dateOfChange:      string;
   comment:           string | null;
-  user?:             UserProfile;
+  user?:             User;
 }
 
 export interface Budget {

@@ -6,45 +6,51 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import AlertSuccess from '../../components/Alert/AlertSuccess';
 import { BACKEND_URL } from '@/lib/config';
 import { PasswordInput } from '@/components/ui/PasswordInput';
+import { useAuth } from '@/lib/AuthContext';
+
 const Login = () => {
   const navigate = useNavigate();
-
+  const {refetchUser} = useAuth();
   const [password, setPassword] = useState<string>('');
   const [username, setUsername] = useState<string>('');
   const [login, setLogin] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
 
+  useEffect(() => {
+    if (username || password) {
+      setError(null);
+    }
+  }, [username, password]);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const data = { username, password };
 
     try {
-      const response = await fetch(`${BACKEND_URL}/api/auth/loginUser`, {
+      const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
+        credentials: "include",
       });
 
       const result = await response.json();
 
       if (!response.ok) {
-        // Acá caen los 401, 403, etc.
         setError(result.message);
         setLogin(false);
         return;
       }
 
-      // Acá solo llega si fue 200
-      localStorage.setItem('token', result.token);
-      sessionStorage.setItem('showLoginToast', 'true');
+      await refetchUser();         
       navigate('/home', { replace: true });
 
     } catch (error) {
       console.error('Error:', error);
       setError('Error al conectar con el servidor');
     }
-  }
+  };
   const successMsgE = searchParams.get('success');
   const errorMsgE = searchParams.get('error');
 

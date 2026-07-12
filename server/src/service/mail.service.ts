@@ -1,21 +1,21 @@
 import nodemailer from 'nodemailer';
 import parseJwt from '../utils/toke.utils.js';
-
+import { config } from '@/utils/config.js';
 
 const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
+    host: config.EMAIL_HOST,
     port: 465,
     secure: true,
     auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD
+        user: config.EMAIL_USER,
+        pass: config.EMAIL_PASSWORD
     }
 });
 
 async function enviarMailVerificador(direccionEmail: string, tokenVerificacion: string) {
     try {
         await transporter.sendMail({
-            from: `"Gestión Taller" <${process.env.EMAIL_USER}>`,
+            from: `"Gestión Taller" <${config.EMAIL_USER}>`,
             to: direccionEmail,
             subject: "Verificación de cuenta",
             html: crearMailVerificacion(tokenVerificacion)
@@ -27,9 +27,9 @@ async function enviarMailVerificador(direccionEmail: string, tokenVerificacion: 
 }
 
 function crearMailVerificacion(tokenVerificacion: string) {
-    const dataToken= parseJwt(tokenVerificacion);
+    const dataToken = parseJwt(tokenVerificacion);
     const username = dataToken ? dataToken.username : "Usuario";
-    const validationLink = `${process.env.FRONTEND_URL}/auth/validateCuenta/${tokenVerificacion}`;
+    const validationLink = `${config.FRONTEND_URL}/auth/validateCuenta/${tokenVerificacion}`;
     return `
     <!DOCTYPE html>
     <html>

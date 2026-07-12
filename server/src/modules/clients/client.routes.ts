@@ -3,14 +3,14 @@ import { createNewClient, getAllClients, getOneClient, modifyClient, getPartialC
 
 const router = Router();
 
-router.post('/createNewClient', createNewClient);
+router.post('/', createNewClient);
 
-router.get('/getAllClients', getAllClients);
+router.get('/', getAllClients);
 
-router.get('/getOneClient/:id', getOneClient);
+router.get('/:id', getOneClient);
 
-router.post('/modifyClient/:id_client', modifyClient);
+router.put('/:id', modifyClient);
 
-router.get('/getPartialClient', getPartialClient);
+router.get('/search', getPartialClient);
 
 export default router;

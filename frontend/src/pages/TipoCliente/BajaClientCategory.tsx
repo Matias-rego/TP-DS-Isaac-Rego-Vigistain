@@ -12,7 +12,7 @@ const FIELDS: DetailFieldConfig[] = [
     name: "categoryClientName",
     label: "Nombre",
   },
-    {
+  {
     name: "amountForCategoryUp",
     label: "Órdenes requeridas",
   },
@@ -39,18 +39,18 @@ interface BajaClientCategoryProps {
 export default function BajaClientCategory({ onSuccess }: BajaClientCategoryProps) {
   return (
     <BajaForm<ClientCategory>
-        title="Eliminar Categoría de Cliente"
-        subtitle="Buscá la categoría de cliente que querés eliminar"
-        searchPlaceholder="Busca tu categoría de cliente por descripción..."
-        searchEndpoint="/api/clientCategories/getPartialCategoryClients"
-        deleteEndpoint="/api/clientCategories/deleteCategoryClient"
-        entityEvent={EVENTS.clientCategoryChanged}
-        successMessage="Categoría de cliente eliminada correctamente."
-        icon={ICON}
-        detailFields={FIELDS}
-        idField="id_category_client"
-        previewField="categoryClientName"
-        onSuccess={onSuccess}
+      title="Eliminar Categoría de Cliente"
+      subtitle="Buscá la categoría de cliente que querés eliminar"
+      searchPlaceholder="Busca tu categoría de cliente por descripción..."
+      searchEndpoint="/api/client-types"
+      deleteEndpoint="/api/client-types"
+      entityEvent={EVENTS.clientCategoryChanged}
+      successMessage="Categoría de cliente eliminada correctamente."
+      icon={ICON}
+      detailFields={FIELDS}
+      idField="id_category_client"
+      previewField="categoryClientName"
+      onSuccess={onSuccess}
     />
   );
 }

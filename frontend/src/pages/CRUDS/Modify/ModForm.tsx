@@ -12,30 +12,16 @@ export interface ModFormProps<T extends object> {
   subtitle?: string;
   icon?: React.ReactNode;
   searchPlaceholder: string;
-  /** Endpoint de búsqueda parcial, ej: "/failureType/getPartialTypes" (se le agrega /:query) */
   searchEndpoint: string;
-  /** Endpoint de modificación, ej: "/failureType/modifyType" (se le agrega /:id) */
   modifyEndpoint: string;
-  /** Key del campo que identifica unívocamente al registro, ej: "id_failure_type" */
   idField: keyof T;
-  /** Key del campo que se muestra en la lista de resultados como preview */
   previewField?: keyof T;
-  /** Función para combinar varios campos en el preview. Tiene prioridad sobre previewField. */
   previewFormat?: (item: T) => string;
-  /** Campos editables del formulario (reutiliza el mismo FieldConfig de AltaForm) */
   fields: FieldConfig[];
   successMessage?: string;
   entityEvent?: string;
   onSuccess?: () => void;
   debounceMs?: number;
-}
-
-function parseJwt(token: string) {
-  try {
-    return JSON.parse(atob(token.split('.')[1]));
-  } catch {
-    return null;
-  }
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -73,13 +59,11 @@ export default function ModForm<T extends object>({
     }
 
     const fetchResults = async () => {
-      const url = `${baseUrl}${searchEndpoint}/${encodeURIComponent(debouncedQuery)}`;
+      
       try {
         const result = await fetch(
-          url,
-          { method: 'GET' }
-        );
-
+          `${baseUrl}${searchEndpoint}/${encodeURIComponent(debouncedQuery)}`,
+          { method: 'GET', credentials: 'include' });
         if (result.status === 404) {
           setResults([]);
           return;
@@ -116,11 +100,6 @@ export default function ModForm<T extends object>({
     setError(null);
 
     try {
-      const token = localStorage.getItem('token');
-      if (!token) throw new Error('No hay token de sesión.');
-
-      const decoded = parseJwt(token);
-      if (!decoded?.id_user) throw new Error('Token inválido o expirado.');
 
       const id = selected[idField];
 
@@ -133,10 +112,10 @@ export default function ModForm<T extends object>({
       const result = await fetch(`${baseUrl}${modifyEndpoint}/${id}`, {
         method: 'PUT',
         headers: {
-          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),
+        credentials: 'include',
       });
 
       if (!result.ok) {

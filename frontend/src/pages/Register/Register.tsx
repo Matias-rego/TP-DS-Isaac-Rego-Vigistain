@@ -8,15 +8,15 @@ import CustomButton1 from "../../components/Buttons/Button1";
 import { PasswordInput } from "../../components/ui/PasswordInput";
 
 const Register = () => {
-    const [username, setUsername]               = useState<string>('');
-    const [email, setEmail]                     = useState<string>('');
-    const [password, setPassword]               = useState<string>('');
+    const [username, setUsername] = useState<string>('');
+    const [email, setEmail] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
     const [confirmPassword, setConfirmPassword] = useState<string>('');
-    const [foto, setFoto]                       = useState<File | null>(null);
-    const [preview, setPreview]                 = useState<string | null>(null);
-    const [error, setError]                     = useState<string | null>(null);
-    const [success, setSuccess]                 = useState<string | null>(null);    
-    const [isRegistered, setIsRegistered]       = useState<boolean>(false);
+    const [foto, setFoto] = useState<File | null>(null);
+    const [preview, setPreview] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<string | null>(null);
+    const [isRegistered, setIsRegistered] = useState<boolean>(false);
 
 
     // Cuando el usuario elige una imagen, generamos preview local
@@ -51,12 +51,11 @@ const Register = () => {
         }
 
         try {
-            const response = await fetch(`${BACKEND_URL}/api/auth/Register`, {
+            const response = await fetch(`${BACKEND_URL}/api/auth/register`, {
                 method: 'POST',
                 body: formData,
-                //  Sin Content-Type — el browser lo setea solo con el boundary correcto
+                credentials: 'include',
             });
-
             const result = await response.json();
 
             if (response.ok && result.message === 'Usuario registrado exitosamente, valida tu cuenta a través del enlace enviado a tu correo electrónico') {

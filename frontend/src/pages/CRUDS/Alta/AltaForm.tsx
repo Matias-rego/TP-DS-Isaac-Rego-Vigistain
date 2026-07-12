@@ -47,13 +47,6 @@ export interface AltaFormProps {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function parseJwt(token: string) {
-  try {
-    return JSON.parse(atob(token.split('.')[1]));
-  } catch {
-    return null;
-  }
-}
 
 function buildInitialState(fields: FieldConfig[]): Record<string, string> {
   return Object.fromEntries(fields.map(f => [f.name, '']));
@@ -181,21 +174,15 @@ export default function AltaForm({
     setErrors({});
 
     try {
-      const token = localStorage.getItem('token');
-      if (!token) throw new Error('No hay token de sesión.');
-
-      const decoded = parseJwt(token);
-      if (!decoded?.id_user) throw new Error('Token inválido o expirado.');
-
       const baseUrl = BACKEND_URL;
 
       const response = await fetch(`${baseUrl}${endpoint}`, {
         method,
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(buildPayload(fields, formData)),
+        credentials: 'include',
       });
 
       // 409 → conflicto de duplicado en el primer campo por convención

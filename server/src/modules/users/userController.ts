@@ -2,10 +2,16 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import enviarMailVerificador from '@/service/mail.service.js';
-import parseJwt from '@/utils/toke.utils.js';
 import prisma from "@/database/prisma.js";
 import { EnumRol } from "@/generated/prisma/browser.js";
+import { config } from '@/utils/config.js';
+import { AccessTokenPayload } from '@/modules/auths/auth.type.js';
 
+export const getAllUsers = async (req: Request, res: Response) => { }
+
+export const createUser = async (req: Request, res: Response) => { }
+
+export const deleteUser = async (req: Request, res: Response) => { }
 
 export const getUser = async (req: Request, res: Response) => {
     try {
@@ -49,7 +55,7 @@ export const registerUser = async (req: Request, res: Response) => {
     try {
         await prisma.user.create({ data });
 
-        const tokenVerificacion = jwt.sign({ userName: username }, "Stack", { expiresIn: '24h' });
+        const tokenVerificacion = jwt.sign({ userName: username }, config.JWT_SECRET, { expiresIn: '24h' });
         await enviarMailVerificador(email, tokenVerificacion);
 
         res.json({ message: 'Usuario registrado exitosamente, valida tu cuenta a través del enlace enviado a tu correo electrónico' });
@@ -60,13 +66,13 @@ export const registerUser = async (req: Request, res: Response) => {
 };
 
 export const validaUser = async (req: Request, res: Response) => {
-    const { token } = req.params;
-    const dataToken = parseJwt(token as string);
+    const { token } = req.params as AccessTokenPayload;
+    const dataToken = jwt.verify(token, config.JWT_SECRET)
     if (!dataToken) {
         return res.status(400).json({ error: 'Token inválido' });
     }
     const { userName } = dataToken;
-    const loginPath = `${process.env.FRONTEND_URL}/login`;
+    const loginPath = `${config.FRONTEND_URL}/login`;
     try {
         const rta = await prisma.user.update({
             where: ({ userName: userName }),
@@ -100,7 +106,7 @@ export const modifyUser = async (req: Request, res: Response) => {
 
     try {
         const rta = await prisma.user.update({
-            where: { id_user: Number(req.params.id_user) },
+            where: { id_user: Number(req.params.id) },
             data
         });
         res.json({

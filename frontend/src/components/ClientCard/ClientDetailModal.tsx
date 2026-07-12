@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import DetailModal from "../Modals/DetailModal";
 import type { DetailFieldConfig, DetailItemConfig } from "../Modals/DetailModal";
 import styles from './ClientDetailModal.module.css';
-import { parseJwt } from "@/pages/App/App";
 import { eventBus } from "@/lib/eventBus";
 import { BACKEND_URL } from "@/lib/config";
 
@@ -78,21 +77,16 @@ const ClientDetailModal = ({
 
   const handleEdit = async (data: Client): Promise<boolean> => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) throw new Error('No hay token de sesión.');
-
-      const decoded = parseJwt(token);
-      if (!decoded?.id_user) throw new Error('Token inválido o expirado.');
 
       const response = await fetch(
-        `${BACKEND_URL}/api/clients/modifyClient/${data.id_client}`,
+        `${BACKEND_URL}/api/clients/${data.id_client}`,
         {
-          method: 'POST',
+          method: 'PUT',
           headers: {
-            Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(data),
+          credentials: 'include',
         }
       );
 
