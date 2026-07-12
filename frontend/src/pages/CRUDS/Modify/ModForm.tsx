@@ -73,9 +73,10 @@ export default function ModForm<T extends object>({
     }
 
     const fetchResults = async () => {
+      const url = `${baseUrl}${searchEndpoint}/${encodeURIComponent(debouncedQuery)}`;
       try {
         const result = await fetch(
-          `${baseUrl}${searchEndpoint}/${encodeURIComponent(debouncedQuery)}`,
+          url,
           { method: 'GET' }
         );
 

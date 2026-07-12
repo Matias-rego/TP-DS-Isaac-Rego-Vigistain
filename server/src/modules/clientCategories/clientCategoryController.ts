@@ -32,8 +32,7 @@ export const getPartialCategoryClients = async (req: Request, res: Response) => 
         }
       }
     });
-
-    if (result.length === 0) return res.status(404).json([]);
+    if (result.length === 0) return res.status(200).json([]);
     res.json(result);
   } catch (error) {
     console.error("Error fetching partial clients:", error);
