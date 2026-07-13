@@ -2,13 +2,16 @@
     position: relative;
     display: inline-flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    background: transparent;   /* reset de boton */
+    border: none;
+    cursor: pointer;
     text-decoration: none;
     color: #a8bdd4;
-    font-size: 1,5rem;
-    font-family: "Georgia", serif;
-    letter-spacing: 0.02em;
-    padding-bottom: 2px;
+    font-size: 0.95rem;        /* antes decia 1,5rem (con coma) y el navegador lo ignoraba */
+    font-family: inherit;      /* usa la misma tipografia sans que el resto */
+    letter-spacing: 0.01em;
+    padding: 0 0 2px;
     transition: color 0.25s ease;
     gap: 2px;
 }

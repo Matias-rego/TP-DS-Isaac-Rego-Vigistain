@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import useDebounce from '@/components/useDebounce';
 import { BACKEND_URL } from '@/lib/config';
 import styles from './SearchBar.module.css';
+import { X } from 'lucide-react';
 
 // ─── Filter config ────────────────────────────────────────────────────────────
 
@@ -139,7 +140,7 @@ export default function SearchBar({
         {loading && <span className={styles.spinner} />}
         {query && (
           <button className={styles.clearBtn} onClick={() => { setQuery(''); onClear?.(); }}>
-            ✕
+            <X size={16} />
           </button>
         )}
       </div>

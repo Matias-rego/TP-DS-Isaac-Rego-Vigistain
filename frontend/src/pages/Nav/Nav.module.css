@@ -80,7 +80,7 @@
 
 .logoText {
   font-size: 1.25rem;
-  font-weight: 900;
+  font-weight: 700;
   color: var(--gris-texto);
   letter-spacing: -0.4px;
 }
@@ -123,7 +123,7 @@
   background: transparent;
   color: var(--gris-texto);
   font-size: 0.95rem;
-  font-weight: 800;
+  font-weight: 600;
   padding: 0.72rem 1rem;
   border-radius: 999px;
   cursor: pointer;
@@ -199,38 +199,28 @@
 .logoutButton {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
-  background: linear-gradient(135deg, var(--azul) 0%, var(--azul-oscuro) 100%);
+  gap: 0.5rem;
+  background: var(--azul);
   color: var(--blanco);
   border: none;
-  padding: 0.65rem 1.15rem;
+  padding: 0.6rem 1.15rem;
   border-radius: 999px;
-  font-weight: 800;
-  font-size: 0.95rem;
+  font-weight: 600;
+  font-size: 0.9rem;
   cursor: pointer;
-  box-shadow: 0 12px 28px rgba(21, 101, 192, 0.28);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  transition: background 0.18s ease;
   flex-shrink: 0;
 }
 
 .logoutButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 16px 36px rgba(21, 101, 192, 0.36);
-  filter: brightness(1.04);
+  background: var(--azul-oscuro);
 }
 
-.logoutButton:active { transform: translateY(0); }
-
 .logoutIcon {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--amarillo);
-  color: #1E293B;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.85rem;
+  color: inherit;
   flex-shrink: 0;
 }
 
@@ -431,9 +421,10 @@
 }
 
 .drawerLinkIcon {
-  font-size: 1.15rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 28px;
-  text-align: center;
   flex-shrink: 0;
 }
 
@@ -447,21 +438,20 @@
   align-items: center;
   gap: 0.6rem;
   width: 100%;
-  background: linear-gradient(135deg, var(--azul) 0%, var(--azul-oscuro) 100%);
+  justify-content: center;
+  background: var(--azul);
   color: var(--blanco);
   border: none;
   padding: 0.8rem 1.2rem;
-  border-radius: 999px;
-  font-weight: 800;
+  border-radius: 12px;
+  font-weight: 600;
   font-size: 0.95rem;
   cursor: pointer;
-  box-shadow: 0 10px 24px rgba(21, 101, 192, 0.28);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: background 0.18s ease;
 }
 
 .drawerLogout:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 14px 30px rgba(21, 101, 192, 0.36);
+  background: var(--azul-oscuro);
 }
 
 /* ─── MODAL ─── */
@@ -498,17 +488,15 @@
 }
 
 .modalIcon {
-  width: 64px;
-  height: 64px;
+  width: 60px;
+  height: 60px;
   margin: 0 auto 1rem;
   border-radius: 50%;
-  background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
-  color: #007ea7;
+  background: var(--azul-suave);
+  color: var(--azul);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.7rem;
-  box-shadow: 0 12px 28px rgba(0, 168, 232, 0.22);
 }
 
 .modalTitle {
@@ -569,14 +557,12 @@
 }
 
 .confirmButton {
-  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  background: var(--azul);
   color: #ffffff;
-  box-shadow: 0 10px 24px rgba(14, 165, 233, 0.3);
 }
 
 .confirmButton:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 14px 30px rgba(14, 165, 233, 0.38);
+  background: var(--azul-oscuro);
 }
 
 /* ─── ANIMACIONES ─── */

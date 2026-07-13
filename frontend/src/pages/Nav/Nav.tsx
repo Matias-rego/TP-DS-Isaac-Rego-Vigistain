@@ -4,6 +4,10 @@ import { parseJwt } from '../App/App';
 import { useEffect, useState } from 'react';
 import type { UserProfile } from '../../types/types';
 import { BACKEND_URL } from '@/lib/config';
+import { LogOut, X, Home, Wrench, ClipboardList, Users, User } from 'lucide-react';
+
+// Logo de TechFix (icono transparente en Cloudinary)
+const LOGO_URL = "https://res.cloudinary.com/dll6qurcd/image/upload/v1783738139/teckfixFvicon_qt61a7.png";
 
 const Nav = () => {
   const [usuario, setUsuario] = useState<UserProfile | null>(null);
@@ -69,7 +73,7 @@ const Nav = () => {
         {/* Logo */}
           <div className={styles.logo} onClick={() => navigate('/home')}
 >
-            <span className={styles.logoMark}>TF</span>
+            <img src={LOGO_URL} alt="TechFix" style={{ height: 74, width: 74, objectFit: 'contain' }} />
             <div className={styles.logoCopy}>
               <span className={styles.logoText}>TechFix</span>
               <span className={styles.logoSubtitle}>Reparamos lo que te conecta</span>
@@ -111,7 +115,7 @@ const Nav = () => {
             className={styles.logoutButton}
             onClick={() => setShowLogoutModal(true)}
           >
-            <span className={styles.logoutIcon}>⏻</span>
+            <span className={styles.logoutIcon}><LogOut size={18} /></span>
             Cerrar sesión
           </button>
           <img
@@ -174,7 +178,7 @@ const Nav = () => {
             onClick={() => setMenuOpen(false)}
             aria-label="Cerrar menú"
           >
-            ✕
+            <X size={22} />
           </button>
         </div>
 
@@ -185,7 +189,7 @@ const Nav = () => {
             className={styles.drawerLink}
             onClick={() => handleNavClick('/home')}
           >
-            <span className={styles.drawerLinkIcon}>🏠</span>
+            <span className={styles.drawerLinkIcon}><Home size={20} /></span>
             Inicio
           </button>
           <button
@@ -193,7 +197,7 @@ const Nav = () => {
             className={styles.drawerLink}
             onClick={() => { setMenuOpen(false); alert('La sección Servicios todavía está en desarrollo.'); }}
           >
-            <span className={styles.drawerLinkIcon}>🔧</span>
+            <span className={styles.drawerLinkIcon}><Wrench size={20} /></span>
             Servicios
           </button>
           <button
@@ -201,7 +205,7 @@ const Nav = () => {
             className={styles.drawerLink}
             onClick={() => handleNavClick('/gestion')}
           >
-            <span className={styles.drawerLinkIcon}>📋</span>
+            <span className={styles.drawerLinkIcon}><ClipboardList size={20} /></span>
             Gestión
           </button>
           <button
@@ -209,7 +213,7 @@ const Nav = () => {
             className={styles.drawerLink}
             onClick={() => handleNavClick('/clientes')}
           >
-            <span className={styles.drawerLinkIcon}>👥</span>
+            <span className={styles.drawerLinkIcon}><Users size={20} /></span>
             Clientes
           </button>
           <button
@@ -217,7 +221,7 @@ const Nav = () => {
             className={styles.drawerLink}
             onClick={() => handleNavClick('/perfil')}
           >
-            <span className={styles.drawerLinkIcon}>👤</span>
+            <span className={styles.drawerLinkIcon}><User size={20} /></span>
             Mi perfil
           </button>
 
@@ -229,7 +233,7 @@ const Nav = () => {
             className={styles.drawerLogout}
             onClick={() => { setMenuOpen(false); setShowLogoutModal(true); }}
           >
-            <span className={styles.logoutIcon}>⏻</span>
+            <span className={styles.logoutIcon}><LogOut size={18} /></span>
             Cerrar sesión
           </button>
         </div>
@@ -239,7 +243,7 @@ const Nav = () => {
       {showLogoutModal && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalCard}>
-            <div className={styles.modalIcon}>⏻</div>
+            <div className={styles.modalIcon}><LogOut size={28} /></div>
             <h2 className={styles.modalTitle}>¿Cerrar sesión?</h2>
             <p className={styles.modalText}>
               Vas a salir de tu cuenta actual. Para volver a ingresar, tendrás que iniciar sesión nuevamente.

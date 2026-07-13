@@ -6,6 +6,7 @@ import ActionButton from '../../components/Buttons/ActionButton';
 import Nav from '../../pages/Nav/Nav';
 import Footer from '../../components/Footer/Footer';
 import styles from './Clientes.module.css';
+import { Users } from 'lucide-react';
 
 const CLIENT_FILTERS: FilterConfig[] = [
   {
@@ -41,7 +42,7 @@ const Clientes = () => {
         <div className={styles.header}>
           <div className={styles.headerText}>
             <div>
-            <h1 className={styles.title}>👥 Directorio de Clientes</h1>
+            <h1 className={styles.title}><Users size={26} style={{ verticalAlign: '-4px', marginRight: 8 }} />Directorio de Clientes</h1>
             <p className={styles.subtitle}>
               Administre la base de datos de sus clientes y realice un seguimiento del historial de servicios.
             </p>

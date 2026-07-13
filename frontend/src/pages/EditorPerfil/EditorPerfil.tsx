@@ -10,6 +10,7 @@ import AlertSuccess from "@/components/Alert/AlertSuccess";
 import Alert from "@/components/Alert/Alert";
 import { useNavigate } from "react-router-dom";
 import { BACKEND_URL } from '@/lib/config';
+import { X, Camera } from "lucide-react";
 
 
 
@@ -150,7 +151,7 @@ const EditorPerfil = () =>{
                               className={styles.removeBtn}
                               onClick={removePhoto}
                             >
-                              ✕
+                              <X size={16} />
                             </button>
                           </div>
                         ) : (
@@ -158,7 +159,7 @@ const EditorPerfil = () =>{
                             className={styles.dropZone}
                             htmlFor="file-input"
                           >
-                            <span className={styles.dropZoneIcon}>📷</span>
+                            <span className={styles.dropZoneIcon}><Camera size={30} /></span>
 
                             <span className={styles.dropZoneText}>
                               Hacé clic para subir una imagen

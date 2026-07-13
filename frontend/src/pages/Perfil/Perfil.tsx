@@ -7,15 +7,6 @@ import { Badge } from '@/components/ui/badge';
 import { BACKEND_URL } from '@/lib/config';
 import styles from './Perfil.module.css';
 import type { UserProfile } from "../../types/types";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
 
 
 
@@ -113,22 +104,9 @@ const Perfil = () => {
 
           {/* ── Sección tarjetas asociadas ── */}
           <div className={styles.sectionWrapper}>
-            <h2 className={styles.sectionTitle}>...Tarjetas...</h2>
+            <h2 className={styles.sectionTitle}>Tarjetas asociadas</h2>
+            <p className={styles.sectionEmpty}>Todavía no hay tarjetas para mostrar.</p>
           </div>
-
-          <Card className={styles.cardBodyPerfil}>
-            <CardHeader>
-              <CardTitle>Card Title</CardTitle>
-              <CardDescription>Card Description</CardDescription>
-              <CardAction>Card Action</CardAction>
-            </CardHeader>
-            <CardContent>
-              <p>Card Content</p>
-            </CardContent>
-            <CardFooter>
-              <p>Card Footer</p>
-            </CardFooter>
-          </Card>
 
         </div>
 
