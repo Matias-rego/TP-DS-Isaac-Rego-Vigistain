@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
-import Nav from "../Nav/Nav";
+import Nav from "@/pages/Nav/Nav";
 import styles from "./Home.module.css";
-import type { UserProfile } from "../../types/types";
-import Footer from "./../../components/Footer/Footer";
+import type { User } from "@/types/types";
+import Footer from "@/components/Footer/Footer";
 import { BACKEND_URL } from '@/lib/config';
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
-  const [usuario, setUsuario] = useState<UserProfile | null>(null);
+  const [usuario, setUsuario] = useState<User | null>(null);
   //const [mostrarToast, setMostrarToast] = useState<boolean>(true);
+  const navigate = useNavigate();
   const [mostrarToast, setMostrarToast] = useState<boolean>(() => {
     return sessionStorage.getItem('showLoginToast') === 'true';
   });
@@ -17,15 +19,13 @@ const Home = () => {
   useEffect(() => {
     const cargarUsuario = async () => {
       try {
-        const token = localStorage.getItem("token");
-        if (!token) return;
 
         const response = await fetch(`${BACKEND_URL}/api/auth/me`,
-          { headers: { Authorization: `Bearer ${token}` }, credentials: 'include' });
+          { credentials: 'include' });
 
         if (!response.ok) return;
 
-        const data: UserProfile = await response.json();
+        const data: User = await response.json();
         setUsuario(data);
       } catch (error) {
         console.error("Error al cargar usuario:", error);
@@ -107,7 +107,7 @@ const Home = () => {
                   </span>
                 </button>
 
-                <button type="button" className={styles.secondaryAction}>
+                <button type="button" className={styles.secondaryAction} onClick={() => navigate('/createOrder')}>
                   <span className={styles.actionIcon}>＋</span>
                   <span>
                     <strong>Nueva orden</strong>

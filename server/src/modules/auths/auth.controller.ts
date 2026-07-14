@@ -6,6 +6,66 @@ import bcrypt from 'bcrypt';
 import { config } from '@/utils/config.js';
 import { AccessTokenPayload, ResetPasswordPayload } from './auth.type.js'
 
+interface DecodedToken {
+    userName: string;
+}
+
+export const validateAccountController = async (req: Request, res: Response) => {
+    const token = req.params.token;
+
+    if (typeof token !== 'string') {
+        return res.status(400).json({ 
+            success: false, 
+            message: "El token proporcionado no es válido." 
+        });
+    }
+
+    const result = await validateAccount(token);
+
+    if (!result.success) {
+        return res.status(400).json(result);
+    }
+
+    return res.status(200).json(result);
+};
+async function validateAccount(token: string) {
+    try {
+
+        const decoded = jwt.verify(token, config.JWT_SECRET) as DecodedToken;
+        
+        if (!decoded || !decoded.userName) {
+            throw new Error("Token inválido o no contiene el ID de usuario");
+        }
+
+        const userN = decoded.userName;
+
+        // 2. Actualizar el estado del usuario a 1 en la base de datos con Prisma
+        const usuarioActualizado = await prisma.user.update({
+            where: {
+                userName: userN,
+            },
+            data: {
+                status: true, 
+            },
+        });
+
+        console.log(`Usuario con Nombre ${userN} validado correctamente.`);
+        return {
+            success: true,
+            message: "Cuenta validada con éxito",
+            usuario: usuarioActualizado
+        };
+
+    } catch (error: any) {
+        console.error("Error al validar la cuenta:", error.message);
+        return {
+            success: false,
+            message: error.message || "Error interno al validar la cuenta"
+        };
+    }
+}
+
+
 export const loginUser = async (req: Request, res: Response) => {
     const { username, password } = req.body;
     try {

@@ -14,7 +14,7 @@ export interface FilterConfig {
   key: string;
   label: string;
   type: 'select' | 'date';
-  options?: FilterOption[]; // solo para type: 'select'
+  options?: FilterOption[]; 
   placeholder?: string;
 }
 
@@ -26,13 +26,11 @@ export interface ActiveFilters {
 
 export interface SearchBarProps {
   searchPlaceholder?: string;
-  /** Endpoint de búsqueda, ej: "/clientCategories/search" (recibe ?q=texto&filtro=valor) */
   searchEndpoint: string;
-  /** Filtros disponibles en el dropdown */
   filters?: FilterConfig[];
-  /** Callback con los resultados del fetch */
+  /** Nuevo atributo para controlar la visibilidad de los filtros */
+  showFilters?: boolean; 
   onResults: (results: unknown[]) => void;
-  /** Callback cuando se limpia la búsqueda */
   onClear?: () => void;
   debounceMs?: number;
 }
@@ -43,6 +41,7 @@ export default function SearchBar({
   searchPlaceholder = 'Buscar...',
   searchEndpoint,
   filters = [],
+  showFilters = true, // Por defecto es true
   onResults,
   onClear,
   debounceMs = 600,
@@ -54,7 +53,6 @@ export default function SearchBar({
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const debouncedQuery = useDebounce(query, debounceMs);
-
   const baseUrl = BACKEND_URL;
 
   // Cerrar dropdown al clickear afuera
@@ -143,8 +141,8 @@ export default function SearchBar({
         )}
       </div>
 
-      {/* ── Filters button + dropdown ── */}
-      {filters.length > 0 && (
+      {/* ── Filters button + dropdown (Ahora condicionado por showFilters) ── */}
+      {showFilters && filters.length > 0 && (
         <div className={styles.filterWrapper} ref={dropdownRef}>
           <button
             className={`${styles.filterBtn} ${activeFilterCount > 0 ? styles.filterBtnActive : ''}`}

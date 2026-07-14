@@ -9,7 +9,6 @@ import imagenTarjetaTipoCliente from "../../assets/imagenTarjetaTipoCliente.png"
 import imagenTarjetaTipoPago from "../../assets/imagenTarjetaTipoPago.jpg";
 import TableRtl from "@/components/DataTable/DataTable";
 import type { ColumnConfig } from "@/components/DataTable/DataTable";
-
 import AltaTipoFalla from '@/pages/TipoFalla/AltaTipoFalla';
 import BajaTipoFalla from '@/pages/TipoFalla/BajaTipoFalla';
 import ModificacionTipoFalla from '@/pages/TipoFalla/ModificacionTipoFalla';

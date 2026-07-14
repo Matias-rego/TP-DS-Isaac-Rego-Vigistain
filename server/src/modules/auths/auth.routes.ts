@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { loginUser, forgotPassword, resetPassword, getMe, logout} from "./auth.controller.js";
+import { loginUser, forgotPassword, resetPassword, getMe, logout, validateAccountController} from "./auth.controller.js";
 import { registerUser } from "@/modules/users/userController.js";
 import authenticate from '@/middlewares/authenticate.middleware.js';
 import { upload } from '@/middlewares/upload.middleware.js';
@@ -21,6 +21,8 @@ router.post('/refresh', (req, res) => {
 router.post('/forgot-password', forgotPassword);
 
 router.post('/reset-password/:token', resetPassword);
+
+router.put('/validate/:token', validateAccountController);
 
 router.get('/me', authenticate([]), getMe);
 

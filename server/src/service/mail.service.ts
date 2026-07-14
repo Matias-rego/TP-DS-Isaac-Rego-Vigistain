@@ -1,17 +1,40 @@
 import nodemailer from 'nodemailer';
 import parseJwt from '../utils/toke.utils.js';
 import { config } from '@/utils/config.js';
+import { Resend } from 'resend';
+
+
+const resend = new Resend(config.RESEND_API_KEY); 
 
 const transporter = nodemailer.createTransport({
-    host: config.EMAIL_HOST,
-    port: 465,
-    secure: true,
+    host: config.EMAIL_HOST, 
+    port: 587,               
+    secure: false,           
     auth: {
         user: config.EMAIL_USER,
-        pass: config.EMAIL_PASSWORD
+        pass: config.EMAIL_PASSWORD 
+    },
+    tls: {
+        rejectUnauthorized: false // <-- Evita bloqueos de seguridad en localhost
     }
 });
-
+/* --> Alternativa del resend para poder enviar mails
+async function enviarMailVerificador(direccionEmail: string, tokenVerificacion: string) {
+    try {
+        await resend.emails.send({
+            from: 'Gestión Taller <onboarding@resend.dev>', // o tu dominio verificado
+            to: direccionEmail,
+            subject: 'Verificación de cuenta',
+            html: crearMailVerificacion(tokenVerificacion),
+        });
+        console.log("Mail enviado con éxito");
+        return true;
+    } catch (error) {
+        console.error("Error enviando mail:", error);
+        return false;
+    }
+}
+*/
 async function enviarMailVerificador(direccionEmail: string, tokenVerificacion: string) {
     try {
         await transporter.sendMail({

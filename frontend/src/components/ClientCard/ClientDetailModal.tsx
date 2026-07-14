@@ -52,7 +52,7 @@ interface ClientDetailModalProps {
   equipos: Equipment[];
   open: boolean;
   onClose: () => void;
-  entityEvent: string;
+  entityEvent?: string;
 }
 
 const ClientDetailModal = ({

@@ -1,5 +1,4 @@
-// App.tsx
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom"; // 👈 Importamos Outlet
 import { type ReactNode } from "react";
 import Home from "../Home/Home";
 import Login from "../Login/Login";
@@ -10,11 +9,22 @@ import ForgotPassword from "@/components/Password/ForgotPasswor";
 import ResetPassword from "@/components/Password/ResetPassword";
 import Gestion from "../Gestion/Gestion";
 import Clientes from "../Clientes/Clients";
+import WorkOrder from "../WorkOrder/WorkOrder";
 import { AuthProvider, useAuth } from "@/lib/AuthContext"; 
+import Validation from "@/pages/Validation/Validation";
 
 export const capitalize = (text: string): string => {
-  if (!text) return ""; // Validación por si viene vacío
+  if (!text) return ""; 
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+};
+
+// 🛡️ 1. Creamos un Layout que inyecta el AuthProvider SOLO a sus rutas hijas
+const ContenedorConAuth = () => {
+  return (
+    <AuthProvider>
+      <Outlet /> {/* Aquí se renderizarán las rutas que estén adentro */}
+    </AuthProvider>
+  );
 };
 
 const RutaPrivada = ({ children }: { children: ReactNode }) => {
@@ -37,11 +47,20 @@ const RaizRedirect = () => {
 
 const App = () => {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<RaizRedirect />} />
+    <BrowserRouter>
+      <Routes>
+        
+        {/* No ejecutan el useEffect de /me, ni cargan el contexto        */}
 
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
+        <Route path="/auth/validateCuenta/:token" element={<Validation />} />
+
+        {/* Usamos el Layout ContenedorConAuth para agruparlas            */}
+
+        <Route element={<ContenedorConAuth />}>
+          <Route path="/" element={<RaizRedirect />} />
+          
           <Route path="/login" element={<RutaPublica><Login /></RutaPublica>} />
           <Route path="/register" element={<RutaPublica><Register /></RutaPublica>} />
 
@@ -50,14 +69,13 @@ const App = () => {
           <Route path="/editor-perfil" element={<RutaPrivada><EditorPerfil /></RutaPrivada>} />
           <Route path="/gestion" element={<RutaPrivada><Gestion /></RutaPrivada>} />
           <Route path="/clientes" element={<RutaPrivada><Clientes /></RutaPrivada>} />
+          <Route path="/createOrder" element={<RutaPrivada><WorkOrder /></RutaPrivada>} />
+        </Route>
 
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password/:token" element={<ResetPassword />} />
-
-          <Route path="*" element={<h1>404 - Página no encontrada</h1>} />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+        {/* Ruta para capturar errores 404 */}
+        <Route path="*" element={<h1>404 - Página no encontrada</h1>} />
+      </Routes>
+    </BrowserRouter>
   );
 };
 

@@ -27,8 +27,8 @@ export const createTypeFail = async (req: Request, res: Response) => {
         const { failureDescription, estimatedImport } = req.body;
         const newTypeFailure = await prisma.failure_Type.create({
             data: {
-                failureDescription,
-                estimatedImport
+                failureDescription: failureDescription,
+                estimatedImport: estimatedImport ? Number(estimatedImport) : 0,
             }
         })
         return res.status(201).json(newTypeFailure);

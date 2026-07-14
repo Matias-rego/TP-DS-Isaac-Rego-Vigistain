@@ -1,10 +1,10 @@
 import { Router } from 'express'
+import { createFailures } from './failureController.js';
 
-// import { getPartialTypes, createTypeFail, getAllTypes, deleteType, modifyType } from './failureController.js'
 
 const router = Router();
 
-// router.get('/getPartialTypes/:query', getPartialTypes);
+router.post("/", createFailures);
 
 // router.post('/createTypeFail', createTypeFail);
 

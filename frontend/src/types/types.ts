@@ -1,7 +1,5 @@
 export type EnumRol = 'admin' | 'tecnico';
 
-export type EnumEquipmentType = 'celular' | 'computadora' | 'tablet' | 'consola' | 'otro';
-
 export type EnumOrderStatus =
   | 'recibido'
   | 'diagnostico'
@@ -65,9 +63,10 @@ export interface Failure {
 
 export interface Equipment {
   id_equipment:   number;
-  equipmentName:  string;
-  tipo_equipment: EnumEquipmentType;
+  equipment_type: string;
   observations:   string;
+  brand:          string;
+  model:          string;
   id_client:      number;
   client?:        Client;
   failures?:      Failure[];
@@ -79,6 +78,7 @@ export interface Order {
   id_equipment:        number;
   id_user:             number | null;
   status:              EnumOrderStatus;
+  
   failureReported:     string;
   technicianDiagnosis: string | null;
   dateOfEntry:         string;

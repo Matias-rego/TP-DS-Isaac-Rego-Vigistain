@@ -107,8 +107,7 @@ export const getPartialClient = async (req: Request, res: Response) => {
         category_client: { select: { categoryClientName: true } }
       }
     });
-    if (clients.length === 0) return res.status(404).json([]);
-    res.json(clients);
+    return res.status(200).json(clients);
   } catch (error) {
     console.error("Error fetching partial clients:", error);
     res.status(500).json({ error: "Error en el getPartialClient" });

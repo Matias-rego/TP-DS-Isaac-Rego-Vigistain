@@ -7,10 +7,12 @@ router.post('/', createNewClient);
 
 router.get('/', getAllClients);
 
+router.get('/search', getPartialClient);
+
 router.get('/:id', getOneClient);
 
 router.put('/:id', modifyClient);
 
-router.get('/search', getPartialClient);
+
 
 export default router;
