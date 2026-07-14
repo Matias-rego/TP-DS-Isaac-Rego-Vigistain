@@ -73,8 +73,8 @@ export default function ModifyPaymentType({ onSuccess }: ModifyPaymentTypeProps)
         title="Modificar Tipo de Pago"
         subtitle="Buscá el tipo de pago que querés editar"
         searchPlaceholder="Buscar tipo de pago..."
-        searchEndpoint="/payments/getPartialTypesPayment"
-        modifyEndpoint="/payments/modifyTypePayment"
+        searchEndpoint="/api/payment-types"
+        modifyEndpoint="/api/payment-types"
         idField="id_payment_type"
         previewField="paymentTypeName"
         icon={ICON}

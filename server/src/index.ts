@@ -1,32 +1,31 @@
 import express from 'express';
 import cors from 'cors';
-import routes from './api/endPoints.js';
-import dotenv from 'dotenv';
-import userRoutes from './api/routes/user.routes.js'; 
-import authRoutes from './api/routes/auth.routes.js';
-import failRoutes from './api/routes/fail.routes.js'
-import paymentsRoutes from './api/routes/payment.routes.js';
-import clientRoutes from './api/routes/client.routes.js';
-dotenv.config();
+import routes from './api/routes.js';
+import { config } from './utils/config.js';
+import cookieParser from 'cookie-parser';
 
 const app = express();
-
 app.use(cors(
     {
-        origin: process.env.FRONTEND_URL,
+        origin: config.FRONTEND_URL,
+        credentials: true,
         methods: ['GET', 'PUT', 'POST', 'PATCH', 'DELETE'], // Métodos permitidos
     }
-));        // ← sin {} adentro si no pasás opciones
-app.use(express.json()); // ← necesario para leer el body en POST
-app.use(express.urlencoded({ extended: true })); // ← necesario para leer el body en POST con form-data 
-app.use('/', routes);
-app.use('/users', userRoutes);
-app.use('/auth', authRoutes); 
-app.use('/failures', failRoutes)
-app.use('/clients', clientRoutes);
-app.use('/payments', paymentsRoutes); 
+));
 
+app.use(cookieParser());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.listen(process.env.PORT, () => {
-    console.log(`Servidor corriendo en http://techtix.rego.net.ar:${process.env.PORT}`);
+app.use('/api/', routes);
+
+app.use(( _ , res: express.Response) => {
+    res.status(404).json({ message: 'Resource not found' });
+});
+
+const server = app.listen(config.PORT, () => {
+    const address = server.address();
+    if (address && typeof address !== "string") {
+        console.log(`Servidor: http://${address.address}:${address.port}`);
+    }
 });

@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+
 
 export const parseJwt = (token: string) => {
     try {

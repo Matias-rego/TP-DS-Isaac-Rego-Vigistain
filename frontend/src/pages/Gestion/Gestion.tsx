@@ -9,7 +9,6 @@ import imagenTarjetaTipoCliente from "../../assets/imagenTarjetaTipoCliente.png"
 import imagenTarjetaTipoPago from "../../assets/imagenTarjetaTipoPago.jpg";
 import TableRtl from "@/components/DataTable/DataTable";
 import type { ColumnConfig } from "@/components/DataTable/DataTable";
-import { parseJwt } from "../App/App";
 import AltaTipoFalla from '@/pages/TipoFalla/AltaTipoFalla';
 import BajaTipoFalla from '@/pages/TipoFalla/BajaTipoFalla';
 import ModificacionTipoFalla from '@/pages/TipoFalla/ModificacionTipoFalla';
@@ -22,10 +21,19 @@ import RegisterPaymentType from "../TipoPago/RegisterPaymentType";
 import DeletePaymentType from "../TipoPago/DeletePaymentType";
 import ModifyPaymentType from "../TipoPago/ModifyPaymentType";
 import Footer from "@/components/Footer/Footer";
+import { useAuth } from "@/lib/AuthContext"
 
 
 // ─── Tipos y columnas ─────────────────────────────────────────────────────────
-
+interface User {
+  id_user:       number;
+  userName:      string;
+  email:         string;
+  password_hash: string;
+  rol:           string;
+  status:        boolean;
+  urlPicture:    string;
+}
 interface FailureType {
   id_failure_type: number;
   failureDescription: string;
@@ -71,19 +79,16 @@ const COLUMNS_PT: ColumnConfig<PaymentType>[] = [
 ];
 
 const Gestion = () => {
+  const { isAuth, loading: authLoading } = useAuth();
+
   const [dataTF, setDataTF] = useState<FailureType[]>([]);
   const [dataTC, setDataTC] = useState<ClientType[]>([]);
   const [dataPT, setDataPT] = useState<PaymentType[]>([]);
 
   const busquedaTF = useCallback(async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) throw new Error('No hay token');
-      const decoded = parseJwt(token);
-      if (!decoded?.id_user) throw new Error('Token inválido');
-
-      const result = await fetch(`${BACKEND_URL}/failures/getAllTypes`, 
-        { headers: { Authorization: `Bearer ${token}` }, method: 'GET' });
+      const result = await fetch(`${BACKEND_URL}/api/failure-types/`,
+        {method: 'GET', credentials: 'include' });
 
       if (result.status === 404) { setDataTF([]); return; }
       const data = await result.json();
@@ -95,13 +100,9 @@ const Gestion = () => {
 
   const busquedaTC = useCallback(async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) throw new Error('No hay token');
-      const decoded = parseJwt(token);
-      if (!decoded?.id_user) throw new Error('Token inválido');
 
-      const result = await fetch(`${BACKEND_URL}/clients/getAllCategoryClients`, 
-        { headers: { Authorization: `Bearer ${token}` }, method: 'GET' });
+      const result = await fetch(`${BACKEND_URL}/api/client-types/`,
+        { method: 'GET', credentials: 'include' });
 
       if (result.status === 404) { setDataTC([]); return; }
       const data = await result.json();
@@ -113,13 +114,9 @@ const Gestion = () => {
 
   const busquedaTP = useCallback(async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) throw new Error('No hay token');
-      const decoded = parseJwt(token);
-      if (!decoded?.id_user) throw new Error('Token inválido');
 
-      const result = await fetch(`${BACKEND_URL}/payments/getAllPaymentTypes`, 
-        { headers: { Authorization: `Bearer ${token}` }, method: 'GET' });
+      const result = await fetch(`${BACKEND_URL}/api/payment-types/`,
+        { method: 'GET', credentials: 'include' });
 
       if (result.status === 404) { setDataPT([]); return; }
       const data = await result.json();
@@ -129,12 +126,16 @@ const Gestion = () => {
     }
   }, []);
 
-  // Carga inicial
-  useEffect(() => { busquedaTF(); }, [busquedaTF]);
-  useEffect(() => { busquedaTC(); }, [busquedaTC]);
-  useEffect(() => { busquedaTP(); }, [busquedaTP]);
 
-  // Suscripciones al eventBus
+  useEffect(() => {
+    if (!authLoading && isAuth) {
+      busquedaTF();
+      busquedaTC();
+      busquedaTP();
+    }
+  }, [authLoading, isAuth, busquedaTF, busquedaTC, busquedaTP]);
+ 
+
   useEffect(() => {
     const unsubscribe = eventBus.on(EVENTS.failureTypeChanged, () => busquedaTF());
     return unsubscribe;
@@ -255,7 +256,7 @@ const Gestion = () => {
           >›</button>
         </div>
       </div>
-      <Footer/>
+      <Footer />
     </>
   );
 };

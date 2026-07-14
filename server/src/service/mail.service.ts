@@ -1,21 +1,44 @@
 import nodemailer from 'nodemailer';
 import parseJwt from '../utils/toke.utils.js';
+import { config } from '@/utils/config.js';
+import { Resend } from 'resend';
 
+
+const resend = new Resend(config.RESEND_API_KEY); 
 
 const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: 465,
-    secure: true,
+    host: config.EMAIL_HOST, 
+    port: 587,               
+    secure: false,           
     auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD
+        user: config.EMAIL_USER,
+        pass: config.EMAIL_PASSWORD 
+    },
+    tls: {
+        rejectUnauthorized: false // <-- Evita bloqueos de seguridad en localhost
     }
 });
-
+/* --> Alternativa del resend para poder enviar mails
+async function enviarMailVerificador(direccionEmail: string, tokenVerificacion: string) {
+    try {
+        await resend.emails.send({
+            from: 'Gestión Taller <onboarding@resend.dev>', // o tu dominio verificado
+            to: direccionEmail,
+            subject: 'Verificación de cuenta',
+            html: crearMailVerificacion(tokenVerificacion),
+        });
+        console.log("Mail enviado con éxito");
+        return true;
+    } catch (error) {
+        console.error("Error enviando mail:", error);
+        return false;
+    }
+}
+*/
 async function enviarMailVerificador(direccionEmail: string, tokenVerificacion: string) {
     try {
         await transporter.sendMail({
-            from: `"Gestión Taller" <${process.env.EMAIL_USER}>`,
+            from: `"Gestión Taller" <${config.EMAIL_USER}>`,
             to: direccionEmail,
             subject: "Verificación de cuenta",
             html: crearMailVerificacion(tokenVerificacion)
@@ -27,9 +50,9 @@ async function enviarMailVerificador(direccionEmail: string, tokenVerificacion: 
 }
 
 function crearMailVerificacion(tokenVerificacion: string) {
-    const dataToken= parseJwt(tokenVerificacion);
+    const dataToken = parseJwt(tokenVerificacion);
     const username = dataToken ? dataToken.username : "Usuario";
-    const validationLink = `${process.env.FRONTEND_URL}/auth/validateCuenta/${tokenVerificacion}`;
+    const validationLink = `${config.FRONTEND_URL}/auth/validateCuenta/${tokenVerificacion}`;
     return `
     <!DOCTYPE html>
     <html>

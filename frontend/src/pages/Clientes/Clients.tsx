@@ -29,20 +29,21 @@ interface categoryClient {
 }
 
 const Clientes = () => {
-  const [results, setResults]               = useState<Client[]>([]);
-  const [clients, setAllClients]            = useState<Client[]>([]);
+  const [results, setResults] = useState<Client[]>([]);
+  const [clients, setAllClients] = useState<Client[]>([]);
   const [registerClient, setRegisterClient] = useState(false);
-  const [categories, setCategories]         = useState<categoryClient[]>([]);
-  const [error, setError]                   = useState<string | null>(null);
-  const [client, setOneClient]              = useState<Client | null>(null);
-  const [open, setOpen]                     = useState(false);
+  const [categories, setCategories] = useState<categoryClient[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [client, setOneClient] = useState<Client | null>(null);
+  const [open, setOpen] = useState(false);
 
   // ─── Fetches ───────────────────────────────────────────────────────────────
 
   const getAllClients = useCallback(async () => {
     try {
       const res = await fetch(
-        `${BACKEND_URL}/clients/getAllClients`
+        `${BACKEND_URL}/api/clients/`,
+        { credentials: 'include' }
       );
       setAllClients(await res.json());
     } catch (e) {
@@ -54,7 +55,8 @@ const Clientes = () => {
   const findCategoryClients = useCallback(async () => {
     try {
       const res = await fetch(
-        `${BACKEND_URL}/clients/getAllCategoryClients`
+        `${BACKEND_URL}/api/client-types/`,
+        { credentials: 'include' }
       );
       setCategories(await res.json());
     } catch (e) {
@@ -65,7 +67,8 @@ const Clientes = () => {
   const fetchOneClient = useCallback(async (id: number): Promise<Client | null> => {
     try {
       const res = await fetch(
-        `${BACKEND_URL}/clients/getOneClient/${id}`
+        `${BACKEND_URL}/api/clients/${id}`,
+        { credentials: 'include' }
       );
       return await res.json();
     } catch (e) {
@@ -150,8 +153,9 @@ const Clientes = () => {
         {/* SearchBar */}
         <div className={styles.searchRow}>
           <SearchBar
+            showFilters={true}
             filters={CLIENT_FILTERS}
-            searchEndpoint="/clients/getPartialClient"
+            searchEndpoint="/api/clients/search/"
             searchPlaceholder="Buscar clientes por nombre, apellido o correo electrónico"
             onResults={(data) => setResults(data as Client[])}
             onClear={() => setResults([])}

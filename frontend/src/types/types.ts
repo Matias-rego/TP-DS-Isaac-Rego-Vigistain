@@ -1,7 +1,5 @@
 export type EnumRol = 'admin' | 'tecnico';
 
-export type EnumEquipmentType = 'celular' | 'computadora' | 'tablet' | 'consola' | 'otro';
-
 export type EnumOrderStatus =
   | 'recibido'
   | 'diagnostico'
@@ -18,7 +16,7 @@ export type EnumPaymentMethod = 'DEBITO' | 'MP' | 'EFECTIVO' | 'CREDITO';
 
 export type EnumFailureStatus = 'resuelta' | 'diagnosticada';
 
-export interface UserProfile {
+export interface User {
   id_user:       number;
   userName:      string;
   email:         string;
@@ -65,9 +63,10 @@ export interface Failure {
 
 export interface Equipment {
   id_equipment:   number;
-  equipmentName:  string;
-  tipo_equipment: EnumEquipmentType;
+  equipment_type: string;
   observations:   string;
+  brand:          string;
+  model:          string;
   id_client:      number;
   client?:        Client;
   failures?:      Failure[];
@@ -79,6 +78,7 @@ export interface Order {
   id_equipment:        number;
   id_user:             number | null;
   status:              EnumOrderStatus;
+  
   failureReported:     string;
   technicianDiagnosis: string | null;
   dateOfEntry:         string;
@@ -86,7 +86,7 @@ export interface Order {
   deliveryDate:        string | null;
   totalCharged:        number | null;
   equipment?:          Equipment;
-  user?:               UserProfile;
+  user?:               User;
   statusHistory?:      Status_History[];
   budget?:             Budget;
 }
@@ -99,7 +99,7 @@ export interface Status_History {
   id_user:           number;
   dateOfChange:      string;
   comment:           string | null;
-  user?:             UserProfile;
+  user?:             User;
 }
 
 export interface Budget {

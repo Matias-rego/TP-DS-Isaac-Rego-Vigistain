@@ -10,10 +10,11 @@ const ForgotPassword = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${BACKEND_URL}/users/forgot-password`, {
+      const response = await fetch(`${BACKEND_URL}/api/auth/forgot-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email }),
+        credentials: 'include',
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
@@ -23,42 +24,42 @@ const ForgotPassword = () => {
     }
   };
 
-return (
-  <div className={styles.container}>
-    <div className={styles.card}>
+  return (
+    <div className={styles.container}>
+      <div className={styles.card}>
 
-      <div className={styles.iconWrap}>
-        🔐
-      </div>
-
-      <h1 className={styles.title}>Restablecer contraseña</h1>
-      <p className={styles.subtitle}>
-        Ingresá tu email y te enviaremos un enlace para restablecer tu contraseña.
-      </p>
-
-      {success && <p className={styles.successMsg}>{success}</p>}
-      {error   && <p className={styles.errorMsg}>{error}</p>}
-
-      <form onSubmit={handleSubmit} className={styles.form}>
-        <div className={styles.group}>
-          <label className={styles.label}>Correo electrónico</label>
-          <input
-            type="email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            className={styles.input}
-            placeholder="tu@email.com"
-            required
-          />
+        <div className={styles.iconWrap}>
+          🔐
         </div>
-        <button type="submit" className={styles.button}>
-          Enviar enlace
-        </button>
-      </form>
 
+        <h1 className={styles.title}>Restablecer contraseña</h1>
+        <p className={styles.subtitle}>
+          Ingresá tu email y te enviaremos un enlace para restablecer tu contraseña.
+        </p>
+
+        {success && <p className={styles.successMsg}>{success}</p>}
+        {error && <p className={styles.errorMsg}>{error}</p>}
+
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <div className={styles.group}>
+            <label className={styles.label}>Correo electrónico</label>
+            <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              className={styles.input}
+              placeholder="tu@email.com"
+              required
+            />
+          </div>
+          <button type="submit" className={styles.button}>
+            Enviar enlace
+          </button>
+        </form>
+
+      </div>
     </div>
-  </div>
-);
+  );
 };
 
 export default ForgotPassword;

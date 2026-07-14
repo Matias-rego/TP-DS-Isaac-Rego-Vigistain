@@ -114,8 +114,9 @@ model Failure {
 
 model Equipment {
   id_equipment    Int               @id @default(autoincrement())
-  equipmentName   String            @unique
-  tipo_equipment  EnumEquipmentType
+  tipo_equipment  String
+  brand           String
+  model           String
   observations    String
   client          Client            @relation(fields: [id_client], references: [id_client])
   id_client       Int
@@ -129,8 +130,8 @@ model Order {
   user               User?           @relation(fields: [id_user], references: [id_user])
   id_user            Int?
   status             EnumOrderStatus @default(recibido)
-  failureReported    String
-  technicianDiagnosis String?
+  observations       String?
+  equipmentPhotoUrl  String?
   dateOfEntry        DateTime        @default(now())
   estimatedDate      DateTime?
   deliveryDate       DateTime?

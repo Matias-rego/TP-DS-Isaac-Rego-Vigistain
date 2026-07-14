@@ -1,24 +1,24 @@
 import nodemailer from 'nodemailer';
 import parseJwt from '../utils/toke.utils.js';
-
+import { config } from '@/utils/config.js';
 
 const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
+    host: config.EMAIL_HOST,
     port: 465,
     secure: true,
     auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD
+        user: config.EMAIL_USER,
+        pass: config.EMAIL_PASSWORD
     }
 });
 
 async function enviarMailResetPassword(direccionEmail: string, resetToken: string) {
     try {
         await transporter.sendMail({
-        from: `"Gestión Taller" <${process.env.EMAIL_USER}>`,
-        to: direccionEmail,
-        subject: "Recuperación de contraseña",
-        html: crearMailResetPassword(resetToken)
+            from: `"Gestión Taller" <${config.EMAIL_USER}>`,
+            to: direccionEmail,
+            subject: "Recuperación de contraseña",
+            html: crearMailResetPassword(resetToken)
         });
         console.log("Mail enviado con éxito");
     } catch (error) {
@@ -27,7 +27,8 @@ async function enviarMailResetPassword(direccionEmail: string, resetToken: strin
 }
 
 function crearMailResetPassword(resetToken: string) {
-    const dataToken= parseJwt(resetToken);
+    const dataToken = parseJwt(resetToken);
+    const resetUrl = `${config.FRONTEND_URL}/reset-password/${resetToken}`;
     const username = dataToken ? dataToken.username : "Usuario";
     return `
     <!DOCTYPE html>
@@ -79,7 +80,7 @@ function crearMailResetPassword(resetToken: string) {
                                 <table border="0" cellpadding="0" cellspacing="0">
                                     <tr>
                                         <td align="center" style="border-radius: 999px; background: linear-gradient(135deg, #1565C0 0%, #0D47A1 100%); box-shadow: 0 8px 24px rgba(21,101,192,0.35);">
-                                            <a href="http://${process.env.FRONTEND_HOST}:${process.env.FRONTEND_PORT}/reset-password/${resetToken}"
+                                            <a href="${resetUrl}"
                                             target="_blank"
                                             style="display: inline-block; padding: 14px 36px; color: #ffffff; text-decoration: none; font-weight: 700; font-size: 15px; letter-spacing: 0.3px; border-radius: 999px;">
                                                 Restablecer contraseña
@@ -111,7 +112,7 @@ function crearMailResetPassword(resetToken: string) {
                             <td style="padding-top: 20px; color: #94a3b8; font-size: 12px; text-align: center; line-height: 20px;">
                                 Si el botón no funciona, copiá y pegá este enlace en tu navegador:<br>
                                 <span style="color: #2563eb; word-break: break-all;">
-                                    http://${process.env.FRONTEND_HOST}:${process.env.FRONTEND_PORT}/reset-password/${resetToken}
+                                    ${resetUrl}
                                 </span>
                             </td>
                         </tr>
