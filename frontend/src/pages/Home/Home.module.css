@@ -1,17 +1,22 @@
-
+/* ============================================================
+   HOME - estilos (rediseno limpio, MOBILE-FIRST + MODO OSCURO)
+   Usa variables --tf-* (definidas en index.css). En modo oscuro
+   esas variables cambian de valor y todo se adapta solo.
+   Breakpoints: SM 640px, MD 768px, LG 1024px.
+   ============================================================ */
 
 .page {
   display: grid;
-  grid-template-rows: auto 1fr auto; /* nav / contenido / footer */
+  grid-template-rows: auto 1fr auto;
   min-height: 100vh;
-  background: #f7f9fc; /* fondo plano, sin degradados */
+  background: var(--tf-bg);
 }
 
 .main {
   width: 100%;
   max-width: 1180px;
   margin: 0 auto;
-  padding: 1.25rem 1rem; /* celular: menos aire */
+  padding: 1.25rem 1rem;
 }
 
 /* ---------- Toast "sesion iniciada" ---------- */
@@ -19,14 +24,14 @@
   position: fixed;
   top: 84px;
   left: 16px;
-  right: 16px; /* celular: ocupa el ancho */
+  right: 16px;
   z-index: 9999;
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-left: 4px solid #1565c0;
+  background: var(--tf-card);
+  border: 1px solid var(--tf-border);
+  border-left: 4px solid var(--tf-primary);
   border-radius: 14px;
   padding: 0.85rem 1rem;
   box-shadow: 0 6px 20px rgba(16, 24, 40, 0.10);
@@ -41,8 +46,8 @@
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: #1565c0;
-  color: #ffffff;
+  background: var(--tf-primary);
+  color: var(--tf-white);
   display: grid;
   place-items: center;
   flex-shrink: 0;
@@ -50,14 +55,14 @@
 
 .toastTitle {
   margin: 0;
-  color: #1e293b;
+  color: var(--tf-text);
   font-size: 0.92rem;
   font-weight: 700;
 }
 
 .toastText {
   margin: 0.1rem 0 0;
-  color: #64748b;
+  color: var(--tf-muted);
   font-size: 0.8rem;
   font-weight: 400;
 }
@@ -65,11 +70,11 @@
 /* ---------- Hero (bienvenida) ---------- */
 .heroCard {
   display: grid;
-  grid-template-columns: 1fr; /* celular: una sola columna */
+  grid-template-columns: 1fr;
   gap: 1.25rem;
   align-items: start;
-  background: #ffffff;
-  border: 1px solid #e6eaf0;
+  background: var(--tf-card);
+  border: 1px solid var(--tf-border);
   border-radius: 16px;
   padding: 1.25rem;
 }
@@ -82,9 +87,9 @@
 .badge {
   display: inline-block;
   width: fit-content;
-  background: #eef4fb;
-  color: #1565c0;
-  border: 1px solid #d6e4f5;
+  background: var(--tf-primary-soft);
+  color: var(--tf-primary);
+  border: 1px solid var(--tf-border);
   padding: 0.35rem 0.75rem;
   border-radius: 999px;
   font-size: 0.75rem;
@@ -93,8 +98,8 @@
 }
 
 .title {
-  color: #1e293b;
-  font-size: 1.7rem; /* celular */
+  color: var(--tf-text);
+  font-size: 1.7rem;
   line-height: 1.15;
   letter-spacing: -0.02em;
   margin: 0;
@@ -102,7 +107,7 @@
 }
 
 .description {
-  color: #64748b;
+  color: var(--tf-muted);
   font-size: 0.98rem;
   line-height: 1.6;
   max-width: 620px;
@@ -112,7 +117,7 @@
 /* ---------- Botones de accion del hero ---------- */
 .primaryActions {
   display: grid;
-  grid-template-columns: 1fr; /* celular: apilados */
+  grid-template-columns: 1fr;
   gap: 0.75rem;
   margin-top: 1.5rem;
 }
@@ -129,28 +134,28 @@
   transition: background 0.18s ease, border-color 0.18s ease;
 }
 
-/* Boton principal: solido azul (una sola accion "fuerte") */
+/* Boton principal: solido azul */
 .mainAction {
-  background: #1565c0;
-  border: 1px solid #1565c0;
-  color: #ffffff;
+  background: var(--tf-primary);
+  border: 1px solid var(--tf-primary);
+  color: var(--tf-white);
 }
 
 .mainAction:hover {
-  background: #0f4c9a;
-  border-color: #0f4c9a;
+  background: var(--tf-primary-dark);
+  border-color: var(--tf-primary-dark);
 }
 
-/* Boton secundario: con contorno (mas discreto) */
+/* Boton secundario: con contorno */
 .secondaryAction {
-  background: #ffffff;
-  border: 1px solid #d7dde6;
-  color: #1e293b;
+  background: var(--tf-card);
+  border: 1px solid var(--tf-border);
+  color: var(--tf-text);
 }
 
 .secondaryAction:hover {
-  background: #f4f7fb;
-  border-color: #b9c4d3;
+  background: var(--tf-bg);
+  border-color: var(--tf-muted);
 }
 
 .mainAction strong,
@@ -180,12 +185,12 @@
 
 .mainAction .actionIcon {
   background: rgba(255, 255, 255, 0.18);
-  color: #ffffff;
+  color: var(--tf-white);
 }
 
 .secondaryAction .actionIcon {
-  background: #eef4fb;
-  color: #1565c0;
+  background: var(--tf-primary-soft);
+  color: var(--tf-primary);
 }
 
 /* ---------- Mensaje para usuarios sin rol tecnico ---------- */
@@ -194,9 +199,9 @@
   align-items: center;
   gap: 0.7rem;
   margin-top: 1.4rem;
-  background: #fff7e6;
-  color: #92600a;
-  border: 1px solid #f3dca6;
+  background: var(--tf-accent-soft);
+  color: var(--tf-text);
+  border: 1px solid var(--tf-border);
   border-radius: 12px;
   padding: 0.85rem 1rem;
   font-size: 0.9rem;
@@ -206,7 +211,7 @@
 .userMessageIcon {
   display: grid;
   place-items: center;
-  color: #b7791f;
+  color: var(--tf-accent-dark);
   flex-shrink: 0;
 }
 
@@ -217,8 +222,8 @@
 
 .quickPanel {
   width: 100%;
-  background: #ffffff;
-  border: 1px solid #e6eaf0;
+  background: var(--tf-card);
+  border: 1px solid var(--tf-border);
   border-radius: 16px;
   padding: 1.1rem;
 }
@@ -234,8 +239,8 @@
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background: #eef4fb;
-  color: #1565c0;
+  background: var(--tf-primary-soft);
+  color: var(--tf-primary);
   display: grid;
   place-items: center;
   flex-shrink: 0;
@@ -243,14 +248,14 @@
 
 .quickPanelTitle {
   margin: 0;
-  color: #1e293b;
+  color: var(--tf-text);
   font-size: 0.98rem;
   font-weight: 600;
 }
 
 .quickPanelText {
   margin: 0.15rem 0 0;
-  color: #64748b;
+  color: var(--tf-muted);
   font-size: 0.8rem;
   font-weight: 400;
 }
@@ -264,9 +269,9 @@
 .quickPanelItem {
   width: 100%;
   border: none;
-  border-top: 1px solid #eef1f5;
+  border-top: 1px solid var(--tf-border);
   background: transparent;
-  color: #334155;
+  color: var(--tf-text);
   padding: 0.7rem 0.25rem;
   display: flex;
   align-items: center;
@@ -277,13 +282,13 @@
 }
 
 .quickPanelItem:hover {
-  color: #1565c0;
+  color: var(--tf-primary);
 }
 
 .quickPanelItem span {
   display: grid;
   place-items: center;
-  color: #1565c0;
+  color: var(--tf-primary);
   flex-shrink: 0;
 }
 
@@ -295,33 +300,32 @@
 /* ---------- Tarjetas de estadisticas ---------- */
 .quickGrid {
   display: grid;
-  /* auto-fit: la grilla decide sola cuantas columnas entran segun el ancho */
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 0.75rem;
   margin-top: 1.25rem;
 }
 
 .quickCard {
-  background: #ffffff;
-  border: 1px solid #e6eaf0;
+  background: var(--tf-card);
+  border: 1px solid var(--tf-border);
   border-radius: 12px;
   padding: 1rem 1.1rem;
   transition: border-color 0.18s ease;
 }
 
 .quickCard:hover {
-  border-color: #c9d6e6;
+  border-color: var(--tf-muted);
 }
 
 .quickIcon {
   display: block;
-  color: #94a3b8;
+  color: var(--tf-muted);
   margin-bottom: 0.35rem;
 }
 
 .quickNumber {
   display: block;
-  color: #1e293b;
+  color: var(--tf-text);
   font-size: 1.6rem;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -329,7 +333,7 @@
 
 .quickLabel {
   display: block;
-  color: #64748b;
+  color: var(--tf-muted);
   font-size: 0.85rem;
   font-weight: 400;
   margin-top: 0.15rem;
@@ -352,7 +356,7 @@
    RESPONSIVE (mobile-first): de chico a grande
    ============================================================ */
 
-/* SM - 640px: tablets chicas / celulares apaisados */
+/* SM - 640px */
 @media (min-width: 640px) {
   .main {
     padding: 2rem 1.5rem;
@@ -369,13 +373,12 @@
     font-size: 2rem;
   }
 
-  /* los dos botones del hero, lado a lado */
   .primaryActions {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-/* MD - 768px: tablets */
+/* MD - 768px */
 @media (min-width: 768px) {
   .main {
     padding: 2.5rem 1.5rem;
@@ -390,10 +393,9 @@
   }
 }
 
-/* LG - 1024px: notebooks y monitores */
+/* LG - 1024px */
 @media (min-width: 1024px) {
   .heroCard {
-    /* recien aca el hero pasa a dos columnas: texto + panel */
     grid-template-columns: 1.5fr 1fr;
     gap: 2rem;
     padding: 2.25rem;

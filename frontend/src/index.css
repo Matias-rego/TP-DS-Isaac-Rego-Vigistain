@@ -239,6 +239,20 @@ a {
 }
 
 .dark {
+  /* TechFix - valores para MODO OSCURO (las mismas variables --tf-*, otro color) */
+  --tf-primary: #3b82f6;
+  --tf-primary-dark: #2563eb;
+  --tf-primary-soft: #1e3a5f;
+  --tf-accent: #FFC107;
+  --tf-accent-dark: #F9A825;
+  --tf-accent-soft: #3a3320;
+  --tf-white: #FFFFFF;
+  --tf-bg: #0f172a;
+  --tf-card: #1e293b;
+  --tf-text: #e2e8f0;
+  --tf-muted: #94a3b8;
+  --tf-border: #334155;
+
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
