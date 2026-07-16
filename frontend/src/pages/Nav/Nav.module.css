@@ -1,13 +1,15 @@
 :root {
-  --azul: #1565C0;
-  --azul-oscuro: #0D47A1;
-  --azul-suave: #E3F2FD;
-  --amarillo: #FFC107;
-  --amarillo-suave: #FFF8E1;
-  --blanco: #FFFFFF;
-  --gris-texto: #1E293B;
-  --gris-suave: #64748B;
-  --borde: #E2E8F0;
+  /* Estas variables del navbar ahora apuntan a las --tf-* del tema.
+     Como las --tf-* cambian en modo oscuro, el navbar se adapta solo. */
+  --azul: var(--tf-primary);
+  --azul-oscuro: var(--tf-primary-dark);
+  --azul-suave: var(--tf-primary-soft);
+  --amarillo: var(--tf-accent);
+  --amarillo-suave: var(--tf-accent-soft);
+  --blanco: var(--tf-card);          /* superficie (fondo del navbar/drawer) */
+  --gris-texto: var(--tf-text);
+  --gris-suave: var(--tf-muted);
+  --borde: var(--tf-border);
   --drawer-width: 280px;
 }
 
@@ -201,7 +203,7 @@
   align-items: center;
   gap: 0.5rem;
   background: var(--azul);
-  color: var(--blanco);
+  color: var(--tf-white);
   border: none;
   padding: 0.6rem 1.15rem;
   border-radius: 999px;
@@ -330,7 +332,7 @@
   justify-content: space-between;
   padding: 1.25rem 1.1rem 1rem;
   border-bottom: 1px solid var(--borde);
-  background: linear-gradient(135deg, var(--azul-suave) 0%, #fff 100%);
+  background: linear-gradient(135deg, var(--azul-suave) 0%, var(--tf-card) 100%);
 }
 
 .drawerUser {
@@ -440,7 +442,7 @@
   width: 100%;
   justify-content: center;
   background: var(--azul);
-  color: var(--blanco);
+  color: var(--tf-white);
   border: none;
   padding: 0.8rem 1.2rem;
   border-radius: 12px;
@@ -469,8 +471,8 @@
 
 .modalCard {
   width: min(92vw, 430px);
-  background: rgba(255, 255, 255, 0.94);
-  border: 1px solid rgba(224, 242, 254, 0.9);
+  background: var(--tf-card);
+  border: 1px solid var(--tf-border);
   border-radius: 28px;
   padding: 1.5rem;
   text-align: center;
@@ -501,14 +503,14 @@
 
 .modalTitle {
   margin: 0;
-  color: #0f172a;
+  color: var(--tf-text);
   font-size: 1.45rem;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .modalText {
   margin: 0.85rem 0 1.5rem;
-  color: #64748b;
+  color: var(--tf-muted);
   font-size: 0.96rem;
   line-height: 1.5;
 }
@@ -547,12 +549,11 @@
 }
 
 .cancelButton {
-  background: #f1f5f9;
-  color: #334155;
+  background: var(--tf-border);
+  color: var(--tf-text);
 }
 
 .cancelButton:hover {
-  background: #e2e8f0;
   transform: translateY(-1px);
 }
 
