@@ -1,12 +1,12 @@
 /* ============================================================
-   TARJETA DE GESTIÓN - limpia (sin foto borrosa, botones planos)
+   TARJETA DE GESTIÓN - limpia + MODO OSCURO (var(--tf-*))
    ============================================================ */
 
 .containerContent {
   display: flex;
   flex-direction: column;
-  border: 1px solid #e6eaf0;
-  background-color: #ffffff;
+  border: 1px solid var(--tf-border);
+  background-color: var(--tf-card);
   overflow: hidden;
   border-radius: 12px;
 }
@@ -18,7 +18,7 @@
 
 .titulo {
   margin: 0;
-  color: #1e293b;
+  color: var(--tf-text);
   font-size: 1.5rem;
   font-weight: 700;
   line-height: 1.2;
@@ -27,7 +27,7 @@
 .descripcion {
   padding: 0.75rem 1.25rem 0;
   font-size: 0.95rem;
-  color: #64748b;
+  color: var(--tf-muted);
   line-height: 1.6;
 }
 
@@ -39,10 +39,10 @@
   gap: 0.5rem;
   margin: 1rem 1.25rem 0;
   padding: 0.7rem 1.2rem;
-  border: 1px solid #1565C0;
+  border: 1px solid var(--tf-primary);
   border-radius: 10px;
   background: transparent;
-  color: #1565C0;
+  color: var(--tf-primary);
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
@@ -50,7 +50,7 @@
 }
 
 .botonVerTabla:hover {
-  background: #eef4fb;
+  background: var(--tf-primary-soft);
 }
 
 @media (min-width: 1024px) {
@@ -95,17 +95,17 @@
 
 /* Gestionar = acción principal (azul) */
 .btnGestionar {
-  background: #1565C0;
-  color: #ffffff;
+  background: var(--tf-primary);
+  color: var(--tf-white);
 }
 .btnGestionar:hover {
-  background: #0f4c9a;
+  background: var(--tf-primary-dark);
 }
 
-/* Eliminar = peligro (rojo) */
+/* Eliminar = peligro (rojo, igual en ambos temas) */
 .btnEliminar {
   background: #dc2626;
-  color: #ffffff;
+  color: var(--tf-white);
 }
 .btnEliminar:hover {
   background: #b91c1c;
@@ -141,7 +141,7 @@
     flex-direction: column;
     width: 340px;
     flex-shrink: 0;
-    border-right: 1px solid #e6eaf0;
+    border-right: 1px solid var(--tf-border);
   }
 
   .columnaDerecha {

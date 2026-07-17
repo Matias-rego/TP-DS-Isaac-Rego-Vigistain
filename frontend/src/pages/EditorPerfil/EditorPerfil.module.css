@@ -1,14 +1,16 @@
+/* EDITOR DE PERFIL - con MODO OSCURO (var(--tf-*)) */
 .container {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f8fafc;
+  background-color: var(--tf-bg);
   padding: 20px;
 }
 
 .card {
-  background: #ffffff;
+  background: var(--tf-card);
+  border: 1px solid var(--tf-border);
   padding: 40px;
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
@@ -32,7 +34,7 @@
   background: none;
   border: none;
   padding: 0;
-  color: #2563eb;
+  color: var(--tf-primary);
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -41,19 +43,19 @@
 }
 
 .linkButton:hover {
-  color: #1d4ed8;
+  color: var(--tf-primary-dark);
 }
 
 .title {
   font-size: 1.8rem;
-  color: #1e293b;
+  color: var(--tf-text);
   margin-bottom: 8px;
   text-align: center;
 }
 
 .subtitle {
   font-size: 0.95rem;
-  color: #64748b;
+  color: var(--tf-muted);
   text-align: center;
   margin-bottom: 24px;
 }
@@ -73,26 +75,28 @@
 .label {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #475569;
+  color: var(--tf-muted);
 }
 
 .input {
   padding: 10px 14px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--tf-border);
   border-radius: 8px;
   font-size: 1rem;
+  background: var(--tf-card);
+  color: var(--tf-text);
   transition: border-color 0.2s;
 }
 
 .input:focus {
   outline: none;
-  border-color: #2563eb;
+  border-color: var(--tf-primary);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .button {
-  background-color: #1565C0;
-  color: white;
+  background-color: var(--tf-primary);
+  color: var(--tf-white);
   padding: 12px;
   border-radius: 8px;
   border: none;
@@ -104,20 +108,20 @@
 }
 
 .button:hover {
-  background-color: #0f4c9a;
+  background-color: var(--tf-primary-dark);
 }
 
 .button2 {
-  background-color: white;
+  background-color: var(--tf-card);
+  border: 1px solid var(--tf-border);
   width: 40%;
   text-align: center;
   display: block;
   margin-left: auto;
   margin-right: auto;
-  color: #37476b;
+  color: var(--tf-text);
   padding: 12px;
   border-radius: 8px;
-  border: none;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -126,22 +130,18 @@
 }
 
 .button2:hover {
-  background-color: #5b71af;
-  color: rgb(168, 160, 160);
+  background-color: var(--tf-bg);
 }
-
-
-
 
 .footer {
   margin-top: 24px;
   text-align: center;
   font-size: 0.9rem;
-  color: #64748b;
+  color: var(--tf-muted);
 }
 
 .link {
-  color: #2563eb;
+  color: var(--tf-primary);
   text-decoration: none;
   font-weight: 600;
   margin-left: 5px;
@@ -157,7 +157,7 @@
   border-radius: 50%;
   object-fit: cover;
   object-position: center;
-  border: 3px solid #1565C0;
+  border: 3px solid var(--tf-primary);
   display: block;
   overflow: hidden;
   margin-left: auto;
@@ -165,7 +165,6 @@
 }
 
 /* ── Foto de perfil ── */
-
 .previewWrap {
   position: relative;
   width: 150px;
@@ -181,7 +180,7 @@
   height: 150px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--tf-border);
 }
 
 .dialogContent {
@@ -189,16 +188,12 @@
   top: 50% !important;
   left: 50% !important;
   gap: 20px !important;
-
   transform: translate(-50%, -50%) !important;
-
   z-index: 999999 !important;
-
-  background: rgb(117, 116, 116);
-
+  background: var(--tf-card);
+  color: var(--tf-text);
   width: 90%;
   max-width: 500px;
-
   border-radius: 12px;
 }
 
@@ -206,7 +201,6 @@
   text-align: center;
   z-index: 999999 !important;
 }
-
 
 .removeBtn {
   position: absolute;
@@ -241,43 +235,44 @@
   gap: 20px;
   width: 80%;
   padding: 20px 16px;
-  border: 1.5px dashed #cbd5e1;
+  border: 1.5px dashed var(--tf-border);
   border-radius: 12px;
-  background: #f8fafc;
+  background: var(--tf-bg);
   cursor: pointer;
   transition: border-color 0.2s, background 0.2s;
 }
 
 .dropZone:hover {
-  border-color: #2563eb;
-  background: #eff6ff;
+  border-color: var(--tf-primary);
+  background: var(--tf-primary-soft);
 }
 
 .dropZoneIcon {
   font-size: 26px;
-  color: #94a3b8;
+  color: var(--tf-muted);
 }
 
 .dropZoneText {
   font-size: 0.875rem;
-  color: #64748b;
+  color: var(--tf-muted);
 }
 
 .dropZoneHint {
   font-size: 0.775rem;
-  color: #94a3b8;
+  color: var(--tf-muted);
 }
 
 .fileInput {
   display: none;
 }
+
 .cardForm {
   width: 100%;
   margin-top: 10px;
   padding: 22px;
   border-radius: 16px;
-  background: #ffffff;
-  border: 1px solid #e6eaf0;
+  background: var(--tf-card);
+  border: 1px solid var(--tf-border);
   box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06);
   display: flex;
   flex-direction: column;
@@ -286,7 +281,7 @@
 }
 
 .cardForm:hover {
-  border-color: #c9d6e6;
+  border-color: var(--tf-muted);
   box-shadow: 0 6px 16px rgba(16, 24, 40, 0.10);
 }
 
@@ -296,7 +291,7 @@
   letter-spacing: -0.02em;
   line-height: 1.2;
   text-align: center;
-  color: #1e293b;
+  color: var(--tf-text);
   margin-bottom: 10px;
 }
 
@@ -305,18 +300,14 @@
   top: 50% !important;
   left: 50% !important;
   gap: 20px !important;
-
   transform: translate(-50%, -50%) !important;
-
   z-index: 999999 !important;
-
-  background: rgb(83, 212, 133);
-
+  background: var(--tf-card);
+  color: var(--tf-text);
   width: 90%;
   max-width: 500px;
-
   border-radius: 12px ;
-  border: 1px solid rgba(19, 65, 29, 0.527);
+  border: 1px solid var(--tf-border);
 }
 
 .dialogPass {
@@ -324,23 +315,23 @@
   z-index: 999999 !important;
 }
 .dialogDescriptionPass{
-  color: #6f7072;
+  color: var(--tf-muted);
   font-size: 0.95rem;
   margin: 8px;
 }
 
 .button3 {
-  background-color: none;
+  background-color: transparent;
+  border: 1px solid var(--tf-border);
   width: 55%;
   text-align: center;
   display: block;
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 10px;
-  color: #37476b;
+  color: var(--tf-text);
   padding: 12px;
   border-radius: 8px;
-  border: none;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -349,6 +340,5 @@
 }
 
 .button3:hover {
-  background-color: #5b71af;
-  color: rgb(168, 160, 160);
+  background-color: var(--tf-bg);
 }
