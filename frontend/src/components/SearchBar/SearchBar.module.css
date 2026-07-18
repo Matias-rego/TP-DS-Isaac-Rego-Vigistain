@@ -1,4 +1,4 @@
-/* ─── SearchBar.module.css ───────────────────────────────────────────────── */
+/* ─── SearchBar.module.css (con MODO OSCURO vía var(--tf-*)) ─── */
 
 .wrapper {
   display: flex;
@@ -6,7 +6,7 @@
   gap: 10px;
   width: 100%;
   padding: 10px 14px;
-  background: #eaf4fb;
+  background: var(--tf-primary-soft);
   border-radius: 16px;
 }
 
@@ -16,20 +16,20 @@
   align-items: center;
   gap: 10px;
   flex: 1;
-  background: #ffffff;
-  border: 1.5px solid #d6eaf8;
+  background: var(--tf-card);
+  border: 1.5px solid var(--tf-border);
   border-radius: 12px;
   padding: 10px 14px;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .searchBox:focus-within {
-  border-color: #5dade2;
+  border-color: var(--tf-primary);
   box-shadow: 0 0 0 3px rgba(93, 173, 226, 0.15);
 }
 
 .searchIcon {
-  color: #7fb3d3;
+  color: var(--tf-muted);
   flex-shrink: 0;
 }
 
@@ -38,19 +38,19 @@
   border: none;
   outline: none;
   font-size: 14px;
-  color: #1a2a3a;
+  color: var(--tf-text);
   background: transparent;
 }
 
 .searchInput::placeholder {
-  color: #a9cce3;
+  color: var(--tf-muted);
 }
 
 .spinner {
   width: 14px;
   height: 14px;
-  border: 2px solid #d6eaf8;
-  border-top-color: #5dade2;
+  border: 2px solid var(--tf-border);
+  border-top-color: var(--tf-primary);
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
   flex-shrink: 0;
@@ -63,7 +63,7 @@
 .clearBtn {
   background: none;
   border: none;
-  color: #a9cce3;
+  color: var(--tf-muted);
   cursor: pointer;
   font-size: 13px;
   padding: 0;
@@ -73,7 +73,7 @@
 }
 
 .clearBtn:hover {
-  color: #5dade2;
+  color: var(--tf-primary);
 }
 
 /* ── Filter button ── */
@@ -87,9 +87,9 @@
   align-items: center;
   gap: 7px;
   padding: 10px 16px;
-  background: #d6eaf8;
-  color: #2980b9;
-  border: 1.5px solid #a9cce3;
+  background: var(--tf-primary-soft);
+  color: var(--tf-primary);
+  border: 1.5px solid var(--tf-border);
   border-radius: 12px;
   font-size: 14px;
   font-weight: 500;
@@ -99,18 +99,18 @@
 }
 
 .filterBtn:hover {
-  background: #c2d9f0;
-  border-color: #7fb3d3;
+  background: var(--tf-border);
+  border-color: var(--tf-muted);
 }
 
 .filterBtnActive {
-  background: #2980b9;
-  color: #ffffff;
-  border-color: #2471a3;
+  background: var(--tf-primary);
+  color: var(--tf-white);
+  border-color: var(--tf-primary-dark);
 }
 
 .filterBtnActive:hover {
-  background: #2471a3;
+  background: var(--tf-primary-dark);
 }
 
 .filterBadge {
@@ -119,16 +119,16 @@
   justify-content: center;
   width: 18px;
   height: 18px;
-  background: #ffffff;
-  color: #2980b9;
+  background: var(--tf-card);
+  color: var(--tf-primary);
   border-radius: 50%;
   font-size: 11px;
   font-weight: 700;
 }
 
 .filterBtnActive .filterBadge {
-  background: #ffffff;
-  color: #2980b9;
+  background: var(--tf-card);
+  color: var(--tf-primary);
 }
 
 /* ── Dropdown ── */
@@ -137,8 +137,8 @@
   top: calc(100% + 8px);
   right: 0;
   width: 280px;
-  background: #ffffff;
-  border: 1.5px solid #d6eaf8;
+  background: var(--tf-card);
+  border: 1.5px solid var(--tf-border);
   border-radius: 14px;
   box-shadow: 0 8px 24px rgba(41, 128, 185, 0.12);
   z-index: 100;
@@ -155,20 +155,20 @@
   align-items: center;
   justify-content: space-between;
   padding: 14px 16px 10px;
-  border-bottom: 1px solid #eaf4fb;
+  border-bottom: 1px solid var(--tf-border);
 }
 
 .dropdownTitle {
   font-size: 13px;
   font-weight: 700;
-  color: #1a2a3a;
+  color: var(--tf-text);
 }
 
 .clearFiltersBtn {
   background: none;
   border: none;
   font-size: 12px;
-  color: #2980b9;
+  color: var(--tf-primary);
   cursor: pointer;
   padding: 0;
   font-weight: 500;
@@ -194,23 +194,23 @@
 .filterLabel {
   font-size: 12px;
   font-weight: 600;
-  color: #5d8aa8;
+  color: var(--tf-muted);
 }
 
 .filterSelect {
   width: 100%;
   padding: 8px 10px;
   font-size: 13px;
-  border: 1.5px solid #d6eaf8;
+  border: 1.5px solid var(--tf-border);
   border-radius: 8px;
-  color: #1a2a3a;
-  background: #f7fbfd;
+  color: var(--tf-text);
+  background: var(--tf-card);
   outline: none;
   transition: border-color 0.15s, box-shadow 0.15s;
   box-sizing: border-box;
 }
 
 .filterSelect:focus {
-  border-color: #5dade2;
+  border-color: var(--tf-primary);
   box-shadow: 0 0 0 3px rgba(93, 173, 226, 0.12);
 }

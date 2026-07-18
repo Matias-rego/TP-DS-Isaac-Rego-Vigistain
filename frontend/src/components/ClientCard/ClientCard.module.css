@@ -1,8 +1,8 @@
-/* ─── ClientCard.module.css ──────────────────────────────────────────────── */
+/* ─── ClientCard.module.css (con MODO OSCURO vía var(--tf-*)) ─── */
 
 .card {
-  background: #ffffff;
-  border: 1.5px solid #e8f4fb;
+  background: var(--tf-card);
+  border: 1.5px solid var(--tf-border);
   border-radius: 16px;
   padding: 18px;
   display: flex;
@@ -16,7 +16,7 @@
 .card:hover {
   box-shadow: 0 6px 24px rgba(93, 173, 226, 0.14);
   transform: translateY(-2px);
-  border-color: #a9cce3;
+  border-color: var(--tf-muted);
 }
 
 .inactive {
@@ -53,7 +53,7 @@
 .nombre {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #1a2a3a;
+  color: var(--tf-text);
   margin: 0;
   line-height: 1.25;
 }
@@ -66,7 +66,7 @@
 
 /* ── Info box ── */
 .infoBox {
-  background: #eaf4fb;
+  background: var(--tf-primary-soft);
   border-radius: 10px;
   padding: 10px 13px;
   display: flex;
@@ -79,12 +79,12 @@
   align-items: center;
   gap: 8px;
   font-size: 0.82rem;
-  color: #2471a3;
+  color: var(--tf-primary);
   font-weight: 500;
 }
 
 .infoRow svg {
-  color: #5dade2;
+  color: var(--tf-primary);
   flex-shrink: 0;
 }
 
@@ -98,16 +98,16 @@
 .tag {
   font-size: 0.7rem;
   font-weight: 600;
-  color: #5d8aa8;
-  background: #eaf4fb;
-  border: 1px solid #c2d9f0;
+  color: var(--tf-muted);
+  background: var(--tf-primary-soft);
+  border: 1px solid var(--tf-border);
   border-radius: 999px;
   padding: 3px 10px;
   letter-spacing: 0.3px;
 }
 
 .tagCategory {
-  color: #2471a3;
-  background: #d6eaf8;
-  border-color: #a9cce3;
+  color: var(--tf-primary);
+  background: var(--tf-primary-soft);
+  border-color: var(--tf-border);
 }

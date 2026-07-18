@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import type { UserProfile } from '../../types/types';
 import { BACKEND_URL } from '@/lib/config';
 import { LogOut, X, Home, Wrench, ClipboardList, Users, User } from 'lucide-react';
+import ThemeToggle from '../../components/ThemeToggle/ThemeToggle';
 
 // Logo de TechFix (icono transparente en Cloudinary)
 const LOGO_URL = "https://res.cloudinary.com/dll6qurcd/image/upload/v1783738139/teckfixFvicon_qt61a7.png";
@@ -110,6 +111,7 @@ const Nav = () => {
 
         {/* Acciones desktop */}
         <div className={styles.navActions}>
+          <ThemeToggle />
           <button
             type="button"
             className={styles.logoutButton}
@@ -128,6 +130,7 @@ const Nav = () => {
 
 
         <div className={styles.mobileRight}>
+          <ThemeToggle />
           <img
             src={usuario?.urlPicture}
             alt={usuario?.userName}
