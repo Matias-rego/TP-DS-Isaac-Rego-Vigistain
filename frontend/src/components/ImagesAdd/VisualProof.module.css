@@ -1,0 +1,174 @@
+/* Contenedor principal tipo tarjeta */
+.card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  width: 100%;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  box-sizing: border-box;
+}
+
+/* Encabezado con título e ícono en la misma línea */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #002347; /* Tu azul marino corporativo */
+  margin: 0 0 4px 0;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: #64748B; /* Gris intermedio fino */
+  margin: 0;
+  pre-wrap: pretty;
+}
+
+.headerIcon {
+  color: #002347;
+  opacity: 0.8;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+
+/* Área de la foto / Dropzone vacía */
+.dropzone {
+  width: 100%;
+  height: 200px;
+  border: 2px dashed #CBD5E1; /* Borde punteado prolijo */
+  border-radius: 12px;
+  background-color: #F8FAFC;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden; /* Clave para que la foto no tape las esquinas redondeadas */
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+/* Estado cuando no hay ninguna foto cargada */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: #94A3B8;
+  font-size: 14px;
+}
+
+/* Envoltura de la imagen cargada */
+.previewWrap {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+/* La foto estirada para cubrir todo el contenedor de forma elegante */
+.previewImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ajusta la imagen sin deformarla */
+}
+
+/* Capa de carga semitransparente con desenfoque */
+.uploadingOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Animación de rotación infinita para el Spinner */
+.spinner {
+  color: #FBAA29; /* Tu naranja de acción */
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Botón flotante 'X' para remover la imagen (arriba a la derecha de la foto) */
+.removeBtn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgba(15, 23, 42, 0.75); /* Fondo oscuro translúcido */
+  color: #ffffff;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.removeBtn:hover {
+  background-color: rgba(239, 68, 68, 0.9); /* Cambia a rojo destructivo al pasar el mouse */
+  transform: scale(1.05);
+}
+
+/* Mensaje de error */
+.error {
+  color: #EF4444;
+  font-size: 13px;
+  margin: 12px 0 0 0;
+  text-align: left;
+}
+
+/* Fila inferior de botones "Elegir archivo" y "Tomar foto" */
+.buttonsRow {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  width: 100%;
+}
+
+/* Botón estilizado plano (Action Button) */
+.actionBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  background-color: #F1F5F9; /* Gris sutil minimalista */
+  color: #334155;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.actionBtn:hover:not(:disabled) {
+  background-color: #E2E8F0;
+  border-color: #CBD5E1;
+}
+
+.actionBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Esconde los inputs reales del sistema nativo */
+.hiddenInput {
+  display: none;
+}

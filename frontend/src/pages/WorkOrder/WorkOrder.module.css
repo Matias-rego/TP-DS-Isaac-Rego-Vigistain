@@ -1,0 +1,374 @@
+
+
+.mainContent {
+  margin: 0.75rem;
+}
+
+.title {
+  color: #1e293b;
+  line-height: 0.96;
+  letter-spacing: -0.07em;
+  margin: 0;
+  font-weight: 950;
+}
+
+.mainTitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: #101828;
+  line-height: 1.2;
+}
+
+.mainDescription {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  color: #4B5563;
+  line-height: 1.6;
+}
+
+.customCard {
+  background-color: #ffffff;
+  border-radius: 18px !important;
+  border: 1.5px solid #EAEFF5 !important;
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.02);
+  padding: 10px;
+  max-width: 420px;
+  width: 100%;
+  /* Si el dropdown de resultados se corta, revisar si esta clase (o la
+     que trae shadcn/ui por default en <Card>) tiene overflow: hidden.
+     De ser así, hay que overridearlo puntualmente donde se use el SearchBar. */
+}
+
+.cardHeaderFlex {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  padding-bottom: 6px !important;
+}
+
+.titleWithIcon {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.cardIconImg {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.eyeIconImg {
+  width: 18px;
+  height: 18px;
+}
+
+.buttonIcons {
+  width: 20px;
+  height: 20px;
+}
+
+.dropdownDist {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.cardTitleText {
+  color: #002347 !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.5px;
+}
+
+.cardDescriptionText {
+  color: #6B7280 !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  margin-top: 4px;
+}
+
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.formFieldArea,
+.formFielArea {
+  width: 100%;
+}
+
+.formActionArea {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.searchContainer {
+  position: relative;
+  width: 100%;
+}
+
+.searchRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+}
+
+.orangeAddBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  background-color: #FBAA29;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  flex-shrink: 0;
+}
+
+.orangeAddBtn:hover {
+  background-color: #e2951f;
+}
+
+.resultsDropdown {
+  position: absolute;
+  top: 105%;
+  left: 0;
+  width: 100%;
+  background-color: #ffffff;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.08);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 50;
+  list-style: none;
+  padding: 6px 0;
+  margin: 0;
+}
+
+.dropdownItem {
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.dropdownItem:hover {
+  background-color: #F8FAFC;
+}
+
+.itemContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.itemName {
+  font-size: 13px;
+  font-weight: 500;
+  color: #0F172A;
+}
+
+.itemEmail {
+  font-size: 11px;
+  color: #64748B;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selectedBadge {
+  margin-top: 14px;
+  padding: 9px 12px;
+  background-color: #F0F7FF;
+  border: 1px solid #E0F0FF;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #003580;
+}
+
+.removeSlideBtn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: #94A3B8;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px;
+  transition: color 0.15s ease;
+}
+
+.removeSlideBtn:hover {
+  color: #EF4444;
+}
+
+.customTextarea {
+  font-family: inherit;
+}
+
+.prevButton,
+.nextButton {
+  display: flex;
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.modalContent {
+  background-color: #ffffff;
+  border-radius: 18px;
+  padding: 24px 18px 18px 18px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.15);
+  position: relative;
+  animation: scaleUp 0.2s ease-out;
+  box-sizing: border-box;
+}
+
+.closeModalBtn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #64748B;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.closeModalBtn:hover {
+  color: #0F172A;
+}
+
+@keyframes scaleUp {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@media (min-width: 640px) {
+  .mainContent {
+    margin: 1.25rem;
+  }
+
+  .mainTitle {
+    font-size: 32px;
+  }
+
+  .mainDescription {
+    font-size: 17px;
+  }
+
+  .customCard {
+    padding: 12px;
+  }
+
+  .cardIconImg {
+    width: 38px;
+    height: 38px;
+  }
+
+  .cardTitleText {
+    font-size: 21px !important;
+  }
+
+  .cardDescriptionText {
+    font-size: 14px !important;
+  }
+
+  .searchRow {
+    flex-wrap: nowrap;
+  }
+
+  .resultsDropdown {
+    width: calc(100% - 54px);
+  }
+
+  .dropdownDist {
+    grid-template-columns: 2fr auto;
+  }
+
+  .itemName {
+    font-size: 14px;
+  }
+
+  .itemEmail {
+    font-size: 12px;
+  }
+
+  .selectedBadge {
+    font-size: 13px;
+    padding: 10px 14px;
+  }
+
+  .modalContent {
+    padding: 32px 24px 24px 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .mainContent {
+    margin: 1.5rem;
+  }
+
+  .mainTitle {
+    font-size: 38px;
+  }
+
+  .mainDescription {
+    font-size: 22px;
+  }
+
+  .cardIconImg {
+    width: 44px;
+    height: 44px;
+  }
+
+  .cardTitleText {
+    font-size: 25px !important;
+  }
+
+  .cardDescriptionText {
+    font-size: 15px !important;
+  }
+
+  .formContainer {
+    gap: 20px;
+  }
+}

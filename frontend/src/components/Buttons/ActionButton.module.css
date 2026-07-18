@@ -94,8 +94,22 @@
 }
 
 /* ── Full width ── */
-.fullWidth {
-  width: 100%;
+.ghost {
+  background: none;
+  color: #64748b;
+  border: none;
+  box-shadow: none;
+  padding-left: 4px;
+  padding-right: 4px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.ghost:hover:not(:disabled) {
+  color: #1e293b;
+  background: none;
+  transform: none;
+  text-decoration: underline;
 }
 
 /* ── Icon ── */

@@ -42,7 +42,7 @@ export default function AltaTipoFalla({ onSuccess }: AltaTipoFallaProps) {
       subtitle="Completá los datos para registrar el tipo"
       icon={ICON}
       fields={FIELDS}
-      endpoint="/failures/createTypeFail"
+      endpoint="/api/failure-types/"
       submitLabel="Crear Tipo de Falla"
       successMessage="Tipo de falla creado correctamente."
       entityEvent={EVENTS.failureTypeChanged}

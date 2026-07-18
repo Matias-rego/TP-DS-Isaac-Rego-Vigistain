@@ -7,7 +7,7 @@ export interface ActionButtonProps {
   onClick?: () => void;
   /** Ícono SVG a la izquierda del texto */
   icon?: React.ReactNode;
-  variant?: 'primary' | 'danger' | 'success' | 'neutral';
+  variant?: 'primary' | 'danger' | 'success' | 'neutral' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
   disabled?: boolean;
   loading?: boolean;

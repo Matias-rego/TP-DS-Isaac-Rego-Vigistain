@@ -4,7 +4,8 @@
   background: var(--tf-card);
   border: 1.5px solid var(--tf-border);
   border-radius: 16px;
-  padding: 18px;
+  padding: 20px;
+  min-height: 200px;
   display: flex;
   flex-direction: column;
   gap: 14px;

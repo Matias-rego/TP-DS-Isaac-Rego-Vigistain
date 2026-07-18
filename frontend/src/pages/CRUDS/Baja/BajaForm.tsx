@@ -3,15 +3,13 @@ import useDebounce from '@/components/useDebounce';
 import { eventBus } from '@/lib/eventBus';
 import { BACKEND_URL } from '@/lib/config';
 import styles from './BajaForm.module.css';
+import { useAuth } from '@/lib/AuthContext';
 
 // ─── Field config para el detalle ────────────────────────────────────────────
 
 export interface DetailFieldConfig {
-  /** Key del objeto de la entidad, ej: "estimatedImport" */
   name: string;
-  /** Label visible, ej: "Costo estimado" */
   label: string;
-  /** Formateador opcional del valor (ej: moneda, porcentaje) */
   format?: (value: unknown) => string;
 }
 
@@ -22,34 +20,17 @@ export interface BajaFormProps<T extends object> {
   subtitle?: string;
   icon?: React.ReactNode;
   searchPlaceholder: string;
-  /** Endpoint de búsqueda parcial, ej: "/failures/getPartialTypes" (se le agrega /:query) */
   searchEndpoint: string;
-  /** Endpoint de borrado, ej: "/failures/deleteType" (se le agrega /:id) */
   deleteEndpoint: string;
-  /** Key del campo que identifica unívocamente al registro, ej: "id_failure_type" */
   idField: keyof T;
-  /** Key del campo que se muestra en la lista de resultados como preview, ej: "failureDescription" */
   previewField?: keyof T;
-  /** Función para combinar varios campos en el preview, ej: (item) => `${item.pteDescuento}% / ${item.cantOrdenesPara} órdenes`. Tiene prioridad sobre previewField. */
   previewFormat?: (item: T) => string;
-  /** Campos a mostrar en el detalle, en orden */
   detailFields: DetailFieldConfig[];
-  /** Si la búsqueda requiere token (default true) */
   requiresAuth?: boolean;
-  /** Nombre del evento a emitir en eventBus tras un borrado exitoso */
   entityEvent?: string;
   successMessage?: string;
   onSuccess?: () => void;
-  /** Debounce en ms para la búsqueda (default 800) */
   debounceMs?: number;
-}
-
-function parseJwt(token: string) {
-  try {
-    return JSON.parse(atob(token.split('.')[1]));
-  } catch {
-    return null;
-  }
 }
 
 function formatValue(value: unknown): string {
@@ -103,7 +84,7 @@ export default function BajaForm<T extends object>({
 
         const result = await fetch(
           `${baseUrl}${searchEndpoint}/${encodeURIComponent(debouncedQuery)}`,
-          { method: 'GET', headers }
+          { method: 'GET', headers, credentials: 'include' }
         );
 
         if (result.status === 404) {
@@ -131,17 +112,12 @@ export default function BajaForm<T extends object>({
   const handleDelete = async () => {
     if (!selected) return;
     try {
-      const token = localStorage.getItem('token');
-      if (!token) throw new Error('No hay token de sesión.');
-
-      const decoded = parseJwt(token);
-      if (!decoded?.id_user) throw new Error('Token inválido o expirado.');
 
       const id = selected[idField];
 
       const result = await fetch(`${baseUrl}${deleteEndpoint}/${id}`, {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
       });
 
       if (!result.ok) {

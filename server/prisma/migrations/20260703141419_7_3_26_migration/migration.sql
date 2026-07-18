@@ -10,13 +10,13 @@
 
 */
 -- DropIndex
-DROP INDEX `Payment_Type_paymentMethod_key` ON `payment_type`;
+DROP INDEX `Payment_Type_paymentMethod_key` ON `Payment_Type`;
 
 -- AlterTable
-ALTER TABLE `category_client` MODIFY `amountForCategoryUp` INTEGER NOT NULL;
+ALTER TABLE `Category_Client` MODIFY `amountForCategoryUp` INTEGER NOT NULL;
 
 -- AlterTable
-ALTER TABLE `payment_type` DROP COLUMN `discountRate`,
+ALTER TABLE `Payment_Type` DROP COLUMN `discountRate`,
     DROP COLUMN `surchargeRate`,
     ADD COLUMN `paymentTypeName` VARCHAR(191) NOT NULL,
     ADD COLUMN `percentaje` DOUBLE NOT NULL DEFAULT 0,
