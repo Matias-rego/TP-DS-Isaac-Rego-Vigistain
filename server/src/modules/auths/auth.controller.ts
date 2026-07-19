@@ -135,10 +135,17 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
 export const resetPassword = async (req: Request, res: Response) => {
     const token = String(req.params.token);
-    const { password } = req.body;
+        const { password } = req.body;
 
-    try {
-        const decoded = jwt.decode(token) as ResetPasswordPayload;
+        if (typeof password !== 'string' || password.length < 8) {
+            return res.status(400).json({ error: 'La contraseña debe tener al menos 8 caracteres' });
+        }
+        if (password.length > 72) {
+            return res.status(400).json({ error: 'La contraseña es demasiado larga' });
+        }
+
+        try {
+            const decoded = jwt.decode(token) as ResetPasswordPayload;
 
         if (!decoded?.id_user) {
             return res.status(400).json({ error: 'Token inválido' });
