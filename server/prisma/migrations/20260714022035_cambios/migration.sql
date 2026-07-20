@@ -10,16 +10,16 @@
 
 */
 -- DropIndex
-DROP INDEX `Equipment_equipmentName_key` ON `equipment`;
+DROP INDEX `Equipment_equipmentName_key` ON `Equipment`;
 
 -- AlterTable
-ALTER TABLE `equipment` DROP COLUMN `equipmentName`,
+ALTER TABLE `Equipment` DROP COLUMN `equipmentName`,
     ADD COLUMN `brand` VARCHAR(191) NOT NULL,
     ADD COLUMN `model` VARCHAR(191) NOT NULL,
     MODIFY `tipo_equipment` VARCHAR(191) NOT NULL;
 
 -- AlterTable
-ALTER TABLE `order` DROP COLUMN `failureReported`,
+ALTER TABLE `Order` DROP COLUMN `failureReported`,
     DROP COLUMN `technicianDiagnosis`,
     ADD COLUMN `equipmentPhotoUrl` VARCHAR(191) NULL,
     ADD COLUMN `observations` VARCHAR(191) NULL;

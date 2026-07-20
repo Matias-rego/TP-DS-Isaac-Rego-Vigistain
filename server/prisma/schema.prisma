@@ -72,6 +72,9 @@ model User {
   urlPicture     String        @default("https://res.cloudinary.com/dcgvogduy/image/upload/v1778239413/taller-mecanico/j4fv1vtqqrhskyw0owms.png")  
   orders         Order[]
   statusHistory  Status_History[]
+  
+
+  @@map("User")
 }
 
 model Client {
@@ -85,6 +88,8 @@ model Client {
   category_client     Category_Client @relation(fields: [id_category_client], references: [id_category_client])
   id_category_client  Int
   equipments          Equipment[]
+
+  @@map("Client")
 }
 
 model Category_Client {
@@ -92,6 +97,8 @@ model Category_Client {
   categoryClientName    String  @unique
   amountForCategoryUp   Int
   clients               Client[]
+
+  @@map("Category_Client")
 }
 
 model Failure_Type {
@@ -99,6 +106,8 @@ model Failure_Type {
   failureDescription String  @unique
   estimatedImport    Float
   failures           Failure[]
+
+  @@map("Failure_Type")
 }
 
 model Failure {
@@ -110,6 +119,8 @@ model Failure {
   description     String
   dateOfFailure   DateTime     @default(now())
   status          EnumFailureStatus @default(diagnosticada)
+
+  @@map("Failure")
 }
 
 model Equipment {
@@ -122,6 +133,8 @@ model Equipment {
   id_client       Int
   failures        Failure[]
   orders          Order[]
+
+  @@map("Equipment")
 }
 model Order {
   id_order           Int             @id @default(autoincrement())
@@ -138,6 +151,8 @@ model Order {
   totalCharged       Float?
   statusHistory      Status_History[]
   budget             Budget?
+
+  @@map("Order")
 }
 model Status_History {
   id_status_history Int      @id @default(autoincrement())
@@ -149,6 +164,8 @@ model Status_History {
   id_user           Int
   dateOfChange      DateTime @default(now())
   comment           String?
+
+  @@map("Status_History")
 }
 model Budget {
   id_budget       Int              @id @default(autoincrement())
@@ -159,6 +176,8 @@ model Budget {
   estimatedTotal  Float
   status          EnumBudgetStatus @default(pendiente)
   payments        Payment[]
+
+  @@map("Budget")
 }
 model Payment_Type {
   id_payment_type  Int               @id @default(autoincrement())
@@ -167,6 +186,8 @@ model Payment_Type {
   type_of_payment EnumPaymentType  
   percentaje     Float             @default(0)
   payments        Payment[]
+
+  @@map("Payment_Type")
 }
 
 model Payment {
