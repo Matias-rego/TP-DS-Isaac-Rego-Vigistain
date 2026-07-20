@@ -6,7 +6,7 @@ import { Navigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { BACKEND_URL } from '@/lib/config';
 import styles from './Perfil.module.css';
-import type { UserProfile } from "../../types/types";
+import type { User } from "../../types/types";
 import {
   Card,
   CardAction,
@@ -20,7 +20,7 @@ import {
 
 
 const Perfil = () => {
-  const [usuario, setUsuario] = useState<UserProfile | null>(null);
+  const [usuario, setUsuario] = useState<User | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [comienzaEdicion, setComienzaEdicion] = useState<boolean>(false);
 
@@ -35,7 +35,7 @@ const Perfil = () => {
 
         if (!response.ok) throw new Error(`Error ${response.status}`);
 
-        const data: UserProfile = await response.json();
+        const data: User = await response.json();
         if (!data) throw new Error('Usuario no encontrado');
 
         setUsuario(data);
@@ -63,19 +63,11 @@ const Perfil = () => {
           {/* ── Tarjeta de perfil ── */}
           <div className={styles.card}>
             <div className={styles.cardFlex}>
-
-              {/*<Avatar className={styles.avatarRoot}>*/}
               <img
                 src={usuario?.urlPicture}
                 alt={usuario?.userName}
                 className={styles.avatarRoot}
               />
-              {/*  <AvatarFallback className="bg-[#1A202C] text-white">
-            {usuario?.userName?.[0]?.toUpperCase() ?? '?'}
-          </AvatarFallback>
-        </Avatar> */}
-
-
 
               {/* Datos */}
               <div className={styles.dataStack}>
@@ -110,22 +102,9 @@ const Perfil = () => {
 
           {/* ── Sección tarjetas asociadas ── */}
           <div className={styles.sectionWrapper}>
-            <h2 className={styles.sectionTitle}>...Tarjetas...</h2>
+            <h2 className={styles.sectionTitle}>Tarjetas asociadas</h2>
+            <p className={styles.sectionEmpty}>Todavía no hay tarjetas para mostrar.</p>
           </div>
-
-          <Card className={styles.cardBodyPerfil}>
-            <CardHeader>
-              <CardTitle>Card Title</CardTitle>
-              <CardDescription>Card Description</CardDescription>
-              <CardAction>Card Action</CardAction>
-            </CardHeader>
-            <CardContent>
-              <p>Card Content</p>
-            </CardContent>
-            <CardFooter>
-              <p>Card Footer</p>
-            </CardFooter>
-          </Card>
 
         </div>
 

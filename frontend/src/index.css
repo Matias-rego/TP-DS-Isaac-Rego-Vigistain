@@ -106,8 +106,23 @@ body {
     radial-gradient(circle at top left, rgba(21, 101, 192, 0.10), transparent 30%),
     radial-gradient(circle at top right, rgba(255, 193, 7, 0.10), transparent 28%),
     linear-gradient(180deg, #FFFFFF 0%, #F5F7FA 100%);
-  color: var(--color-text);
+  color: var(--tf-text);
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* Fondo del body en MODO OSCURO (antes quedaba claro) */
+.dark body {
+  background:
+    radial-gradient(circle at top left, rgba(59, 130, 246, 0.12), transparent 30%),
+    radial-gradient(circle at top right, rgba(255, 193, 7, 0.05), transparent 28%),
+    linear-gradient(180deg, #0f172a 0%, #0b1120 100%);
+}
+
+/* Transición suave al cambiar entre claro y oscuro */
+*,
+*::before,
+*::after {
+  transition: background-color 0.35s ease, border-color 0.35s ease, color 0.35s ease;
 }
 
 button,
@@ -239,6 +254,20 @@ a {
 }
 
 .dark {
+  /* TechFix - valores para MODO OSCURO (las mismas variables --tf-*, otro color) */
+  --tf-primary: #3b82f6;
+  --tf-primary-dark: #2563eb;
+  --tf-primary-soft: #1e3a5f;
+  --tf-accent: #FFC107;
+  --tf-accent-dark: #F9A825;
+  --tf-accent-soft: #3a3320;
+  --tf-white: #FFFFFF;
+  --tf-bg: #0f172a;
+  --tf-card: #1e293b;
+  --tf-text: #e2e8f0;
+  --tf-muted: #94a3b8;
+  --tf-border: #334155;
+
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
