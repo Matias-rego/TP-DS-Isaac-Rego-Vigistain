@@ -341,4 +341,10 @@
 
 .button3:hover {
   background-color: var(--tf-bg);
+  color: rgb(168, 160, 160);
+}
+.errorText {
+  font-size: 0.78rem;
+  color: #dc2626;
+  margin-top: -2px;
 }
