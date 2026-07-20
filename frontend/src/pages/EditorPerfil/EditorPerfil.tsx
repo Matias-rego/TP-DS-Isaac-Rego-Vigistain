@@ -9,6 +9,7 @@ import AlertSuccess from "@/components/Alert/AlertSuccess";
 import Alert from "@/components/Alert/Alert";
 import { useNavigate } from "react-router-dom";
 import { BACKEND_URL } from '@/lib/config';
+import { X, Camera } from "lucide-react";
 import ActionButton from "@/components/Buttons/ActionButton";
 
 const EditorPerfil = () => {
@@ -25,6 +26,10 @@ const EditorPerfil = () => {
   const [resetSuccess, setResetSuccess] = useState<string | null>(null);
 
   const navigate = useNavigate();
+
+  const changeModalPass = () => {
+    setModalPass(true);
+  };
 
   const handleFoto = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -104,11 +109,8 @@ const EditorPerfil = () => {
   useEffect(() => {
     const cargarPerfil = async () => {
       try {
-        const token = localStorage.getItem('token');
-        if (!token) throw new Error('No hay token');
-
         const response = await fetch(`${BACKEND_URL}/api/auth/me`,
-          { headers: { Authorization: `Bearer ${token}` }, credentials: 'include' });
+          { credentials: 'include' });
 
         if (!response.ok) throw new Error(`Error ${response.status}`);
 
@@ -154,7 +156,6 @@ const EditorPerfil = () => {
                 <DialogContent className={styles.dialogContent} showCloseButton={false}>
                   <DialogHeader className={styles.dialog}>
                     <DialogTitle>Cambiar foto de perfil</DialogTitle>
-
                     <VisuallyHidden>
                       <DialogDescription>
                         Seleccioná una imagen para actualizar tu foto de perfil
@@ -169,27 +170,14 @@ const EditorPerfil = () => {
 
                     {preview ? (
                       <div className={styles.previewWrap}>
-                        <img
-                          src={preview}
-                          alt="Preview"
-                          className={styles.preview}
-                        />
-
-                        <button
-                          type="button"
-                          className={styles.removeBtn}
-                          onClick={removePhoto}
-                        >
-                          ✕
+                        <img src={preview} alt="Preview" className={styles.preview} />
+                        <button type="button" className={styles.removeBtn} onClick={removePhoto}>
+                          <X size={16} />
                         </button>
                       </div>
                     ) : (
-                      <label
-                        className={styles.dropZone}
-                        htmlFor="file-input"
-                      >
-                        <span className={styles.dropZoneIcon}>📷</span>
-
+                      <label className={styles.dropZone} htmlFor="file-input">
+                        <span className={styles.dropZoneIcon}><Camera size={30} /></span>
                         <span className={styles.dropZoneText}>
                           Hacé clic para subir una imagen
                         </span>
@@ -203,6 +191,24 @@ const EditorPerfil = () => {
                       onChange={handleFoto}
                     />
                   </div>
+                </DialogContent>
+              </DialogPortal>
+            </Dialog>
+
+            <Dialog open={modalPass} onOpenChange={setModalPass}>
+              <DialogPortal>
+                <DialogContent className={styles.dialogContentPass} showCloseButton={false}>
+                  <DialogHeader className={styles.dialogPass}>
+                    <DialogTitle className={styles.dialogTitle}>Cambio de contraseña</DialogTitle>
+                    <DialogDescription className={styles.dialogDescriptionPass}>
+                      Para cambiar tu contraseña tendra que ingresar un email al cual le llegara un enlace para restablecerla. A continuacion
+                      debes hacer click en el boton "Comenzar restablecimiento" para seguir el procedimiento.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <button type="button" className={styles.button3} onClick={() => {
+                    setModalPass(false);
+                    navigate(`/forgot-password`);
+                  }}>Comenzar restablecimiento</button>
                 </DialogContent>
               </DialogPortal>
             </Dialog>
@@ -282,6 +288,6 @@ const EditorPerfil = () => {
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 export default EditorPerfil;

@@ -4,6 +4,7 @@ import styles from "./Home.module.css";
 import type { User } from "@/types/types";
 import Footer from "@/components/Footer/Footer";
 import { BACKEND_URL } from '@/lib/config';
+import { ClipboardList, Plus, Wallet, Zap, Search, Check, FileText, Clock, Wrench, CircleCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const Home = () => {
@@ -74,7 +75,7 @@ const Home = () => {
 
       {mostrarToast && (
         <div className={`${styles.toast} ${toastSaliendo ? styles.toastExit : ''}`}>
-          <div className={styles.toastIcon}>✓</div>
+          <div className={styles.toastIcon}><Check size={20} /></div>
           <div>
             <p className={styles.toastTitle}>Sesión iniciada</p>
             <p className={styles.toastText}>Acceso validado correctamente.</p>
@@ -85,7 +86,7 @@ const Home = () => {
       <main className={styles.main}>
         <section className={styles.heroCard}>
           <div className={styles.heroContent}>
-            <div className={styles.badge}>TechFix · Taller de Reparaciones</div>
+            <div className={styles.badge}>Taller de reparaciones</div>
 
             <h1 className={styles.title}>
               Bienvenido{usuario?.userName ? `, ${usuario.userName}` : ""}.
@@ -100,7 +101,7 @@ const Home = () => {
             {esTecnico ? (
               <div className={styles.primaryActions}>
                 <button type="button" className={styles.mainAction}>
-                  <span className={styles.actionIcon}>📋</span>
+                  <span className={styles.actionIcon}><ClipboardList size={22} /></span>
                   <span>
                     <strong>Ver órdenes</strong>
                     <small>Revisar trabajos activos</small>
@@ -108,7 +109,7 @@ const Home = () => {
                 </button>
 
                 <button type="button" className={styles.secondaryAction} onClick={() => navigate('/createOrder')}>
-                  <span className={styles.actionIcon}>＋</span>
+                  <span className={styles.actionIcon}><Plus size={22} /></span>
                   <span>
                     <strong>Nueva orden</strong>
                     <small>Registrar equipo entrante</small>
@@ -118,7 +119,7 @@ const Home = () => {
             ) : (
               <>
                 <div className={styles.userMessage}>
-                  <span className={styles.userMessageIcon}>🔎</span>
+                  <span className={styles.userMessageIcon}><Search size={20} /></span>
                   <span>
                     Tu cuenta está activa. Cuando el backend tenga disponible el rol cliente,
                     este panel mostrará tus equipos, presupuestos e historial de reparaciones.
@@ -159,54 +160,58 @@ const Home = () => {
             )}
           </div>
 
-          <div className={styles.heroVisual}>
-            <div className={styles.quickPanel}>
-              <div className={styles.quickPanelHeader}>
-                <span className={styles.quickPanelIcon}>⚡</span>
-                <div>
-                  <p className={styles.quickPanelTitle}>Accesos rápidos</p>
-                  <p className={styles.quickPanelText}>Gestioná el taller sin perder tiempo.</p>
+            <div className={styles.heroVisual}>
+              <div className={styles.quickPanel}>
+                <div className={styles.quickPanelHeader}>
+                  <span className={styles.quickPanelIcon}><Zap size={22} /></span>
+                  <div>
+                    <p className={styles.quickPanelTitle}>Accesos rápidos</p>
+                    <p className={styles.quickPanelText}>Gestioná el taller sin perder tiempo.</p>
+                  </div>
+                </div>
+
+                <div className={styles.quickPanelList}>
+                  <button type="button" className={styles.quickPanelItem}>
+                    <span><ClipboardList size={18} /></span>
+                    <strong>Consultar órdenes</strong>
+                  </button>
+
+                  <button type="button" className={styles.quickPanelItem}>
+                    <span><Plus size={18} /></span>
+                    <strong>Crear nueva orden</strong>
+                  </button>
+
+                  <button type="button" className={styles.quickPanelItem}>
+                    <span><Wallet size={18} /></span>
+                    <strong>Ver presupuestos</strong>
+                  </button>
                 </div>
               </div>
-
-              <div className={styles.quickPanelList}>
-                <button type="button" className={styles.quickPanelItem}>
-                  <span>📋</span>
-                  <strong>Consultar órdenes</strong>
-                </button>
-
-                <button type="button" className={styles.quickPanelItem}>
-                  <span>➕</span>
-                  <strong>Crear nueva orden</strong>
-                </button>
-
-                <button type="button" className={styles.quickPanelItem}>
-                  <span>💰</span>
-                  <strong>Ver presupuestos</strong>
-                </button>
-              </div>
             </div>
-          </div>
         </section>
 
         {esTecnico && (
           <section className={styles.quickGrid}>
             <div className={styles.quickCard}>
+              <FileText className={styles.quickIcon} size={20} />
               <span className={styles.quickNumber}>24</span>
               <span className={styles.quickLabel}>Órdenes activas</span>
             </div>
 
             <div className={styles.quickCard}>
+              <Clock className={styles.quickIcon} size={20} />
               <span className={styles.quickNumber}>7</span>
               <span className={styles.quickLabel}>Pendientes de presupuesto</span>
             </div>
 
             <div className={styles.quickCard}>
+              <Wrench className={styles.quickIcon} size={20} />
               <span className={styles.quickNumber}>15</span>
               <span className={styles.quickLabel}>En reparación</span>
             </div>
 
             <div className={styles.quickCard}>
+              <CircleCheck className={styles.quickIcon} size={20} />
               <span className={styles.quickNumber}>32</span>
               <span className={styles.quickLabel}>Entregadas este mes</span>
             </div>

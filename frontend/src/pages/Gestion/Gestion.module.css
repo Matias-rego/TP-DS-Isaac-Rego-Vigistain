@@ -1,106 +1,130 @@
-.cardModern {
-  background: white;
+/* ============================================================
+   GESTIÓN - limpio + MODO OSCURO (usa var(--tf-*))
+   ============================================================ */
 
-  border-radius: 24px;
-
-  border: 1px solid #e5e7eb;
-
-  box-shadow:
-    0 10px 30px rgba(0,0,0,0.08);
-
-  /* overflow: hidden; */
-
-  transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease;
-}
-
-.cardModern:hover {
-  transform: translateY(-5px);
-
-  box-shadow:
-    0 20px 40px rgba(0,0,0,0.12);
-}
-
-.cardContent {
-  height: 250px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 1.2rem;
-  font-weight: 600;
-}.cardModern {
-  background: white;
-
-  border-radius: 24px;
-
-  border: 1px solid #e5e7eb;
-
-  box-shadow:
-    0 10px 30px rgba(0,0,0,0.08);
-
-  overflow: hidden;
-
-  transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease;
-}
-
-.cardModern:hover {
-  transform: translateY(-5px);
-
-  box-shadow:
-    0 20px 40px rgba(0,0,0,0.12);
-}
-
-.cardContent {
-  height: 250px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 1.2rem;
-  font-weight: 600;
-}
 .container {
-    max-width: 1200px;
-    margin: 2rem auto;
-    padding: 0 1rem;
-    flex-direction: column;
-    gap: 1.5rem;
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
-.titleHeader{
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--color-primary);
-    
+
+/* ── Encabezado ── */
+.titleHeader {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--tf-text);
+  margin: 0;
 }
+
 .titleHeader::after {
-    content: '';
-    display: block;
-    width: 60px;
-    height: 4px;
-    background: var(--color-primary);
-    margin-top: 0.5rem;
-    border-radius: 2px;
+  content: '';
+  display: block;
+  width: 56px;
+  height: 3px;
+  background: var(--tf-primary);
+  margin-top: 0.5rem;
+  border-radius: 2px;
 }
+
 .descriptionHeader {
-    font-size: 1.1rem;
-    color: var(--color-muted);
-    margin-top: 0.5rem;
+  font-size: 1.05rem;
+  color: var(--tf-muted);
+  margin-top: 0.75rem;
 }
-.buttonGestion{
-  background-color: aqua;
+
+/* ── Pantalla de opciones: 3 tarjetas ── */
+.opcionesGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
 }
-.nextButton{
-  display: none;
-}
-@media (min-width:768px){
-  .nextButton{
-    display: block;
+
+@media (min-width: 768px) {
+  .opcionesGrid {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
+.opcionCard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
+  text-align: left;
+  background: var(--tf-card);
+  border: 1px solid var(--tf-border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.opcionCard:hover {
+  border-color: var(--tf-primary);
+  box-shadow: 0 4px 16px rgba(21, 101, 192, 0.10);
+  transform: translateY(-2px);
+}
+
+.opcionIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--tf-primary-soft);
+  color: var(--tf-primary);
+  margin-bottom: 0.5rem;
+}
+
+.opcionTitulo {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--tf-text);
+}
+
+.opcionDesc {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--tf-muted);
+  line-height: 1.5;
+}
+
+.opcionAbrir {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--tf-primary);
+}
+
+/* ── Detalle (cuando elegiste una opción) ── */
+.detalle {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.volverBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  align-self: flex-start;
+  background: transparent;
+  border: 1px solid var(--tf-border);
+  border-radius: 10px;
+  padding: 0.5rem 0.9rem;
+  color: var(--tf-text);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+
+.volverBtn:hover {
+  background: var(--tf-bg);
+  border-color: var(--tf-muted);
+}

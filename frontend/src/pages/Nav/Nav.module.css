@@ -1,13 +1,15 @@
 :root {
-  --azul: #1565C0;
-  --azul-oscuro: #0D47A1;
-  --azul-suave: #E3F2FD;
-  --amarillo: #FFC107;
-  --amarillo-suave: #FFF8E1;
-  --blanco: #FFFFFF;
-  --gris-texto: #1E293B;
-  --gris-suave: #64748B;
-  --borde: #E2E8F0;
+  /* Estas variables del navbar ahora apuntan a las --tf-* del tema.
+     Como las --tf-* cambian en modo oscuro, el navbar se adapta solo. */
+  --azul: var(--tf-primary);
+  --azul-oscuro: var(--tf-primary-dark);
+  --azul-suave: var(--tf-primary-soft);
+  --amarillo: var(--tf-accent);
+  --amarillo-suave: var(--tf-accent-soft);
+  --blanco: var(--tf-card);          /* superficie (fondo del navbar/drawer) */
+  --gris-texto: var(--tf-text);
+  --gris-suave: var(--tf-muted);
+  --borde: var(--tf-border);
   --drawer-width: 280px;
 }
 
@@ -80,7 +82,7 @@
 
 .logoText {
   font-size: 1.25rem;
-  font-weight: 900;
+  font-weight: 700;
   color: var(--gris-texto);
   letter-spacing: -0.4px;
 }
@@ -123,7 +125,7 @@
   background: transparent;
   color: var(--gris-texto);
   font-size: 0.95rem;
-  font-weight: 800;
+  font-weight: 600;
   padding: 0.72rem 1rem;
   border-radius: 999px;
   cursor: pointer;
@@ -199,38 +201,28 @@
 .logoutButton {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
-  background: linear-gradient(135deg, var(--azul) 0%, var(--azul-oscuro) 100%);
-  color: var(--blanco);
+  gap: 0.5rem;
+  background: var(--azul);
+  color: var(--tf-white);
   border: none;
-  padding: 0.65rem 1.15rem;
+  padding: 0.6rem 1.15rem;
   border-radius: 999px;
-  font-weight: 800;
-  font-size: 0.95rem;
+  font-weight: 600;
+  font-size: 0.9rem;
   cursor: pointer;
-  box-shadow: 0 12px 28px rgba(21, 101, 192, 0.28);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  transition: background 0.18s ease;
   flex-shrink: 0;
 }
 
 .logoutButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 16px 36px rgba(21, 101, 192, 0.36);
-  filter: brightness(1.04);
+  background: var(--azul-oscuro);
 }
 
-.logoutButton:active { transform: translateY(0); }
-
 .logoutIcon {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--amarillo);
-  color: #1E293B;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.85rem;
+  color: inherit;
   flex-shrink: 0;
 }
 
@@ -340,7 +332,7 @@
   justify-content: space-between;
   padding: 1.25rem 1.1rem 1rem;
   border-bottom: 1px solid var(--borde);
-  background: linear-gradient(135deg, var(--azul-suave) 0%, #fff 100%);
+  background: linear-gradient(135deg, var(--azul-suave) 0%, var(--tf-card) 100%);
 }
 
 .drawerUser {
@@ -431,9 +423,10 @@
 }
 
 .drawerLinkIcon {
-  font-size: 1.15rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 28px;
-  text-align: center;
   flex-shrink: 0;
 }
 
@@ -447,21 +440,20 @@
   align-items: center;
   gap: 0.6rem;
   width: 100%;
-  background: linear-gradient(135deg, var(--azul) 0%, var(--azul-oscuro) 100%);
-  color: var(--blanco);
+  justify-content: center;
+  background: var(--azul);
+  color: var(--tf-white);
   border: none;
   padding: 0.8rem 1.2rem;
-  border-radius: 999px;
-  font-weight: 800;
+  border-radius: 12px;
+  font-weight: 600;
   font-size: 0.95rem;
   cursor: pointer;
-  box-shadow: 0 10px 24px rgba(21, 101, 192, 0.28);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: background 0.18s ease;
 }
 
 .drawerLogout:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 14px 30px rgba(21, 101, 192, 0.36);
+  background: var(--azul-oscuro);
 }
 
 /* ─── MODAL ─── */
@@ -479,8 +471,8 @@
 
 .modalCard {
   width: min(92vw, 430px);
-  background: rgba(255, 255, 255, 0.94);
-  border: 1px solid rgba(224, 242, 254, 0.9);
+  background: var(--tf-card);
+  border: 1px solid var(--tf-border);
   border-radius: 28px;
   padding: 1.5rem;
   text-align: center;
@@ -498,29 +490,27 @@
 }
 
 .modalIcon {
-  width: 64px;
-  height: 64px;
+  width: 60px;
+  height: 60px;
   margin: 0 auto 1rem;
   border-radius: 50%;
-  background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
-  color: #007ea7;
+  background: var(--azul-suave);
+  color: var(--azul);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.7rem;
-  box-shadow: 0 12px 28px rgba(0, 168, 232, 0.22);
 }
 
 .modalTitle {
   margin: 0;
-  color: #0f172a;
+  color: var(--tf-text);
   font-size: 1.45rem;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .modalText {
   margin: 0.85rem 0 1.5rem;
-  color: #64748b;
+  color: var(--tf-muted);
   font-size: 0.96rem;
   line-height: 1.5;
 }
@@ -559,24 +549,21 @@
 }
 
 .cancelButton {
-  background: #f1f5f9;
-  color: #334155;
+  background: var(--tf-border);
+  color: var(--tf-text);
 }
 
 .cancelButton:hover {
-  background: #e2e8f0;
   transform: translateY(-1px);
 }
 
 .confirmButton {
-  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  background: var(--azul);
   color: #ffffff;
-  box-shadow: 0 10px 24px rgba(14, 165, 233, 0.3);
 }
 
 .confirmButton:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 14px 30px rgba(14, 165, 233, 0.38);
+  background: var(--azul-oscuro);
 }
 
 /* ─── ANIMACIONES ─── */

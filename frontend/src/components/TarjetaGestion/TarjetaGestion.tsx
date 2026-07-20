@@ -2,15 +2,12 @@ import styles from './TarjetaGestion.module.css';
 import { Card, CardContent } from '@/components/ui/card';
 import ModalTable from '../ModalTable/ModalTable';
 import BottomPanel from '@/components/ui/SheetSide';
-import AltaTipoFalla from '@/pages/TipoFalla/AltaTipoFalla';
-import BajaTipoFalla from '@/pages/TipoFalla/BajaTipoFalla';
-import ModificacionTipoFalla from '@/pages/TipoFalla/ModificacionTipoFalla';
 import { useState } from 'react';
+import { ClipboardList } from 'lucide-react';
 
 type TarjetaGestionProps = {
   titulo: string;
   descripcion: string;
-  imagen: string;
   childrenCard?: React.ReactNode;
   childrenTable?: React.ReactNode;
   childrenFuncionAlta?: React.ReactNode;
@@ -21,8 +18,6 @@ type TarjetaGestionProps = {
 const TarjetaGestion = ({
   titulo,
   descripcion,
-  imagen,
-  childrenCard,
   childrenTable,
   childrenFuncionAlta,
   childrenFuncionBaja,
@@ -35,19 +30,12 @@ const TarjetaGestion = ({
       <CardContent className="p-0">
         <div className={styles.containerContent}>
 
-
           <div className={styles.columnaIzquierda}>
 
-
+            {/* Título limpio (sin la foto borrosa de antes) */}
             <div className={styles.cajaTitulo}>
-              <img src={imagen} alt={titulo} className={styles.imagenTitulo} />
-              <div className={styles.tituloDecorativo}>
-                <div className={styles.tituloContent}>
-                  <h2 className={styles.titulo}>{titulo}</h2>
-                </div>
-              </div>
+              <h2 className={styles.titulo}>{titulo}</h2>
             </div>
-
 
             <p className={styles.descripcion}>{descripcion}</p>
 
@@ -56,23 +44,18 @@ const TarjetaGestion = ({
               className={styles.botonVerTabla}
               onClick={() => setAbrirTabla(true)}
             >
-              📋 Ver tabla
+              <ClipboardList size={18} style={{ verticalAlign: '-4px', marginRight: 6 }} />Ver tabla
             </button>
 
-
             <ModalTable
-                open={abrirTabla}
-                onClose={() => setAbrirTabla(false)}
-                titulo={titulo}
+              open={abrirTabla}
+              onClose={() => setAbrirTabla(false)}
+              titulo={titulo}
             >
-                {childrenTable}
+              {childrenTable}
             </ModalTable>
 
-
-
-
             <div className={styles.tablaBotones}>
-
 
               <BottomPanel
                 trigger={
@@ -93,7 +76,7 @@ const TarjetaGestion = ({
                       Eliminar
                     </button>
                   }
-                  title="Eliminación de Tipo falla"
+                  title={`Eliminación de ${titulo}`}
                   description="Eliminar"
                 >
                   {childrenFuncionBaja}
@@ -105,7 +88,7 @@ const TarjetaGestion = ({
                       Editar
                     </button>
                   }
-                  title="Modificación de Tipo falla"
+                  title={`Modificación de ${titulo}`}
                   description="Modificar"
                 >
                   {childrenFuncionModify}

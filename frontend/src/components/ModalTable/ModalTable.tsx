@@ -1,4 +1,5 @@
 import styles from './ModalTable.module.css';
+import { X } from 'lucide-react';
 
 type ModalTableProps = {
   open: boolean;
@@ -17,7 +18,7 @@ const ModalTable = ({ open, onClose, titulo, children }: ModalTableProps) => {
         <div className={styles.header}>
           <h2 className={styles.titulo}>{titulo} — Tabla</h2>
           <button type="button" className={styles.cerrar} onClick={onClose}>
-            ✕
+            <X size={20} />
           </button>
         </div>
 

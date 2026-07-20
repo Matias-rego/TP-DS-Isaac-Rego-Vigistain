@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import styles from './ForgotPassword.module.css';
 import { BACKEND_URL } from '@/lib/config';
+import { KeyRound } from 'lucide-react';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -29,7 +30,7 @@ const ForgotPassword = () => {
       <div className={styles.card}>
 
         <div className={styles.iconWrap}>
-          🔐
+          <KeyRound size={28} />
         </div>
 
         <h1 className={styles.title}>Restablecer contraseña</h1>
