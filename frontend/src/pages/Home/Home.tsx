@@ -176,7 +176,7 @@ const Home = () => {
                     <strong>Consultar órdenes</strong>
                   </button>
 
-                  <button type="button" className={styles.quickPanelItem}>
+                  <button type="button" className={styles.quickPanelItem} onClick={() => navigate('/createOrder')}>
                     <span><Plus size={18} /></span>
                     <strong>Crear nueva orden</strong>
                   </button>
