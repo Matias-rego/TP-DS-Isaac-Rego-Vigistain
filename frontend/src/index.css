@@ -125,6 +125,29 @@ body {
   transition: background-color 0.35s ease, border-color 0.35s ease, color 0.35s ease;
 }
 
+/* Modo oscuro: campos de texto legibles (arregla inputs que quedaban
+   blancos con el texto invisible al escribir) */
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: var(--tf-card);
+  color: var(--tf-text);
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: var(--tf-muted);
+}
+
+/* Evita que el autocompletado del navegador pinte el input de blanco en oscuro */
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--tf-text);
+  -webkit-box-shadow: 0 0 0 1000px var(--tf-card) inset;
+  caret-color: var(--tf-text);
+}
+
 button,
 input,
 textarea,
