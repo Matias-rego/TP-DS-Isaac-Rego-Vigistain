@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
-import prisma from "@/database/prisma.js"
+import prisma from "@/database/prisma.js";
+import { emitEvent } from "@/websocket.js";
+import { EVENTS } from "@/shared/events.js";
 
 export const getPartialTypes = async (req: Request, res: Response) => {
     try {
@@ -31,6 +33,7 @@ export const createTypeFail = async (req: Request, res: Response) => {
                 estimatedImport: estimatedImport ? Number(estimatedImport) : 0,
             }
         })
+        emitEvent(EVENTS.failureTypeChanged, newTypeFailure);
         return res.status(201).json(newTypeFailure);
     } catch (error) {
         console.error('Error en getTypesFail:', error);
@@ -71,6 +74,7 @@ export const deleteType = async (req: Request, res: Response) => {
             where: { id_failure_type: id }
         });
 
+        emitEvent(EVENTS.failureTypeDeleted, { id: id });
         return res.status(200).json({ message: 'Tipo de falla eliminado correctamente' });
 
     } catch (e) {
@@ -86,6 +90,7 @@ export const modifyType = async (req: Request, res: Response) => {
             where: { id_failure_type: Number(req.params.id_failure_type) },
             data
         });
+        emitEvent(EVENTS.failureTypeChanged, result);
         res.json({
             user: result,
             success: 'Tipo de falla modificado correctamente',

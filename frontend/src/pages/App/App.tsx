@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
-import { type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import Home from "../Home/Home";
 import Login from "../Login/Login";
 import Register from "../Register/Register";
@@ -12,6 +12,7 @@ import Clientes from "../Clientes/Clients";
 import WorkOrder from "../WorkOrder/WorkOrder";
 import { AuthProvider, useAuth } from "@/lib/AuthContext"; 
 import Validation from "@/pages/Validation/Validation";
+import { WebSocketManager } from "@/lib/WebSocketManager";
 
 export const capitalize = (text: string): string => {
   if (!text) return ""; 
@@ -22,6 +23,7 @@ export const capitalize = (text: string): string => {
 const ContenedorConAuth = () => {
   return (
     <AuthProvider>
+      <WebSocketManager />
       <Outlet /> 
     </AuthProvider>
   );
@@ -46,6 +48,7 @@ const RaizRedirect = () => {
 };
 
 const App = () => {
+
   return (
     <BrowserRouter>
       <Routes>
