@@ -100,7 +100,7 @@ importers:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@25.8.0)(typescript@6.0.3)
       tsx:
-        specifier: ^4.21.0
+        specifier: ^4.22.1
         version: 4.22.1
       typescript:
         specifier: ^6.0.3

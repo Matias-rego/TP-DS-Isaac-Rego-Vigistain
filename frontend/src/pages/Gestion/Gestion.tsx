@@ -141,7 +141,6 @@ const Gestion = () => {
     return unsubscribe;
   }, [busquedaTP]);
 
-  // Las 3 opciones que se muestran al entrar
   const opciones = [
     { key: 'falla',   titulo: 'Tipo de Falla',   icon: <Wrench size={26} />,     descripcion: 'Administrá los tipos de falla que pueden ocurrir en los dispositivos.' },
     { key: 'cliente', titulo: 'Tipo de Cliente', icon: <Users size={26} />,      descripcion: 'Administrá los tipos de cliente que interactúan con tu negocio.' },
@@ -150,6 +149,7 @@ const Gestion = () => {
 
   return (
     <>
+    <div className={styles.bodyContainer}>
       <Nav />
       <div className={styles.container}>
         <div className={styles.header}>
@@ -162,7 +162,7 @@ const Gestion = () => {
         </div>
 
         {seleccion === null ? (
-          // ── Pantalla de opciones: 3 tarjetas ──
+          
           <div className={styles.opcionesGrid}>
             {opciones.map((o) => (
               <button key={o.key} type="button" className={styles.opcionCard} onClick={() => setSeleccion(o.key)}>
@@ -174,7 +174,7 @@ const Gestion = () => {
             ))}
           </div>
         ) : (
-          // ── Detalle de la opción elegida + botón volver ──
+          
           <div className={styles.detalle}>
             <button type="button" className={styles.volverBtn} onClick={() => setSeleccion(null)}>
               <ArrowLeft size={18} /> Volver
@@ -222,6 +222,7 @@ const Gestion = () => {
         )}
       </div>
       <Footer />
+    </div>
     </>
   );
 };

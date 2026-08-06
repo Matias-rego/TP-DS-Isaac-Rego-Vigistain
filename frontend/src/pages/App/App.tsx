@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom"; // 👈 Importamos Outlet
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { type ReactNode } from "react";
 import Home from "../Home/Home";
 import Login from "../Login/Login";
@@ -22,7 +22,7 @@ export const capitalize = (text: string): string => {
 const ContenedorConAuth = () => {
   return (
     <AuthProvider>
-      <Outlet /> {/* Aquí se renderizarán las rutas que estén adentro */}
+      <Outlet /> 
     </AuthProvider>
   );
 };
