@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import prisma from "@/database/prisma.js";
+import { emitEvent } from "@/websocket.js";
+import { EVENTS } from "@/shared/events.js";
 
 export const getAllCategoryClients = async (req: Request, res: Response) => {
   try {
@@ -17,12 +19,14 @@ export const deleteCategoryClient = async (req: Request, res: Response) => {
     await prisma.category_Client.delete({
       where: { id_category_client: Number(id) }
     });
+    emitEvent(EVENTS.clientCategoryDeleted, { id: Number(id)});
     res.status(200).json({ message: "Client deleted successfully" });
   } catch (error) {
     console.error("Error deleting client:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
 export const getPartialCategoryClients = async (req: Request, res: Response) => {
   try {
     const result = await prisma.category_Client.findMany({
@@ -48,6 +52,7 @@ export const createCategoryClient = async (req: Request, res: Response) => {
         amountForCategoryUp
       }
     })
+    emitEvent(EVENTS.clientCategoryChanged, newCategoryClient);
     return res.status(201).json(newCategoryClient);
   } catch (error) {
     console.error('Error en el createCategoryClient', error)
@@ -63,6 +68,7 @@ export const modifyCategoryClient = async (req: Request, res: Response) => {
       where: { id_category_client: Number(req.params.id) },
       data: data
     });
+    emitEvent(EVENTS.clientCategoryChanged, updatedCategoryClient);
     res.json(updatedCategoryClient);
   } catch (error) {
     console.error("Error updating category client:", error);

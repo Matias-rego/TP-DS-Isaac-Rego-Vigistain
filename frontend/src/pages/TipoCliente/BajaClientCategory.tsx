@@ -44,7 +44,7 @@ export default function BajaClientCategory({ onSuccess }: BajaClientCategoryProp
       searchPlaceholder="Busca tu categoría de cliente por descripción..."
       searchEndpoint="/api/client-types"
       deleteEndpoint="/api/client-types"
-      entityEvent={EVENTS.clientCategoryChanged}
+      entityEvent={EVENTS.clientCategoryDeleted}
       successMessage="Categoría de cliente eliminada correctamente."
       icon={ICON}
       detailFields={FIELDS}

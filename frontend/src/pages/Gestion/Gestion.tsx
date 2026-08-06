@@ -129,15 +129,32 @@ const Gestion = () => {
   }, [busquedaTF]);
 
   useEffect(() => {
+    const unsubscribe = eventBus.on(EVENTS.failureTypeDeleted, () => busquedaTF());
+    return unsubscribe;
+  }, [busquedaTF]);
+
+  useEffect(() => {
     const unsubscribe = eventBus.on(EVENTS.clientChanged, () => busquedaTC());
     return unsubscribe;
   }, [busquedaTC]);
+
   useEffect(() => {
     const unsubscribe = eventBus.on(EVENTS.clientCategoryChanged, () => busquedaTC());
     return unsubscribe;
   }, [busquedaTC]);
+
+  useEffect(() => {
+    const unsubscribe = eventBus.on(EVENTS.clientCategoryDeleted, () => busquedaTC());
+    return unsubscribe;
+  }, [busquedaTC]);
+
   useEffect(() => {
     const unsubscribe = eventBus.on(EVENTS.paymentTypeChanged, () => busquedaTP());
+    return unsubscribe;
+  }, [busquedaTP]);
+
+  useEffect(() => {
+    const unsubscribe = eventBus.on(EVENTS.paymentTypeDeleted, () => busquedaTP());
     return unsubscribe;
   }, [busquedaTP]);
 
