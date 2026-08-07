@@ -153,7 +153,7 @@ const UserManagement = () => {
           <SearchBar
             showFilters={true}
             filters={USER_FILTERS}
-            searchEndpoint="/api/users/search/"
+            searchEndpoint="/api/users/search"
             searchPlaceholder="Buscar usuarios por nombre de usuario o correo electrónico"
             onResults={(data) => setResults(data as User[])}
             onClear={() => setResults([])}

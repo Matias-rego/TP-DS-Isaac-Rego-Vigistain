@@ -147,13 +147,17 @@ const Nav = () => {
 
 
         <div className={styles.mobileRight}>
+          {user?.rol === 'admin' && (
+            <UserToggle />
+          )}
           <ThemeToggle />
-          <img
+        {/*  <img
             src={usuario?.urlPicture}
             alt={usuario?.userName}
             className={styles.avatarMobile}
             onClick={() => navigate('/perfil')}
           />
+        */}
           <button
             type="button"
             className={`${styles.hamburger} ${menuOpen ? styles.hamburgerOpen : ''}`}

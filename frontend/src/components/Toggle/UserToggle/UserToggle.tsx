@@ -1,5 +1,5 @@
-import UserCircleIconWhite from "@/assets/userCircleIconWhite.svg";
-import UserCircleIconBlack2 from "@/assets/userCircleIconBlack2.svg";
+import UserCircleIconWhite2 from "@/assets/userCircleIconWhite2.svg";
+import UserCircleIconBlack from "@/assets/userCircleIconBlack.svg";
 import styles from "./UserToggle.module.css";
 import { useTheme } from "next-themes";
 import {useNavigate} from "react-router-dom";
@@ -21,7 +21,7 @@ const UserToggle = () => {
         aria-label="Cambiar entre modo claro y oscuro"
         title={esOscuro ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
         >
-        {esOscuro ?  <img src={UserCircleIconBlack2} alt="Modo claro" /> : <img src={UserCircleIconWhite} alt="Modo oscuro" /> }
+        {esOscuro ?  <img src={UserCircleIconWhite2} alt="Modo oscuro" /> : <img src={UserCircleIconBlack} alt="Modo claro" /> }
         </button>
     );
 };

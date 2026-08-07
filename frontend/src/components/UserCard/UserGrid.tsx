@@ -16,7 +16,6 @@ export default function UserGrid({ users, onCardClick, onAddClick, columns }: Us
   const [rolFilter, setRolFilter] = useState<string>(ALL_ROLES);
   const [onlyUnvalidated, setOnlyUnvalidated] = useState(false);
 
-  // Roles disponibles, derivados de los usuarios recibidos
   const availableRoles = useMemo(
     () => Array.from(new Set(users.map(u => u.rol))).sort(),
     [users]
@@ -32,7 +31,7 @@ export default function UserGrid({ users, onCardClick, onAddClick, columns }: Us
 
   return (
     <div>
-      {/* ── Filtros ── */}
+
       <div className={styles.filters}>
         <select
           className={styles.rolSelect}
@@ -55,7 +54,6 @@ export default function UserGrid({ users, onCardClick, onAddClick, columns }: Us
         </label>
       </div>
 
-      {/* ── Grid ── */}
       <div className={`${styles.grid} ${styles[`cols${columns}`]}`}>
         {filteredUsers.map(user => (
           <UserCard

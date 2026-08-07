@@ -1,3 +1,15 @@
+:root {
+  --filter-bg: #ffffff;
+  --filter-border: #dddddd;
+  --filter-text: #333333;
+}
+
+[data-theme='dark'] {
+  --filter-bg: #1e293b;
+  --filter-border: #334155;
+  --filter-text: #f8fafc;
+}
+
 .filters {
   display: flex;
   align-items: center;
@@ -9,10 +21,10 @@
 .rolSelect {
   padding: 8px 12px;
   border-radius: 8px;
-  border: 1px solid #dddddd;
-  background: #ffffff;
+  border: 1px solid var(--filter-border);
+  background: var(--filter-bg);
   font-size: 13px;
-  color: #333333;
+  color: var(--filter-text);
   cursor: pointer;
 }
 
@@ -21,7 +33,7 @@
   align-items: center;
   gap: 6px;
   font-size: 13px;
-  color: #444444;
+  color: var(--filter-text);
   cursor: pointer;
   user-select: none;
 }
@@ -30,22 +42,27 @@
   cursor: pointer;
 }
 
+/* GRID RESPONSIVO */
 .grid {
   display: grid;
   gap: 16px;
-  grid-template-columns: repeat(1, 1fr);
+  width: 100%;
+  /* 1 columna por defecto en móviles (hasta 280px mínimo por tarjeta) */
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
 }
 
-.cols2 {
-  grid-template-columns: repeat(2, 1fr);
+/* Media query para adaptar el comportamiento si mantienes clases fijas */
+@media (min-width: 640px) {
+  .cols2 { grid-template-columns: repeat(2, 1fr); }
+  .cols3 { grid-template-columns: repeat(3, 1fr); }
+  .cols4 { grid-template-columns: repeat(4, 1fr); }
 }
 
-.cols3 {
-  grid-template-columns: repeat(3, 1fr);
-}
-
-.cols4 {
-  grid-template-columns: repeat(4, 1fr);
+@media (max-width: 639px) {
+  /* En móviles forzar a 1 sola columna sin importar las clases cols2/cols3 */
+  .cols2, .cols3, .cols4 {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 .addCard {
@@ -55,7 +72,7 @@
   justify-content: center;
   gap: 6px;
   min-height: 140px;
-  border: 1.5px dashed #cccccc;
+  border: 1.5px dashed var(--filter-border);
   border-radius: 14px;
   color: #999999;
   cursor: pointer;

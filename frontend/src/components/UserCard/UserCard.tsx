@@ -1,6 +1,5 @@
 import styles from './UserCard.module.css';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface UserCardProps {
   id_user: number;
@@ -13,7 +12,7 @@ export interface UserCardProps {
   onClick?: (id: number) => void;
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+
 
 function getInitials(nombre: string): string {
   return nombre
@@ -23,7 +22,7 @@ function getInitials(nombre: string): string {
     .join('');
 }
 
-// Genera un color de avatar consistente según el nombre (fallback si no hay urlPicture)
+
 const AVATAR_COLORS = [
   { bg: '#fde8d8', text: '#e8825a' },
   { bg: '#dceefb', text: '#5dade2' },
@@ -40,7 +39,6 @@ function getAvatarColor(nombre: string) {
 const DEFAULT_PICTURE =
   'https://res.cloudinary.com/dcgvogduy/image/upload/v1778239413/taller-mecanico/j4fv1vtqqrhskyw0owms.png';
 
-// ─── Component ───────────────────────────────────────────────────────────────
 
 export default function UserCard({
   id_user,
@@ -61,7 +59,6 @@ export default function UserCard({
       className={`${styles.card} ${!status ? styles.inactive : ''}`}
       onClick={() => onClick?.(id_user)}
     >
-      {/* ── Header ── */}
       <div className={styles.header}>
         {hasCustomPicture ? (
           <img src={urlPicture} alt={userName} className={styles.avatarImg} />
@@ -79,7 +76,7 @@ export default function UserCard({
         </div>
       </div>
 
-      {/* ── Info ── */}
+      
       <div className={styles.infoBox}>
         <div className={styles.infoRow}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
