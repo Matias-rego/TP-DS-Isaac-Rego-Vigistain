@@ -91,6 +91,11 @@ export const loginUser = async (req: Request, res: Response) => {
             return;
         }
 
+        if (!user.validationStatus){
+            res.status(403).json({message: 'Su cuenta se encuentra activa, espere la validacion del administrador para poder iniciar sesión.'});
+            return;
+        }
+
         const token = jwt.sign(
             { id: user.id_user, userName: user.userName, rol: user.rol } as AccessTokenPayload,
             config.JWT_SECRET,

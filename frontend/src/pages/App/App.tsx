@@ -10,6 +10,7 @@ import ResetPassword from "@/components/Password/ResetPassword";
 import Gestion from "../Gestion/Gestion";
 import Clientes from "../Clientes/Clients";
 import WorkOrder from "../WorkOrder/WorkOrder";
+import UserManagement from "../UserManagement/UserManagement";
 import { AuthProvider, useAuth } from "@/lib/AuthContext"; 
 import Validation from "@/pages/Validation/Validation";
 import { WebSocketManager } from "@/lib/WebSocketManager";
@@ -68,6 +69,7 @@ const App = () => {
           <Route path="/register" element={<RutaPublica><Register /></RutaPublica>} />
 
           <Route path="/home" element={<RutaPrivada><Home /></RutaPrivada>} />
+          <Route path="/userManagement" element={<RutaPrivada><UserManagement /></RutaPrivada>} />
           <Route path="/perfil" element={<RutaPrivada><Perfil /></RutaPrivada>} />
           <Route path="/editor-perfil" element={<RutaPrivada><EditorPerfil /></RutaPrivada>} />
           <Route path="/gestion" element={<RutaPrivada><Gestion /></RutaPrivada>} />

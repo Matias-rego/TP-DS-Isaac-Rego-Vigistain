@@ -68,7 +68,8 @@ model User {
   email          String        @unique
   password_hash  String
   rol            EnumRol
-  status         Boolean       @default(true)
+  status         Boolean       @default(false)
+  validationStatus Boolean       @default(false)
   urlPicture     String        @default("https://res.cloudinary.com/dcgvogduy/image/upload/v1778239413/taller-mecanico/j4fv1vtqqrhskyw0owms.png")  
   orders         Order[]
   statusHistory  Status_History[]
