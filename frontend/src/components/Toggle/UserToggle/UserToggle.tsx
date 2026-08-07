@@ -18,7 +18,7 @@ const UserToggle = () => {
         type="button"
         className={styles.toggle}
         onClick={() => navigate('/userManagement')}
-        aria-label="Cambiar entre modo claro y oscuro"
+        aria-label="Adaministrar Usuarios"
         title="Administrar usuarios"
         >
         {esOscuro ?  <img src={UserCircleIconWhite2} alt="Modo oscuro" /> : <img src={UserCircleIconBlack} alt="Modo claro" /> }
