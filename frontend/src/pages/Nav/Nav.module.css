@@ -36,7 +36,10 @@
   cursor: pointer;
   pointer-events: all;
 }
-
+.adminIcon {
+  width: 32px;
+  height: 32px;
+}
 /* Desktop: se deshabilita el click */
 @media (min-width: 768px) {
   .logo {

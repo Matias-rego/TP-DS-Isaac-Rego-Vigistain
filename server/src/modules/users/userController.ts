@@ -7,7 +7,22 @@ import { EnumRol } from "@/generated/prisma/browser.js";
 import { config } from '@/utils/config.js';
 import { AccessTokenPayload } from '@/modules/auths/auth.type.js';
 
-export const getAllUsers = async (req: Request, res: Response) => { }
+export const getAllUsers = async (req: Request, res: Response) => {
+    try{
+        const users = await prisma.user.findMany({
+            where: {
+                status:true,
+            },
+        });
+        if (!users || users.length === 0) {
+            return res.status(404).json({ error: 'No se encontraron usuarios' });
+        }
+        res.json(users);
+    }catch(e){
+        console.error('Error en getAllUsers:', e);
+        res.status(500).json({error:'Error interno del server'})
+    }
+ }
 
 export const createUser = async (req: Request, res: Response) => { }
 
