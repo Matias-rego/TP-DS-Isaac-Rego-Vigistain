@@ -5,6 +5,9 @@ import enviarMailResetPassword from '@/service/mailRec.service.js';
 import bcrypt from 'bcrypt';
 import { config } from '@/utils/config.js';
 import { AccessTokenPayload, ResetPasswordPayload } from './auth.type.js'
+import enviarMailVerificador from '@/service/mail.service.js';
+import { EnumRol } from "@/generated/prisma/browser.js";
+import { LoginDto } from './auth.schema.js';
 
 interface DecodedToken {
     userName: string;
@@ -67,7 +70,7 @@ async function validateAccount(token: string) {
 
 
 export const loginUser = async (req: Request, res: Response) => {
-    const { username, password } = req.body;
+    const { username, password }: LoginDto = req.body;
     try {
         // Reemplaza el SELECT * FROM usuario WHERE nombre_usuario = ?
         const user = await prisma.user.findFirst({
@@ -132,6 +135,45 @@ export const forgotPassword = async (req: Request, res: Response) => {
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 }
+
+
+export const registerUser = async (req: Request, res: Response) => {
+    const { username, email, password } = req.body;
+
+    // Si el usuario subió foto, multer ya la mandó a Cloudinary y dejó la URL en req.file.path
+    // Si no subió nada, req.file es undefined → guardamos null
+    const fotoUrl = (req.file)?.path;
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const data: any = {
+        userName: username,
+        email: email,
+        password_hash: hashedPassword,
+        rol: EnumRol.tecnico,
+        status: false,
+    };
+
+    if (fotoUrl) {
+        data.urlPicture = fotoUrl;
+    }
+
+    //const consult = 'INSERT INTO usuario (nombre_usuario, email, password_hash, foto_url) VALUES (?, ?, ?, ?)';
+
+
+    try {
+        await prisma.user.create({ data });
+
+        const tokenVerificacion = jwt.sign({ userName: username }, config.JWT_SECRET, { expiresIn: '24h' });
+        await enviarMailVerificador(email, tokenVerificacion);
+
+        res.json({ message: 'Usuario registrado exitosamente, valida tu cuenta a través del enlace enviado a tu correo electrónico' });
+    } catch (e) {
+        console.log('Error en registerUser:', e);
+        res.status(500).json({ error: 'Error al registrar usuario' });
+    }
+};
+
 
 export const resetPassword = async (req: Request, res: Response) => {
     const token = String(req.params.token);

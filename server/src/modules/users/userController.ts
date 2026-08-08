@@ -1,9 +1,6 @@
 import { Request, Response } from 'express';
-import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import enviarMailVerificador from '@/service/mail.service.js';
 import prisma from "@/database/prisma.js";
-import { EnumRol } from "@/generated/prisma/browser.js";
 import { config } from '@/utils/config.js';
 import { AccessTokenPayload } from '@/modules/auths/auth.type.js';
 
@@ -25,43 +22,6 @@ export const getUser = async (req: Request, res: Response) => {
     } catch (e) {
         console.error('Error en getUser:', e);
         res.status(500).json({ error: 'Error interno' });
-    }
-};
-
-export const registerUser = async (req: Request, res: Response) => {
-    const { username, email, password } = req.body;
-
-    // Si el usuario subió foto, multer ya la mandó a Cloudinary y dejó la URL en req.file.path
-    // Si no subió nada, req.file es undefined → guardamos null
-    const fotoUrl = (req.file as any)?.path;
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const data: any = {
-        userName: username,
-        email: email,
-        password_hash: hashedPassword,
-        rol: EnumRol.tecnico,
-        status: false,
-    };
-
-    if (fotoUrl) {
-        data.urlPicture = fotoUrl;
-    }
-
-    //const consult = 'INSERT INTO usuario (nombre_usuario, email, password_hash, foto_url) VALUES (?, ?, ?, ?)';
-
-
-    try {
-        await prisma.user.create({ data });
-
-        const tokenVerificacion = jwt.sign({ userName: username }, config.JWT_SECRET, { expiresIn: '24h' });
-        await enviarMailVerificador(email, tokenVerificacion);
-
-        res.json({ message: 'Usuario registrado exitosamente, valida tu cuenta a través del enlace enviado a tu correo electrónico' });
-    } catch (e) {
-        console.log('Error en registerUser:', e);
-        res.status(500).json({ error: 'Error al registrar usuario' });
     }
 };
 
