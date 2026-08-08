@@ -55,7 +55,7 @@ export default function DeletePaymentType({ onSuccess }: DeletePaymentTypeProps)
             searchPlaceholder="Busca tu tipo de pago por nombre..."
             searchEndpoint="/api/payment-types"
             deleteEndpoint="/api/payment-types"
-            entityEvent={EVENTS.paymentTypeChanged}
+            entityEvent={EVENTS.paymentTypeDeleted}
             successMessage="Tipo de pago eliminado correctamente."
             icon={ICON}
             detailFields={FIELDS}

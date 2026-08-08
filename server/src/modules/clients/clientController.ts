@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import prisma from "@/database/prisma.js";
+import { emitEvent } from "@/websocket.js";
+import { EVENTS } from "@/shared/events.js";
 
 async function getCategoryClientByOrders(orderCount: number) {
   try {
@@ -37,6 +39,7 @@ export const createNewClient = async (req: Request, res: Response) => {
         },
       }
     })
+    emitEvent(EVENTS.clientChanged, newClient);
     return res.status(201).json(newClient)
   } catch (error) {
     console.error(`Error en el createNewClient, ${error}`);
@@ -78,6 +81,7 @@ export const modifyClient = async (req: Request, res: Response) => {
       where: { id_client: Number(req.params.id) },
       data: data,
     })
+    emitEvent(EVENTS.clientChanged, modifyClient);
     res.json(modifyClient);
   } catch (error) {
     console.error("Error en el modifyClient", error);

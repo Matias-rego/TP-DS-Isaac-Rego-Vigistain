@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import prisma from "@/database/prisma.js";
+import { emitEvent } from "@/websocket.js";
+import { EVENTS } from "@/shared/events.js";
 
 export const createTypePayment = async (req: Request, res: Response) => {
     try {
@@ -12,6 +14,7 @@ export const createTypePayment = async (req: Request, res: Response) => {
                 percentaje
             }
         });
+        emitEvent(EVENTS.paymentTypeChanged, newTypePayment);
         res.status(201).json(newTypePayment);
     } catch (error) {
         console.error('Error en createTypePayment:', error);
@@ -47,6 +50,7 @@ export const deleteTypePayment = async (req: Request, res: Response) => {
         const deletedTypePayment = await prisma.payment_Type.delete({
             where: { id_payment_type: id }
         });
+        emitEvent(EVENTS.paymentTypeDeleted, { id: id });
         res.status(200).json(deletedTypePayment);
     } catch (error) {
         res.status(500).json({ error: "Error al eliminar el tipo de pago" });
@@ -64,6 +68,7 @@ export const modifyTypePayment = async (req: Request, res: Response) => {
             where: { id_payment_type: id },
             data: data
         });
+        emitEvent(EVENTS.paymentTypeChanged, updatedTypePayment);
         res.status(200).json(updatedTypePayment);
     } catch (error) {
         res.status(500).json({ error: "Error al modificar el tipo de pago" });
