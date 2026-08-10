@@ -49,6 +49,7 @@ export interface DetailModalProps<T = any, I = any> {
   cancelLabel?: string;
   onCancel?: () => void;
   compact?: boolean;
+  zIndex?: number;
   children?: React.ReactNode;
 }
 
@@ -160,6 +161,7 @@ export function DetailModal<T = any, I = any>({
   cancelLabel = 'Cancelar',
   onCancel,
   compact = false,
+  zIndex = 1000,
   children,
 }: DetailModalProps<T, I>) {
   if (!open) return null;
@@ -178,7 +180,8 @@ export function DetailModal<T = any, I = any>({
     const modalSizeClass = compact ? styles['maxW-md'] : styles['maxW-lg'];
 
   return (
-    <div className={styles.overlay}>
+    <div className={styles.overlay}
+      style={{zIndex}}>
       <div className={`${styles.modal} ${modalSizeClass}`}>
         
         {/* Header */}
