@@ -142,6 +142,7 @@ const ClientDetailModal = ({
           : [{ label: 'Editar Cliente', variant: 'secondary', onClick: () => setIsEditing(true) }]
       }
       cancelLabel={isEditing ? "Cancelar" : "Cerrar"}
+      zIndex={1100}
       onCancel={() => isEditing ? setIsEditing(false) : onClose()}
     >
       {isEditing && (
