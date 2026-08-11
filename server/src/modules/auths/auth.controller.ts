@@ -7,7 +7,7 @@ import { config } from '@/utils/config.js';
 import { AccessTokenPayload, ResetPasswordPayload } from './auth.type.js'
 import enviarMailVerificador from '@/service/mail.service.js';
 import { EnumRol } from "@/generated/prisma/browser.js";
-import { LoginDto, RegisterDto } from './auth.schema.js';
+import { ForgotPasswordDto, LoginDto, RegisterDto, ResetPasswordDto } from './auth.schema.js';
 import { nextTick } from 'process';
 
 interface DecodedToken {
@@ -119,7 +119,7 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
 }
 
 export const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
-    const { email } = req.body;
+    const { email }: ForgotPasswordDto = req.body;
     try {
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user) {
@@ -179,7 +179,7 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
 
 export const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
     const token = String(req.params.token);
-        const { password } = req.body;
+        const { password }: ResetPasswordDto = req.body;
 
         if (typeof password !== 'string' || password.length < 8) {
             return res.status(400).json({ error: 'La contraseña debe tener al menos 8 caracteres' });

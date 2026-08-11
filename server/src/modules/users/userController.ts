@@ -1,9 +1,7 @@
 import { Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
 import prisma from "@/database/prisma.js";
 import { EnumRol, Prisma } from "@/generated/prisma/browser.js";
-import { config } from '@/utils/config.js';
-import { AccessTokenPayload } from '@/modules/auths/auth.type.js';
+
 
 export const getAllUsers = async (req: Request, res: Response) => {
     try{

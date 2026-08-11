@@ -12,6 +12,18 @@ export const registerSchema = z.object({
     username: username,
     password: password,
     email: email,
-});
+}).strict();
 
 export type RegisterDto = z.infer<typeof registerSchema>;
+
+export const forgotPasswordSchema = z.object({
+    email: email,
+}).strict();
+
+export type ForgotPasswordDto = z.infer<typeof forgotPasswordSchema>;
+
+export const resetPasswordSchema = z.object({
+    password: password,
+}).strict();
+
+export type ResetPasswordDto = z.infer<typeof resetPasswordSchema>;

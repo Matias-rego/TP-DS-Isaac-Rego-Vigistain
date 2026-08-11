@@ -49,6 +49,7 @@ Esta API expone los recursos del sistema bajo el prefijo base `/api`.
  ├─GET /:description — buscar categoría (con auth)
  ├─DELETE /:id — eliminar categoría (con auth)
  └─PUT /:id — actualizar categoría (con auth)
+```
 
  ## /status
 
@@ -74,7 +75,7 @@ Esta API expone los recursos del sistema bajo el prefijo base `/api`.
   - Content-Type: `application/json`
   - Body: `{ username: string, password: string }`
 - Response:
-  - `200`: cookie `access_token` + `{ token: string }`
+  - `200`: cookie `access_token`
   - `401`: `{ message: 'Usuario o contraseña incorrectos' }`
   - `403`: `{ message: string }`
   - `500`: `{ message: 'Error en el servidor', error: any }`
