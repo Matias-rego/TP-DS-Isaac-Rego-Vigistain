@@ -63,7 +63,7 @@ export interface Failure {
 
 export interface Equipment {
   id_equipment:   number;
-  equipment_type: string;
+  tipo_equipment: string;
   observations:   string;
   brand:          string;
   model:          string;

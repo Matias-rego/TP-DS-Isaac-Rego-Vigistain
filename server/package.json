@@ -7,7 +7,7 @@
   "type": "module",
   "main": "src/index.ts",
   "scripts": {
-    "dev": "pnpx tsx watch --env-file=.env src/index.ts",
+    "dev": "tsx watch --env-file=.env src/index.ts",
     "dev:npm": "npx tsx watch --env-file=.env src/index.ts",
     "dev:docker": "pnpx tsx watch src/index.ts",
     "lint": "eslint .",
@@ -30,7 +30,7 @@
     "nodemon": "^3.1.14",
     "prisma": "^6.19.3",
     "ts-node": "^10.9.2",
-    "tsx": "^4.21.0",
+    "tsx": "^4.22.1",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.63.0"
   },
@@ -49,6 +49,7 @@
     "mysql2": "^3.22.1",
     "nodemailer": "^8.0.5",
     "resend": "^6.17.2",
+    "socket.io": "^4.8.3",
     "zod": "^4.4.3"
   }
 }

@@ -28,3 +28,21 @@ export const registerOrder = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const getOrderOfEquipment = async (req:Request, res:Response) => {
+  try{
+    const id_equipment = Number(req.params.id);
+    if(isNaN(id_equipment)){
+      return res.status(400).json({ message: "El ID de equipo no es válido" });
+    };
+    const orders = await prisma.order.findMany({
+      where:{
+        id_equipment : id_equipment,
+      }
+    });
+    return res.status(200).json(orders);
+  }catch(e){
+    console.error("Error : ", e);
+    res.status(500).json({message:"Error en el getOrderOfEquipment"})
+  }
+}

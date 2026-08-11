@@ -38,9 +38,12 @@ export const eventBus = new EventBus();
 
 export const EVENTS = {
   clientChanged: 'client:changed',
+  clientDeleted: 'client:deleted',                    
   clientCategoryChanged: 'clientCategory:changed',
+  clientCategoryDeleted: 'clientCategory:deleted',
   paymentTypeChanged: 'paymentType:changed',
+  paymentTypeDeleted: 'paymentType:deleted',        
   failureTypeChanged: 'failureType:changed',
   failureTypeDeleted: 'failureType:deleted',
-  // agregá acá nuevas entidades a medida que las necesites
+  userChanged: 'user:changed',
 } as const;

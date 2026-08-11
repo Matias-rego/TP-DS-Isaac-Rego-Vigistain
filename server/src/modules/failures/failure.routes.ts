@@ -1,10 +1,12 @@
 import { Router } from 'express'
-import { createFailures } from './failureController.js';
+import { createFailures, getFailureOfEquipment } from './failureController.js';
 
 
 const router = Router();
 
 router.post("/", createFailures);
+
+router.get('/ofEquipment/:id', getFailureOfEquipment);
 
 // router.post('/createTypeFail', createTypeFail);
 

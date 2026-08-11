@@ -1,5 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom"; // 👈 Importamos Outlet
-import { type ReactNode } from "react";
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { useEffect, type ReactNode } from "react";
 import Home from "../Home/Home";
 import Login from "../Login/Login";
 import Register from "../Register/Register";
@@ -9,9 +9,11 @@ import ForgotPassword from "@/components/Password/ForgotPasswor";
 import ResetPassword from "@/components/Password/ResetPassword";
 import Gestion from "../Gestion/Gestion";
 import Clientes from "../Clientes/Clients";
-import WorkOrder from "../WorkOrder/WorkOrder";
+import WorkOrder from "../Orders/WorkOrderCreating/WorkOrder";
+import UserManagement from "../UserManagement/UserManagement";
 import { AuthProvider, useAuth } from "@/lib/AuthContext"; 
 import Validation from "@/pages/Validation/Validation";
+import { WebSocketManager } from "@/lib/WebSocketManager";
 
 export const capitalize = (text: string): string => {
   if (!text) return ""; 
@@ -22,7 +24,8 @@ export const capitalize = (text: string): string => {
 const ContenedorConAuth = () => {
   return (
     <AuthProvider>
-      <Outlet /> {/* Aquí se renderizarán las rutas que estén adentro */}
+      <WebSocketManager />
+      <Outlet /> 
     </AuthProvider>
   );
 };
@@ -46,6 +49,7 @@ const RaizRedirect = () => {
 };
 
 const App = () => {
+
   return (
     <BrowserRouter>
       <Routes>
@@ -65,6 +69,7 @@ const App = () => {
           <Route path="/register" element={<RutaPublica><Register /></RutaPublica>} />
 
           <Route path="/home" element={<RutaPrivada><Home /></RutaPrivada>} />
+          <Route path="/userManagement" element={<RutaPrivada><UserManagement /></RutaPrivada>} />
           <Route path="/perfil" element={<RutaPrivada><Perfil /></RutaPrivada>} />
           <Route path="/editor-perfil" element={<RutaPrivada><EditorPerfil /></RutaPrivada>} />
           <Route path="/gestion" element={<RutaPrivada><Gestion /></RutaPrivada>} />
