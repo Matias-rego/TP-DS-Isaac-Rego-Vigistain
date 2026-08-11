@@ -5,7 +5,7 @@
 }
 
 .title {
-  color: #1e293b;
+  color: var(--tf-text);
   line-height: 0.96;
   letter-spacing: -0.07em;
   margin: 0;
@@ -16,7 +16,7 @@
   font-family: 'Inter', sans-serif;
   font-size: 26px;
   font-weight: 700;
-  color: #101828;
+  color: var(--tf-text);
   line-height: 1.2;
 }
 
@@ -24,14 +24,14 @@
   font-family: 'Inter', sans-serif;
   font-size: 15px;
   font-weight: 400;
-  color: #4B5563;
+  color: var(--tf-muted);
   line-height: 1.6;
 }
 
 .customCard {
-  background-color: #ffffff;
+  background-color: var(--tf-card);
   border-radius: 18px !important;
-  border: 1.5px solid #EAEFF5 !important;
+  border: 1.5px solid var(--tf-border) !important;
   box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.02);
   padding: 10px;
   max-width: 420px;
@@ -79,14 +79,14 @@
 }
 
 .cardTitleText {
-  color: #002347 !important;
+  color: var(--tf-text) !important;
   font-size: 18px !important;
   font-weight: 600 !important;
   letter-spacing: -0.5px;
 }
 
 .cardDescriptionText {
-  color: #6B7280 !important;
+  color: var(--tf-muted) !important;
   font-size: 13px !important;
   font-weight: 400 !important;
   margin-top: 4px;
@@ -148,8 +148,8 @@
   top: 105%;
   left: 0;
   width: 100%;
-  background-color: #ffffff;
-  border: 1px solid #E2E8F0;
+  background-color: var(--tf-card);
+  border: 1px solid var(--tf-border);
   border-radius: 12px;
   box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.08);
   max-height: 200px;
@@ -167,7 +167,7 @@
 }
 
 .dropdownItem:hover {
-  background-color: #F8FAFC;
+  background-color: var(--tf-bg);
 }
 
 .itemContainer {
@@ -180,12 +180,12 @@
 .itemName {
   font-size: 13px;
   font-weight: 500;
-  color: #0F172A;
+  color: var(--tf-text);
 }
 
 .itemEmail {
   font-size: 11px;
-  color: #64748B;
+  color: var(--tf-muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -194,11 +194,11 @@
 .selectedBadge {
   margin-top: 14px;
   padding: 9px 12px;
-  background-color: #F0F7FF;
-  border: 1px solid #E0F0FF;
+  background-color: var(--tf-primary-soft);
+  border: 1px solid var(--tf-border);
   border-radius: 8px;
   font-size: 12px;
-  color: #003580;
+  color: var(--tf-primary);
 }
 
 .removeSlideBtn {
@@ -242,7 +242,7 @@
 }
 
 .modalContent {
-  background-color: #ffffff;
+  background-color: var(--tf-card);
   border-radius: 18px;
   padding: 24px 18px 18px 18px;
   width: 100%;
@@ -262,13 +262,13 @@
   background: none;
   border: none;
   font-size: 18px;
-  color: #64748B;
+  color: var(--tf-muted);
   cursor: pointer;
   transition: color 0.2s;
 }
 
 .closeModalBtn:hover {
-  color: #0F172A;
+  color: var(--tf-text);
 }
 
 @keyframes scaleUp {
