@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import prisma from '@/database/prisma.js';
 import jwt from 'jsonwebtoken';
 import enviarMailResetPassword from '@/service/mailRec.service.js';
@@ -7,7 +7,8 @@ import { config } from '@/utils/config.js';
 import { AccessTokenPayload, ResetPasswordPayload } from './auth.type.js'
 import enviarMailVerificador from '@/service/mail.service.js';
 import { EnumRol } from "@/generated/prisma/browser.js";
-import { LoginDto } from './auth.schema.js';
+import { LoginDto, RegisterDto } from './auth.schema.js';
+import { nextTick } from 'process';
 
 interface DecodedToken {
     userName: string;
@@ -69,7 +70,7 @@ async function validateAccount(token: string) {
 }
 
 
-export const loginUser = async (req: Request, res: Response) => {
+export const loginUser = async (req: Request, res: Response, next: NextFunction) => {
     const { username, password }: LoginDto = req.body;
     try {
         // Reemplaza el SELECT * FROM usuario WHERE nombre_usuario = ?
@@ -110,15 +111,14 @@ export const loginUser = async (req: Request, res: Response) => {
             secure: config.NODE_ENV === 'production', // Solo en producción
             sameSite: 'lax', // el sameSite puede ser 'strict', 'lax' o 'none' dependiendo de tus necesidades
             maxAge: 3600000, // 1 hora
-        })
-            .json({ token });
+        }).json({ message: 'Login successful',});
 
     } catch (error) {
-        res.status(500).json({ message: 'Error en el servidor', error });
+        next(error);
     }
 }
 
-export const forgotPassword = async (req: Request, res: Response) => {
+export const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
     const { email } = req.body;
     try {
         const user = await prisma.user.findUnique({ where: { email } });
@@ -135,15 +135,13 @@ export const forgotPassword = async (req: Request, res: Response) => {
         }
         res.status(200).json({ message: 'Correo de recuperación enviado' });
     } catch (error) {
-
-        console.error('Error en forgotPassword:', error);
-        res.status(500).json({ error: 'Error interno del servidor' });
+        next(error);
     }
 }
 
 
-export const registerUser = async (req: Request, res: Response) => {
-    const { username, email, password } = req.body;
+export const registerUser = async (req: Request, res: Response, next: NextFunction) => {
+    const { username, email, password }: RegisterDto = req.body;
 
     // Si el usuario subió foto, multer ya la mandó a Cloudinary y dejó la URL en req.file.path
     // Si no subió nada, req.file es undefined → guardamos null
@@ -173,14 +171,13 @@ export const registerUser = async (req: Request, res: Response) => {
         await enviarMailVerificador(email, tokenVerificacion);
 
         res.json({ message: 'Usuario registrado exitosamente, valida tu cuenta a través del enlace enviado a tu correo electrónico' });
-    } catch (e) {
-        console.log('Error en registerUser:', e);
-        res.status(500).json({ error: 'Error al registrar usuario' });
+    } catch (error) {
+        next(error);
     }
 };
 
 
-export const resetPassword = async (req: Request, res: Response) => {
+export const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
     const token = String(req.params.token);
         const { password } = req.body;
 

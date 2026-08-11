@@ -109,11 +109,9 @@ const EditorPerfil = () => {
   useEffect(() => {
     const cargarPerfil = async () => {
       try {
-        const token = localStorage.getItem('token');
-        if (!token) throw new Error('No hay token');
 
         const response = await fetch(`${BACKEND_URL}/api/auth/me`,
-          { headers: { Authorization: `Bearer ${token}` }, credentials: 'include' });
+          { credentials: 'include' });
 
         if (!response.ok) throw new Error(`Error ${response.status}`);
 

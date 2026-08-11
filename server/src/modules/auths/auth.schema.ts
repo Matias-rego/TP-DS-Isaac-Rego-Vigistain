@@ -1,19 +1,17 @@
 import { z } from "zod";
+import { username, password, email } from "@/utils/fields.js";
 
 export const loginSchema = z.object({
-    username: z
-        .string({
-            error: "Username is required",
-        })
-        .trim()
-        .min(3, "Username must be at least 3 characters long")
-        .max(30, "Username cannot be longer than 30 characters"),
+    username: username,
+    password: password
+}).strict();
 
-    password: z
-        .string({
-            error: "Password is required",
-        })
-        .min(6, "Password must be at least 6 characters long")
-        .max(100, "Password cannot be longer than 100 characters"),
-});
 export type LoginDto = z.infer<typeof loginSchema>;
+
+export const registerSchema = z.object({
+    username: username,
+    password: password,
+    email: email,
+});
+
+export type RegisterDto = z.infer<typeof registerSchema>;

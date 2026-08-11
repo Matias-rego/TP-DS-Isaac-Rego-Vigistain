@@ -15,7 +15,11 @@ export const getAllUsers = async (req: Request, res: Response) => {
         if (!users || users.length === 0) {
             return res.status(404).json({ error: 'No se encontraron usuarios' });
         }
-        res.json(users);
+        // sacar al usuario el password_hash
+        res.json(users.map((user) => {
+            const { password_hash, ...rest } = user;
+            return rest;
+        }));
     }catch(e){
         console.error('Error en getAllUsers:', e);
         res.status(500).json({error:'Error interno del server'})
@@ -81,32 +85,6 @@ export const getUser = async (req: Request, res: Response) => {
         res.status(500).json({ error: 'Error interno' });
     }
 };
-
-export const validaUser = async (req: Request, res: Response) => {
-    const { token } = req.params as AccessTokenPayload;
-    const dataToken = jwt.verify(token, config.JWT_SECRET)
-    if (!dataToken) {
-        return res.status(400).json({ error: 'Token inválido' });
-    }
-    const { userName } = dataToken;
-    const loginPath = `${config.FRONTEND_URL}/login`;
-    try {
-        const rta = await prisma.user.update({
-            where: ({ userName: userName }),
-            data: ({ status: true })
-        })
-
-
-        if (!rta) {
-            return res.redirect(`${loginPath}?error=Usuario no encontrado`);
-        }
-        res.redirect(`${loginPath}?success=Cuenta validada exitosamente. Ya puedes iniciar sesión.`);
-
-    } catch (e) {
-        console.log('Error en validaUser:', e);
-        res.redirect(`${loginPath}?error=Error interno al validar la cuenta`);
-    }
-}
 
 export const modifyUser = async (req: Request, res: Response) => {
     const fotoUrl = (req.file as any)?.path ?? null;
