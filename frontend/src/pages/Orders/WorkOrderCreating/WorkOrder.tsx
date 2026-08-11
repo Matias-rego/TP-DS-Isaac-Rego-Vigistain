@@ -80,6 +80,30 @@ const WorkOrder = () => {
   // Antes quedaba pegado en 1 para siempre porque nada lo actualizaba.
   const cantFallas = fallas.length;
   const navigate = useNavigate();
+
+  // ── Wizard por pasos: mostramos una seccion a la vez y bloqueamos el avance
+  //    en los pasos obligatorios hasta que esten completos. No cambia la logica
+  //    de guardado (handleSubmitOrder queda igual), solo la navegacion visual.
+  const [step, setStep] = useState(0);
+  const tipoEquipoElegido =
+    deviceValues.deviceType === "otro" ? deviceValues.deviceTypeOther : deviceValues.deviceType;
+  const equipoValido =
+    selectedEquipment != null ||
+    Boolean(tipoEquipoElegido && deviceValues.brand && deviceValues.model);
+  const fallasValidas = fallas.some(
+    (f) => f.id_failure_type !== null && f.description.trim() !== ""
+  );
+  const pasos = [
+    { titulo: "Cliente", valido: selectedClient != null, hint: "Elegí o registrá un cliente para continuar." },
+    { titulo: "Equipo", valido: equipoValido, hint: "Completá tipo, marca y modelo (o buscá un equipo existente)." },
+    { titulo: "Fallas", valido: fallasValidas, hint: "Agregá al menos una falla con su tipo y descripción." },
+    { titulo: "Detalles", valido: true, hint: "" },
+    { titulo: "Confirmar", valido: true, hint: "" },
+  ];
+  const puedeAvanzar = pasos[step].valido;
+  const avanzar = () => { if (puedeAvanzar && step < pasos.length - 1) setStep(step + 1); };
+  const retroceder = () => { if (step > 0) setStep(step - 1); };
+
   const handleSelectClient = (client: Client) => {
     setSelectedClient(client);
     setShowDropdown(false);
@@ -277,7 +301,20 @@ const WorkOrder = () => {
         <p className={styles.mainDescription}>Registre todos los detalles técnicos para la reparación. Los campos marcados con un asterisco son obligatorios para la gestión de la cola de diagnóstico. </p>
 
 
+        <div className={styles.wizardSteps}>
+          {pasos.map((p, i) => (
+            <div
+              key={p.titulo}
+              className={`${styles.wizardStep} ${i === step ? styles.wizardStepActive : ""} ${i < step ? styles.wizardStepDone : ""}`}
+            >
+              <span className={styles.wizardStepNum}>{i < step ? "✓" : i + 1}</span>
+              {p.titulo}
+            </div>
+          ))}
+        </div>
+
         <div className={styles.orderGrid}>
+        {step === 0 && (
         <div className={styles.gridItem}>
           <Card className={styles.customCard} style={{ margin: '0 auto' }}>
             <CardHeader className={styles.cardHeaderFlex}>
@@ -377,8 +414,10 @@ const WorkOrder = () => {
             </CardContent>
           </Card>
         </div>
+        )}
 
-        {/* ── Identificación del Equipo / Buscar Equipo (slider propio) ── */}
+        {/* ── Paso 2: Equipo (nuevo o buscar) ── */}
+        {step === 1 && (
         <div className={styles.gridItem}>
           <div className={styles.sliderWrapper}>
             <button
@@ -514,8 +553,10 @@ const WorkOrder = () => {
             </button>
           </div>
         </div>
+        )}
 
-        {/* ── Identificación de Fallas (slider propio) ── */}
+        {/* ── Paso 3: Fallas ── */}
+        {step === 2 && (
         <div className={styles.gridItem}>
           <div className={styles.sliderWrapper}>
             {cantFallas > 1 &&
@@ -584,7 +625,11 @@ const WorkOrder = () => {
             />
           </div>
         </div>
+        )}
 
+        {/* ── Paso 4: Detalles (opcional) ── */}
+        {step === 3 && (
+        <>
         {/* ── Prueba visual ── */}
         <div className={styles.gridItem}>
           <VisualProof
@@ -662,6 +707,49 @@ const WorkOrder = () => {
             </CardContent>
           </Card>
         </div>
+        </>
+        )}
+
+        {/* ── Paso 5: Confirmar ── */}
+        {step === 4 && (
+        <div className={styles.gridItem}>
+          <Card className={styles.customCard} style={{ margin: '0 auto' }}>
+            <CardHeader className={styles.cardHeaderFlex}>
+              <div className={styles.titleWithIcon}>
+                <img src={ClipboardCheck} alt="Icono de confirmar" className={styles.cardIconImg} />
+                <CardTitle className={styles.cardTitleText}>Revisar y confirmar</CardTitle>
+              </div>
+              <CardDescription className={styles.cardDescriptionText}>
+                Revisá que esté todo bien antes de registrar la orden.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className={styles.infoGrid}>
+                <div className={styles.infoRow}>
+                  <span className={styles.label}>Cliente</span>
+                  <span className={styles.value}>{selectedClient?.clientName || "---"}</span>
+                </div>
+                <div className={styles.infoRow}>
+                  <span className={styles.label}>Equipo</span>
+                  <span className={styles.value}>
+                    {selectedEquipment
+                      ? `${selectedEquipment.brand} ${selectedEquipment.model}`
+                      : `${deviceValues.brand} ${deviceValues.model}`}
+                  </span>
+                </div>
+                <div className={styles.infoRow}>
+                  <span className={styles.label}>Fallas cargadas</span>
+                  <span className={styles.value}>{fallas.filter((f) => f.id_failure_type !== null).length}</span>
+                </div>
+                <div className={styles.infoRow}>
+                  <span className={styles.label}>Fecha estimada</span>
+                  <span className={styles.value}>{estimatedDeliveryDate || "Sin definir"}</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        )}
         </div>
 
         {/* ── Feedback de envío — antes no existía nada visible para el usuario ── */}
@@ -688,12 +776,31 @@ const WorkOrder = () => {
           </div>
         )}
 
-        <div className={styles.submitRow}>
-          <ActionButton
-            label={submitting ? "Registrando..." : "Registrar Orden"}
-            icon={<img src={ClipboardCheck} alt="Icono de confirmar orden" className={styles.buttonIcons} />}
-            onClick={() => { if (!submitting) handleSubmitOrder(); }}
-          />
+        <div className={styles.wizardNav}>
+          {step > 0 ? (
+            <button type="button" className={styles.navBtn} onClick={retroceder}>
+              Atrás
+            </button>
+          ) : (
+            <span />
+          )}
+          <span className={styles.wizardHint}>{!puedeAvanzar ? pasos[step].hint : ""}</span>
+          {step < pasos.length - 1 ? (
+            <button
+              type="button"
+              className={styles.navBtnPrimary}
+              onClick={avanzar}
+              disabled={!puedeAvanzar}
+            >
+              Siguiente
+            </button>
+          ) : (
+            <ActionButton
+              label={submitting ? "Registrando..." : "Registrar Orden"}
+              icon={<img src={ClipboardCheck} alt="Icono de confirmar orden" className={styles.buttonIcons} />}
+              onClick={() => { if (!submitting) handleSubmitOrder(); }}
+            />
+          )}
         </div>
       </div>
       {showEquipmentModal && selectedEquipmentForModal && (
