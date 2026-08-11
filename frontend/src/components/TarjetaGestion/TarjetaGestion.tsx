@@ -1,6 +1,6 @@
 import styles from './TarjetaGestion.module.css';
 import { Card, CardContent } from '@/components/ui/card';
-import ModalTable from '../ModalTable/ModalTable';
+import ModalTable from '../Modals/ModalTable/ModalTable';
 import BottomPanel from '@/components/ui/SheetSide';
 import { useState } from 'react';
 import { ClipboardList } from 'lucide-react';

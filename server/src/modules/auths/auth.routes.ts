@@ -27,3 +27,5 @@ router.put('/validate/:token', validateAccountController);
 router.get('/me', authenticate([]), getMe);
 
 export default router;
+
+

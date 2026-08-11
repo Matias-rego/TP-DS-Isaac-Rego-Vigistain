@@ -21,14 +21,14 @@
 }
 
 .label {
-  font-family: 'Inter', sans-serif;
+  font-family: inherit;
   font-size: 14px;
   font-weight: 500;
-  color: #101828;
+  color: var(--tf-text);
 }
 
 .required {
-  color: #D85A30;
+  color: var(--tf-danger);
 }
 
 /* ── Tipo de dispositivo ── */
@@ -44,25 +44,30 @@
   align-items: center;
   gap: 10px;
   padding: 14px 16px;
-  background-color: #ffffff;
-  border: 1.5px solid #EAEFF5;
-  border-radius: 12px;
-  font-family: 'Inter', sans-serif;
+  background-color: var(--tf-bg);
+  border: 1.5px solid var(--tf-border);
+  border-radius: var(--radius-sm, 12px);
+  font-family: inherit;
   font-size: 14px;
   font-weight: 500;
-  color: #101828;
+  color: var(--tf-text);
   cursor: pointer;
-  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
 }
 
 .typeOption:hover {
-  border-color: #B4C6E3;
+  border-color: var(--tf-primary);
 }
 
 .typeOptionSelected {
-  background-color: #F0F7FF;
-  border-color: #002347;
-  color: #002347;
+  background-color: var(--tf-primary-soft);
+  border-color: var(--tf-primary);
+  color: var(--tf-primary);
+}
+
+/* Para que los iconos dentro de la opción seleccionada adopten el color del texto si son SVGs dinámicos */
+.typeOptionSelected svg {
+  stroke: var(--tf-primary);
 }
 
 /* ── Inputs ── */
@@ -71,31 +76,31 @@
 .textarea {
   width: 100%;
   padding: 10px 14px;
-  background-color: #ffffff;
-  border: 1.5px solid #EAEFF5;
-  border-radius: 10px;
-  font-family: 'Inter', sans-serif;
+  background-color: var(--tf-bg);
+  border: 1.5px solid var(--tf-border);
+  border-radius: var(--radius-sm, 10px);
+  font-family: inherit;
   font-size: 14px;
-  color: #101828;
+  color: var(--tf-text);
   outline: none;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
   box-sizing: border-box;
 }
 
 .input::placeholder,
 .textarea::placeholder {
-  color: #9CA3AF;
+  color: var(--tf-muted);
 }
 
 .input:focus,
 .textarea:focus {
-  border-color: #002347;
+  border-color: var(--tf-primary);
 }
 
 .textarea {
   resize: vertical;
   min-height: 72px;
-  font-family: 'Inter', sans-serif;
+  font-family: inherit;
   line-height: 1.5;
 }
 

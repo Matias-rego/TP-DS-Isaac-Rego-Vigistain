@@ -9,7 +9,7 @@ import ForgotPassword from "@/components/Password/ForgotPasswor";
 import ResetPassword from "@/components/Password/ResetPassword";
 import Gestion from "../Gestion/Gestion";
 import Clientes from "../Clientes/Clients";
-import WorkOrder from "../WorkOrder/WorkOrder";
+import WorkOrder from "../Orders/WorkOrderCreating/WorkOrder";
 import UserManagement from "../UserManagement/UserManagement";
 import { AuthProvider, useAuth } from "@/lib/AuthContext"; 
 import Validation from "@/pages/Validation/Validation";

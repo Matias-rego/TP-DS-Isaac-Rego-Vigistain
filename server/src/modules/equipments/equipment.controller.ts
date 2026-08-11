@@ -1,6 +1,8 @@
 import {Request, Response} from 'express';
 import prisma from '@/database/prisma.js';
 
+
+
 export const uploadPhotoCloud = async (req:Request, res:Response) =>{
     try {
     if (!req.file) {
@@ -35,3 +37,30 @@ export const registerEquipment = async (req:Request,res:Response) => {
         });
     }
 }
+
+export const getPartialEquipment = async (req: Request, res: Response) => {
+  try {
+    const { q } = req.query;
+    if (!q || typeof q !== 'string' || q.trim() === '') {
+      return res.status(200).json([]);
+    }
+    const searchTerm = q.trim();
+    const equipments = await prisma.equipment.findMany({
+      where: {
+        OR: [
+          { brand: { contains: searchTerm } },
+          { model: { contains: searchTerm } },
+          { tipo_equipment: { contains: searchTerm } },
+        ],
+      },
+      include:{
+        client : true,
+      }
+    });
+
+    return res.status(200).json(equipments);
+  } catch (e) {
+    console.error("Error en la busqueda parcial de equipos server: ", e);
+    return res.status(500).json({ error: "Error en el getPartialEquipment" });
+  }
+};

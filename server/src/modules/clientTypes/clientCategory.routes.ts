@@ -14,3 +14,5 @@ router.delete('/:id', deleteCategoryClient);
 router.put('/:id', modifyCategoryClient);
 
 export default router;
+
+
