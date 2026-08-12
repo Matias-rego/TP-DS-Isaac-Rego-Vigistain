@@ -83,7 +83,7 @@ model Client {
   clientName          String          @unique
   clientEmail         String          @unique
   clientPhone         String
-  dniCuit             String          @unique
+  cuit                String          @unique
   dateOfRegistration  DateTime        @default(now())
   status              Boolean         @default(true)
   category_client     Category_Client @relation(fields: [id_category_client], references: [id_category_client])

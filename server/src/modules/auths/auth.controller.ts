@@ -1,14 +1,14 @@
-import { NextFunction, Request, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import prisma from '@/database/prisma.js';
 import jwt from 'jsonwebtoken';
 import enviarMailResetPassword from '@/service/mailRec.service.js';
 import bcrypt from 'bcrypt';
 import { config } from '@/utils/config.js';
-import { AccessTokenPayload, ResetPasswordPayload } from './auth.type.js'
+import type { AccessTokenPayload, ResetPasswordPayload } from './auth.type.js'
 import enviarMailVerificador from '@/service/mail.service.js';
 import { EnumRol } from "@/generated/prisma/browser.js";
-import { ForgotPasswordDto, LoginDto, RegisterDto, ResetPasswordDto } from './auth.schema.js';
-import { nextTick } from 'process';
+import type { ForgotPasswordDto, LoginDto, RegisterDto, ResetPasswordDto } from './auth.schema.js';
+
 
 interface DecodedToken {
     userName: string;
@@ -18,9 +18,9 @@ export const validateAccountController = async (req: Request, res: Response) => 
     const token = req.params.token;
 
     if (typeof token !== 'string') {
-        return res.status(400).json({ 
-            success: false, 
-            message: "El token proporcionado no es válido." 
+        return res.status(400).json({
+            success: false,
+            message: "El token proporcionado no es válido."
         });
     }
 
@@ -32,11 +32,12 @@ export const validateAccountController = async (req: Request, res: Response) => 
 
     return res.status(200).json(result);
 };
+
 async function validateAccount(token: string) {
     try {
 
         const decoded = jwt.verify(token, config.JWT_SECRET) as DecodedToken;
-        
+
         if (!decoded || !decoded.userName) {
             throw new Error("Token inválido o no contiene el ID de usuario");
         }
@@ -49,7 +50,7 @@ async function validateAccount(token: string) {
                 userName: userN,
             },
             data: {
-                status: true, 
+                status: true,
             },
         });
 
@@ -60,11 +61,17 @@ async function validateAccount(token: string) {
             usuario: usuarioActualizado
         };
 
-    } catch (error: any) {
-        console.error("Error al validar la cuenta:", error.message);
+    } catch (error: unknown) {
+        const message =
+            error instanceof Error
+                ? error.message
+                : "Error interno al validar la cuenta";
+
+        console.error("Error al validar la cuenta:", message);
+
         return {
             success: false,
-            message: error.message || "Error interno al validar la cuenta"
+            message
         };
     }
 }
@@ -95,8 +102,8 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
             return;
         }
 
-        if (!user.validationStatus){
-            res.status(403).json({message: 'Su cuenta se encuentra activa, espere la validacion del administrador para poder iniciar sesión.'});
+        if (!user.validationStatus) {
+            res.status(403).json({ message: 'Su cuenta se encuentra activa, espere la validacion del administrador para poder iniciar sesión.' });
             return;
         }
 
@@ -111,7 +118,7 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
             secure: config.NODE_ENV === 'production', // Solo en producción
             sameSite: 'lax', // el sameSite puede ser 'strict', 'lax' o 'none' dependiendo de tus necesidades
             maxAge: 3600000, // 1 hora
-        }).json({ message: 'Login successful',});
+        }).json({ message: 'Login successful', });
 
     } catch (error) {
         next(error);
@@ -141,6 +148,7 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
 
 
 export const registerUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
     const { username, email, password }: RegisterDto = req.body;
 
     // Si el usuario subió foto, multer ya la mandó a Cloudinary y dejó la URL en req.file.path
@@ -149,22 +157,15 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const data: any = {
+    const data = {
         userName: username,
         email: email,
         password_hash: hashedPassword,
         rol: EnumRol.tecnico,
         status: false,
+        ...(fotoUrl && { urlPicture: fotoUrl }),
     };
 
-    if (fotoUrl) {
-        data.urlPicture = fotoUrl;
-    }
-
-    //const consult = 'INSERT INTO usuario (nombre_usuario, email, password_hash, foto_url) VALUES (?, ?, ?, ?)';
-
-
-    try {
         await prisma.user.create({ data });
 
         const tokenVerificacion = jwt.sign({ userName: username }, config.JWT_SECRET, { expiresIn: '24h' });
@@ -177,19 +178,19 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
 };
 
 
-export const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
+export const resetPassword = async (req: Request, res: Response, _next: NextFunction) => {
     const token = String(req.params.token);
-        const { password }: ResetPasswordDto = req.body;
+    const { password }: ResetPasswordDto = req.body;
 
-        if (typeof password !== 'string' || password.length < 8) {
-            return res.status(400).json({ error: 'La contraseña debe tener al menos 8 caracteres' });
-        }
-        if (password.length > 72) {
-            return res.status(400).json({ error: 'La contraseña es demasiado larga' });
-        }
+    if (typeof password !== 'string' || password.length < 8) {
+        return res.status(400).json({ error: 'La contraseña debe tener al menos 8 caracteres' });
+    }
+    if (password.length > 72) {
+        return res.status(400).json({ error: 'La contraseña es demasiado larga' });
+    }
 
-        try {
-            const decoded = jwt.decode(token) as ResetPasswordPayload;
+    try {
+        const decoded = jwt.decode(token) as ResetPasswordPayload;
 
         if (!decoded?.id_user) {
             return res.status(400).json({ error: 'Token inválido' });

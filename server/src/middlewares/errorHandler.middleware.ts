@@ -1,4 +1,4 @@
-import { ErrorRequestHandler, Request, Response, NextFunction } from 'express';
+import type { ErrorRequestHandler, Request, Response, NextFunction } from 'express';
 import { config } from '@/utils/config.js';
 // El error de body-parser (express.json) no viene tipado como una clase propia,
 // así que extendemos el shape que realmente trae en runtime.

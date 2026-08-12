@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import prisma from "@/database/prisma.js";
 import { EnumRol, Prisma } from "@/generated/prisma/browser.js";
 

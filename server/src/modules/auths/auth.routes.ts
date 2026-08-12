@@ -4,7 +4,7 @@ import authenticate from '@/middlewares/authenticate.middleware.js';
 import { upload } from '@/middlewares/upload.middleware.js';
 import { validate } from '@/middlewares/validation.middleware.js';
 import { forgotPasswordSchema, resetPasswordSchema, loginSchema, registerSchema } from './auth.schema.js';
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 
 const router = Router();
 

@@ -1,7 +1,8 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import prisma from "@/database/prisma.js";
 import { emitEvent } from "@/websocket.js";
 import { EVENTS } from "@/shared/events.js";
+import type { ModifyClientDto, NewClientDto } from "./client.schema.js";
 
 async function getCategoryClientByOrders(orderCount: number) {
   try {
@@ -23,7 +24,7 @@ async function getCategoryClientByOrders(orderCount: number) {
 export const createNewClient = async (req: Request, res: Response) => {
 
   try {
-    const { clientName, clientEmail, clientPhone, dniCuit } = req.body;
+    const { clientName, clientEmail, clientPhone, cuit }: NewClientDto = req.body;
     const category = await getCategoryClientByOrders(0);
     console.log(category);
     const newClient = await prisma.client.create({
@@ -31,7 +32,7 @@ export const createNewClient = async (req: Request, res: Response) => {
         clientName,
         clientEmail,
         clientPhone,
-        dniCuit,
+        cuit,
         category_client: {
           connect: {
             id_category_client: category?.id_category_client,
@@ -71,10 +72,10 @@ export const getOneClient = async (req: Request, res: Response) => {
   }
 }
 export const modifyClient = async (req: Request, res: Response) => {
-  const data: any = {};
+  const data: ModifyClientDto = {};
   if (req.body.clientName) data.clientName = req.body.clientName;
   if (req.body.clientEmail) data.clientEmail = req.body.clientEmail;
-  if (req.body.dniCuit) data.dniCuit = req.body.dniCuit;
+  if (req.body.cuit) data.cuit = req.body.cuit;
   if (req.body.clientPhone) data.clientPhone = req.body.clientPhone;
   try {
     const modifyClient = await prisma.client.update({
