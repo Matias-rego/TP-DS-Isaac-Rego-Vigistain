@@ -1,7 +1,8 @@
-import { Request, Response, NextFunction } from "express";
+import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import type { $Enums } from "@/database/prisma.js";
 import { config } from '@/utils/config.js';
-import { AccessTokenPayload } from "@/modules/auths/auth.type.js";
+import type { AccessTokenPayload } from "@/modules/auths/auth.type.js";
 
 declare module "express-serve-static-core" {
   interface Request {
@@ -9,7 +10,7 @@ declare module "express-serve-static-core" {
   }
 }
 
-export const authenticate = (allowedRoles: string[] = []) => {
+export const authenticate = (allowedRoles: $Enums.EnumRol[] = []) => {
   return (req: Request, res: Response, next: NextFunction) => {
     const token = req.cookies?.access_token;
 

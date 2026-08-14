@@ -1,14 +1,11 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import prisma from "@/database/prisma.js";
+import type { RegisterOrderDto } from './order.schema.js';
 
 export const registerOrder = async (req: Request, res: Response) => {
   try {
-    const { id_equipment, observations, equipmentPhotoUrl, estimatedDate } = req.body;
-    if (!id_equipment) {
-      return res.status(400).json({
-        message: "Falta id_equipment para registrar la orden",
-      });
-    }
+    const { id_equipment, observations, equipmentPhotoUrl, estimatedDate }: RegisterOrderDto = req.body;
+
     const response = await prisma.order.create({
       data: {
         id_equipment,

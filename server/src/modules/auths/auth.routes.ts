@@ -8,9 +8,12 @@ import type { Request, Response } from 'express';
 
 const router = Router();
 
-router.post('/register', upload.single('foto'), validate(registerSchema), registerUser);
+router.post('/register', 
+    upload.single('foto'), 
+    validate({ body: registerSchema }),
+    registerUser);
 
-router.post('/login', validate(loginSchema), loginUser);
+router.post('/login', validate({ body: loginSchema }), loginUser);
 
 router.post('/logout', authenticate([]), logout);
 
@@ -18,9 +21,9 @@ router.post('/refresh', (req: Request, res: Response) => {
     res.status(200).json({ message: 'Refresh token endpoint not implemented yet' });
 });
 
-router.post('/forgot-password', validate(forgotPasswordSchema), forgotPassword);
+router.post('/forgot-password', validate({ body: forgotPasswordSchema }), forgotPassword);
 
-router.post('/reset-password/:token', validate(resetPasswordSchema), resetPassword);
+router.post('/reset-password/:token', validate({ body: resetPasswordSchema }), resetPassword);
 
 router.put('/validate/:token', validateAccountController);
 

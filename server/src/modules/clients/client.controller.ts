@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import prisma from "@/database/prisma.js";
 import { emitEvent } from "@/websocket.js";
 import { EVENTS } from "@/shared/events.js";
-import type { ModifyClientDto, NewClientDto } from "./client.schema.js";
+import type { ModifyClientDto, CreateClientDto } from "./client.schema.js";
 
 async function getCategoryClientByOrders(orderCount: number) {
   try {
@@ -24,7 +24,7 @@ async function getCategoryClientByOrders(orderCount: number) {
 export const createNewClient = async (req: Request, res: Response) => {
 
   try {
-    const { clientName, clientEmail, clientPhone, cuit }: NewClientDto = req.body;
+    const { clientName, clientEmail, clientPhone, cuit }: CreateClientDto = req.body;
     const category = await getCategoryClientByOrders(0);
     console.log(category);
     const newClient = await prisma.client.create({

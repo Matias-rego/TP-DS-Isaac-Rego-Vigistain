@@ -1,28 +1,28 @@
 import type { Request, Response } from 'express';
 import prisma from "@/database/prisma.js";
-import { EnumRol, Prisma } from "@/generated/prisma/browser.js";
+import type { EnumRol, Prisma } from "@/generated/prisma/browser.js";
+import type { ModifyUserDto } from './user.schema.js';
 
 
-export const getAllUsers = async (req: Request, res: Response) => {
-    try{
+export const getAllUsers = async (_req: Request, res: Response) => {
+    try {
         const users = await prisma.user.findMany({
             where: {
-                status:true,
+                status: true,
+            },
+            omit: {
+                password_hash: true,
             },
         });
         if (!users || users.length === 0) {
             return res.status(404).json({ error: 'No se encontraron usuarios' });
         }
-        // sacar al usuario el password_hash
-        res.json(users.map((user) => {
-            const { password_hash, ...rest } = user;
-            return rest;
-        }));
-    }catch(e){
+        return res.json(users);
+    } catch (e) {
         console.error('Error en getAllUsers:', e);
-        res.status(500).json({error:'Error interno del server'})
+        res.status(500).json({ error: 'Error interno del server' })
     }
- }
+}
 
 export const getPartialUser = async (req: Request, res: Response) => {
     try {
@@ -32,14 +32,14 @@ export const getPartialUser = async (req: Request, res: Response) => {
         if (typeof q === 'string' && q.trim() !== '') {
             whereConditions.push({
                 OR: [
-                    { userName: { contains: q} },
-                    { email: { contains: q} },
+                    { userName: { contains: q } },
+                    { email: { contains: q } },
                 ],
             });
         }
         if (typeof rol === 'string' && rol.trim() !== '') {
             whereConditions.push({
-                rol: rol as EnumRol, 
+                rol: rol as EnumRol,
             });
         }
         if (validationStatus !== undefined) {
@@ -65,9 +65,9 @@ export const getPartialUser = async (req: Request, res: Response) => {
     }
 };
 
-export const createUser = async (req: Request, res: Response) => { }
+export const createUser = async (_req: Request, _res: Response) => { }
 
-export const deleteUser = async (req: Request, res: Response) => { }
+export const deleteUser = async (_req: Request, _res: Response) => { }
 
 export const getUser = async (req: Request, res: Response) => {
     try {
@@ -85,9 +85,9 @@ export const getUser = async (req: Request, res: Response) => {
 };
 
 export const modifyUser = async (req: Request, res: Response) => {
-    const fotoUrl = (req.file as any)?.path ?? null;
+    const fotoUrl = (req.file as { path: string })?.path ?? null;
 
-    const data: any = {};
+    const data: ModifyUserDto = {};
     if (req.body.username) data.userName = req.body.username;
     if (req.body.email) data.email = req.body.email;
     if (fotoUrl) data.urlPicture = fotoUrl;

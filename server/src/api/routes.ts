@@ -5,7 +5,7 @@ import failureTypeRoutes from '@/modules/failureTypes/failureType.routes.js';
 import clientRoutes from '@/modules/clients/client.routes.js';
 import paymentTypeRoutes from '@/modules/paymentTypes/paymentType.routes.js';
 import failureRoutes from '@/modules/failures/failure.routes.js';
-import clientTypeRoutes from '@/modules/clientTypes/clientCategory.routes.js';
+import clientTypeRoutes from '@/modules/clientTypes/clientType.routes.js';
 import equipmentRoutes from '@/modules/equipments/equipment.routes.js';
 import orderRouter from '@/modules/orders/order.routes.js';
 import { authenticate } from '@/middlewares/authenticate.middleware.js';

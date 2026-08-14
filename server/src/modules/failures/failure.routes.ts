@@ -1,12 +1,15 @@
 import { Router } from 'express'
-import { createFailures, getFailureOfEquipment } from './failureController.js';
+import { createFailures, getFailureOfEquipment } from './failure.controller.js';
+import { createFailuresSchema } from './failure.schema.js';
+import { validate } from '@/middlewares/validation.middleware.js';
+import { idSchema } from '@/shared/common.schema.js';
 
 
 const router = Router();
 
-router.post("/", createFailures);
+router.post("/", validate({ body: createFailuresSchema }), createFailures);
 
-router.get('/ofEquipment/:id', getFailureOfEquipment);
+router.get('/ofEquipment/:id', validate({ params: idSchema }) , getFailureOfEquipment);
 
 // router.post('/createTypeFail', createTypeFail);
 

@@ -1,11 +1,13 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import prisma from "@/database/prisma.js";
 import { emitEvent } from "@/websocket.js";
 import { EVENTS } from "@/shared/events.js";
+import type { CreateTypePaymentDto, ModifyTypePaymentDto } from "./paymentType.schema.js";
+
 
 export const createTypePayment = async (req: Request, res: Response) => {
     try {
-        const { paymentTypeName, paymentMethod, type_of_payment, percentaje } = req.body;
+        const { paymentTypeName, paymentMethod, type_of_payment, percentaje }: CreateTypePaymentDto = req.body;
         const newTypePayment = await prisma.payment_Type.create({
             data: {
                 paymentTypeName,
@@ -25,7 +27,7 @@ export const getAllPaymentTypes = async (req: Request, res: Response) => {
     try {
         const result = await prisma.payment_Type.findMany();
         res.status(200).json(result);
-    } catch (error) {
+    } catch (_error) {
         res.status(500).json({ error: "Error al obtener los tipos de pago" });
     }
 };
@@ -40,7 +42,7 @@ export const getPartialTypesPayment = async (req: Request, res: Response) => {
             }
         });
         res.status(200).json(result);
-    } catch (error) {
+    } catch (_error) {
         res.status(500).json({ error: "Error al obtener los tipos de pago" });
     }
 };
@@ -52,12 +54,12 @@ export const deleteTypePayment = async (req: Request, res: Response) => {
         });
         emitEvent(EVENTS.paymentTypeDeleted, { id: id });
         res.status(200).json(deletedTypePayment);
-    } catch (error) {
+    } catch (_error) {
         res.status(500).json({ error: "Error al eliminar el tipo de pago" });
     }
 };
 export const modifyTypePayment = async (req: Request, res: Response) => {
-    const data: any = {};
+    const data: ModifyTypePaymentDto = {};
     if (req.body.paymentTypeName) data.paymentTypeName = req.body.paymentTypeName;
     if (req.body.paymentMethod) data.paymentMethod = req.body.paymentMethod;
     if (req.body.type_of_payment) data.type_of_payment = req.body.type_of_payment;
@@ -70,7 +72,7 @@ export const modifyTypePayment = async (req: Request, res: Response) => {
         });
         emitEvent(EVENTS.paymentTypeChanged, updatedTypePayment);
         res.status(200).json(updatedTypePayment);
-    } catch (error) {
+    } catch (_error) {
         res.status(500).json({ error: "Error al modificar el tipo de pago" });
     }
 };

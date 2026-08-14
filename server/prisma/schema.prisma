@@ -129,7 +129,7 @@ model Equipment {
   tipo_equipment  String
   brand           String
   model           String
-  observations    String
+  observations    String?
   client          Client            @relation(fields: [id_client], references: [id_client])
   id_client       Int
   failures        Failure[]

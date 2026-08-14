@@ -286,9 +286,10 @@ Esta API expone los recursos del sistema bajo el prefijo base `/api`.
   - `409`: `{ message: string }`
   - `500`: `{ message: 'Error al eliminar un tipo de falla' }`
 
-### PUT /failure-types/:id_failure_type
+### PUT /failure-types/:id
 - Request:
   - Content-Type: `application/json`
+  - Path param: `id` (number)
   - Body opcional: `{ failureDescription?: string, estimatedImport?: number }`
 - Response:
   - `200`: `{ user: object, success: string }`

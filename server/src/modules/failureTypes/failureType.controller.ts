@@ -1,7 +1,8 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import prisma from "@/database/prisma.js";
 import { emitEvent } from "@/websocket.js";
 import { EVENTS } from "@/shared/events.js";
+import type { ModifyFailureTypeDto } from './failureType.schema.js';
 
 export const getPartialTypes = async (req: Request, res: Response) => {
     try {
@@ -77,17 +78,17 @@ export const deleteType = async (req: Request, res: Response) => {
         emitEvent(EVENTS.failureTypeDeleted, { id: id });
         return res.status(200).json({ message: 'Tipo de falla eliminado correctamente' });
 
-    } catch (e) {
+    } catch (_e) {
         return res.status(500).json({ message: 'Error al eliminar un tipo de falla' });
     }
 }
 export const modifyType = async (req: Request, res: Response) => {
-    const data: any = {};
+    const data: ModifyFailureTypeDto = {};
     if (req.body.failureDescription) data.failureDescription = req.body.failureDescription;
     if (req.body.estimatedImport) data.estimatedImport = req.body.estimatedImport;
     try {
         const result = await prisma.failure_Type.update({
-            where: { id_failure_type: Number(req.params.id_failure_type) },
+            where: { id_failure_type: Number(req.params.id) },
             data
         });
         emitEvent(EVENTS.failureTypeChanged, result);
@@ -95,8 +96,9 @@ export const modifyType = async (req: Request, res: Response) => {
             user: result,
             success: 'Tipo de falla modificado correctamente',
         })
-    } catch (e) {
+    } catch (_e) {
         console.error('Error modificando Tipo Falla');
         res.status(500).json({ error: 'Error al modificar usuario' });
+        
     }
 };
