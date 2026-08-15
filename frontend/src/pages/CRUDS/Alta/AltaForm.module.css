@@ -134,7 +134,7 @@
 
 .input:focus {
   border-color: var(--tf-primary);
-  background: var(--tf-white);
+  background: var(--tf-card);
   box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1);
 }
 
@@ -146,7 +146,7 @@
 /* Campo con error */
 .fieldError .input {
   border-color: var(--tf-danger);
-  background: #fff5f5;
+  background: var(--tf-card);
 }
 
 .fieldError .input:focus {
