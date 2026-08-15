@@ -1,45 +1,15 @@
 import type { Request, Response } from "express";
 import prisma from "@/database/prisma.js"; 
-
-interface FailureInput {
-  id_failure_type: number;
-  failureDescription: string;
-  id_equipment: number;
-}
+import type { CreateFailuresDto } from "./failure.schema.js";
 
 export const createFailures = async (req: Request, res: Response) => {
-  const failures = req.body as FailureInput[];
-
-  if (!Array.isArray(failures) || failures.length === 0) {
-    return res.status(400).json({
-      message: "Se esperaba un array de fallas con al menos un elemento.",
-    });
-  }
-  const errores: string[] = [];
-  failures.forEach((f, i) => {
-    if (f.id_failure_type === undefined || f.id_failure_type === null) {
-      errores.push(`Falla #${i + 1}: falta id_failure_type.`);
-    }
-    if (f.id_equipment === undefined || f.id_equipment === null) {
-      errores.push(`Falla #${i + 1}: falta id_equipment.`);
-    }
-    if (!f.failureDescription || f.failureDescription.trim() === "") {
-      errores.push(`Falla #${i + 1}: falta la descripción.`);
-    }
-  });
-
-  if (errores.length > 0) {
-    return res.status(400).json({
-      message: "Hay fallas incompletas.",
-      details: errores,
-    });
-  }
+  const failures: CreateFailuresDto = req.body;
 
   try {
     const resultado = await prisma.failure.createMany({
       data: failures.map((f) => ({
-        id_failure_type: Number(f.id_failure_type),
-        id_equipment: Number(f.id_equipment),
+        id_failure_type: f.id_failure_type,
+        id_equipment: f.id_equipment,
         description: f.failureDescription,
       })),
     });

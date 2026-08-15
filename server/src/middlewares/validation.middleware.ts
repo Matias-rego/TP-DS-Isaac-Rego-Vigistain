@@ -1,23 +1,35 @@
-// middlewares/validate.ts
-import { Request, Response, NextFunction } from "express";
-import { ZodType, z } from "zod";
+import type { Request, Response, NextFunction } from "express";
+import type { ZodType } from "zod";
+import { z } from "zod";
 
 type ReqPart = "body" | "query" | "params";
 
-export function validate(schema: ZodType, part: ReqPart = "body") {
+type ValidationSchemas = Partial<
+  Record<ReqPart, ZodType>
+>;
+
+export function validate(schemas: ValidationSchemas) {
   return (req: Request, res: Response, next: NextFunction) => {
-    const result = schema.safeParse(req[part]);
+    const errors: Record<string, unknown> = {};
 
-    if (!result.success) {
-      const errorTree = z.treeifyError(result.error);
+    for (const [part, schema] of Object.entries(schemas)) {
+      const result = schema.safeParse(req[part as ReqPart]);
 
+      if (!result.success) {
+        errors[part] = z.treeifyError(result.error);
+        continue;
+      }
+
+      req[part as ReqPart] = result.data;
+    }
+
+    if (Object.keys(errors).length > 0) {
       return res.status(400).json({
         message: "Validation failed",
-        errors: errorTree,
+        errors,
       });
     }
 
-    req[part] = result.data;
     next();
   };
 }

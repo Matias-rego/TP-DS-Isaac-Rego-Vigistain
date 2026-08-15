@@ -49,6 +49,7 @@ Esta API expone los recursos del sistema bajo el prefijo base `/api`.
  ├─GET /:description — buscar categoría (con auth)
  ├─DELETE /:id — eliminar categoría (con auth)
  └─PUT /:id — actualizar categoría (con auth)
+```
 
  ## /status
 
@@ -74,7 +75,7 @@ Esta API expone los recursos del sistema bajo el prefijo base `/api`.
   - Content-Type: `application/json`
   - Body: `{ username: string, password: string }`
 - Response:
-  - `200`: cookie `access_token` + `{ token: string }`
+  - `200`: cookie `access_token`
   - `401`: `{ message: 'Usuario o contraseña incorrectos' }`
   - `403`: `{ message: string }`
   - `500`: `{ message: 'Error en el servidor', error: any }`
@@ -180,7 +181,7 @@ Esta API expone los recursos del sistema bajo el prefijo base `/api`.
 ### POST /clients
 - Request:
   - Content-Type: `application/json`
-  - Body: `{ clientName: string, clientEmail: string, clientPhone: string, dniCuit: string }`
+  - Body: `{ clientName: string, clientEmail: string, clientPhone: string, Cuit: string }`
 - Response:
   - `201`: cliente creado
   - `500`: `{ message: 'Error del servidor' }`
@@ -210,7 +211,7 @@ Esta API expone los recursos del sistema bajo el prefijo base `/api`.
 ### PUT /clients/:id
 - Request:
   - Content-Type: `application/json`
-  - Body opcional: `{ clientName?: string, clientEmail?: string, dniCuit?: string, clientPhone?: string }`
+  - Body opcional: `{ clientName?: string, clientEmail?: string, cuit?: string, clientPhone?: string }`
 - Response:
   - `200`: cliente modificado
   - `500`: `{ error: 'Error modificando al cliente' }`
@@ -285,9 +286,10 @@ Esta API expone los recursos del sistema bajo el prefijo base `/api`.
   - `409`: `{ message: string }`
   - `500`: `{ message: 'Error al eliminar un tipo de falla' }`
 
-### PUT /failure-types/:id_failure_type
+### PUT /failure-types/:id
 - Request:
   - Content-Type: `application/json`
+  - Path param: `id` (number)
   - Body opcional: `{ failureDescription?: string, estimatedImport?: number }`
 - Response:
   - `200`: `{ user: object, success: string }`

@@ -1,13 +1,13 @@
 import { io, Socket } from 'socket.io-client';
 import { eventBus, EVENTS } from './eventBus';
+import { VITE_WS_URL } from './config';
 
-const WS_URL = import.meta.env.VITE_WS_URL ?? 'http://localhost:3000';
 
 class WebSocketClient {
   private socket: Socket | null = null;
 
   connect(): void {
-    this.socket = io(WS_URL, { transports: ['websocket'] });
+    this.socket = io(VITE_WS_URL, { transports: ['websocket'] });
 
     this.socket.on('connect', () => console.log('[WS] Conectado'));
 

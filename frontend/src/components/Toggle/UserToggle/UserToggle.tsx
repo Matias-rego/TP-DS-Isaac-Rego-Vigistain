@@ -1,5 +1,5 @@
-import UserCircleIconWhite2 from "@/assets/userCircleIconWhite2.svg";
-import UserCircleIconBlack from "@/assets/userCircleIconBlack.svg";
+import UserCircleIconWhite2 from "@/assets/UserCircleIconWhite2.svg";
+import UserCircleIconBlack from "@/assets/UserCircleIconBlack.svg";
 import styles from "./UserToggle.module.css";
 import { useTheme } from "next-themes";
 import {useNavigate} from "react-router-dom";

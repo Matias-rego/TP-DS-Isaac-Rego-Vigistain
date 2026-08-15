@@ -1,10 +1,14 @@
-import { Request, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import prisma from '@/database/prisma.js';
 import jwt from 'jsonwebtoken';
 import enviarMailResetPassword from '@/service/mailRec.service.js';
 import bcrypt from 'bcrypt';
 import { config } from '@/utils/config.js';
-import { AccessTokenPayload, ResetPasswordPayload } from './auth.type.js'
+import type { AccessTokenPayload, ResetPasswordPayload } from './auth.type.js'
+import enviarMailVerificador from '@/service/mail.service.js';
+import { EnumRol } from "@/generated/prisma/browser.js";
+import type { ForgotPasswordDto, LoginDto, RegisterDto, ResetPasswordDto } from './auth.schema.js';
+
 
 interface DecodedToken {
     userName: string;
@@ -14,9 +18,9 @@ export const validateAccountController = async (req: Request, res: Response) => 
     const token = req.params.token;
 
     if (typeof token !== 'string') {
-        return res.status(400).json({ 
-            success: false, 
-            message: "El token proporcionado no es válido." 
+        return res.status(400).json({
+            success: false,
+            message: "El token proporcionado no es válido."
         });
     }
 
@@ -28,11 +32,12 @@ export const validateAccountController = async (req: Request, res: Response) => 
 
     return res.status(200).json(result);
 };
+
 async function validateAccount(token: string) {
     try {
 
         const decoded = jwt.verify(token, config.JWT_SECRET) as DecodedToken;
-        
+
         if (!decoded || !decoded.userName) {
             throw new Error("Token inválido o no contiene el ID de usuario");
         }
@@ -45,7 +50,7 @@ async function validateAccount(token: string) {
                 userName: userN,
             },
             data: {
-                status: true, 
+                status: true,
             },
         });
 
@@ -56,18 +61,24 @@ async function validateAccount(token: string) {
             usuario: usuarioActualizado
         };
 
-    } catch (error: any) {
-        console.error("Error al validar la cuenta:", error.message);
+    } catch (error: unknown) {
+        const message =
+            error instanceof Error
+                ? error.message
+                : "Error interno al validar la cuenta";
+
+        console.error("Error al validar la cuenta:", message);
+
         return {
             success: false,
-            message: error.message || "Error interno al validar la cuenta"
+            message
         };
     }
 }
 
 
-export const loginUser = async (req: Request, res: Response) => {
-    const { username, password } = req.body;
+export const loginUser = async (req: Request, res: Response, next: NextFunction) => {
+    const { username, password }: LoginDto = req.body;
     try {
         // Reemplaza el SELECT * FROM usuario WHERE nombre_usuario = ?
         const user = await prisma.user.findFirst({
@@ -91,8 +102,8 @@ export const loginUser = async (req: Request, res: Response) => {
             return;
         }
 
-        if (!user.validationStatus){
-            res.status(403).json({message: 'Su cuenta se encuentra activa, espere la validacion del administrador para poder iniciar sesión.'});
+        if (!user.validationStatus) {
+            res.status(403).json({ message: 'Su cuenta se encuentra activa, espere la validacion del administrador para poder iniciar sesión.' });
             return;
         }
 
@@ -107,16 +118,15 @@ export const loginUser = async (req: Request, res: Response) => {
             secure: config.NODE_ENV === 'production', // Solo en producción
             sameSite: 'lax', // el sameSite puede ser 'strict', 'lax' o 'none' dependiendo de tus necesidades
             maxAge: 3600000, // 1 hora
-        })
-            .json({ token });
+        }).json({ message: 'Login successful', });
 
     } catch (error) {
-        res.status(500).json({ message: 'Error en el servidor', error });
+        next(error);
     }
 }
 
-export const forgotPassword = async (req: Request, res: Response) => {
-    const { email } = req.body;
+export const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
+    const { email }: ForgotPasswordDto = req.body;
     try {
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user) {
@@ -132,25 +142,55 @@ export const forgotPassword = async (req: Request, res: Response) => {
         }
         res.status(200).json({ message: 'Correo de recuperación enviado' });
     } catch (error) {
-
-        console.error('Error en forgotPassword:', error);
-        res.status(500).json({ error: 'Error interno del servidor' });
+        next(error);
     }
 }
 
-export const resetPassword = async (req: Request, res: Response) => {
+
+export const registerUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+    const { username, email, password }: RegisterDto = req.body;
+
+    // Si el usuario subió foto, multer ya la mandó a Cloudinary y dejó la URL en req.file.path
+    // Si no subió nada, req.file es undefined → guardamos null
+    const fotoUrl = (req.file)?.path;
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const data = {
+        userName: username,
+        email: email,
+        password_hash: hashedPassword,
+        rol: EnumRol.tecnico,
+        status: false,
+        ...(fotoUrl && { urlPicture: fotoUrl }),
+    };
+
+        await prisma.user.create({ data });
+
+        const tokenVerificacion = jwt.sign({ userName: username }, config.JWT_SECRET, { expiresIn: '24h' });
+        await enviarMailVerificador(email, tokenVerificacion);
+
+        res.json({ message: 'Usuario registrado exitosamente, valida tu cuenta a través del enlace enviado a tu correo electrónico' });
+    } catch (error) {
+        next(error);
+    }
+};
+
+
+export const resetPassword = async (req: Request, res: Response, _next: NextFunction) => {
     const token = String(req.params.token);
-        const { password } = req.body;
+    const { password }: ResetPasswordDto = req.body;
 
-        if (typeof password !== 'string' || password.length < 8) {
-            return res.status(400).json({ error: 'La contraseña debe tener al menos 8 caracteres' });
-        }
-        if (password.length > 72) {
-            return res.status(400).json({ error: 'La contraseña es demasiado larga' });
-        }
+    if (typeof password !== 'string' || password.length < 8) {
+        return res.status(400).json({ error: 'La contraseña debe tener al menos 8 caracteres' });
+    }
+    if (password.length > 72) {
+        return res.status(400).json({ error: 'La contraseña es demasiado larga' });
+    }
 
-        try {
-            const decoded = jwt.decode(token) as ResetPasswordPayload;
+    try {
+        const decoded = jwt.decode(token) as ResetPasswordPayload;
 
         if (!decoded?.id_user) {
             return res.status(400).json({ error: 'Token inválido' });
