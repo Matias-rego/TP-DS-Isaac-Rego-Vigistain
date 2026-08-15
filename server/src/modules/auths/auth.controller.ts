@@ -151,6 +151,9 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
     try {
     const { username, email, password }: RegisterDto = req.body;
 
+    const userCount = await prisma.user.count();
+    const role = userCount === 0 ? EnumRol.admin : EnumRol.tecnico;    
+    const adminValidation = role === EnumRol.admin ? true : false;
     // Si el usuario subió foto, multer ya la mandó a Cloudinary y dejó la URL en req.file.path
     // Si no subió nada, req.file es undefined → guardamos null
     const fotoUrl = (req.file)?.path;
@@ -161,9 +164,10 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
         userName: username,
         email: email,
         password_hash: hashedPassword,
-        rol: EnumRol.tecnico,
+        rol: role,
         status: false,
         ...(fotoUrl && { urlPicture: fotoUrl }),
+        validationStatus: adminValidation,
     };
 
         await prisma.user.create({ data });

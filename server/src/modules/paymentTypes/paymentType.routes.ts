@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createTypePayment, deleteTypePayment, getAllPaymentTypes, getPartialTypesPayment, modifyTypePayment } from "./paymentType.controllers.js";
+import { createTypePayment, deleteTypePayment, getAllPaymentTypes, getPartialTypesPayment, modifyTypePayment } from "./paymentType.controller.js";
 import { createTypePaymentSchema, modifyTypePaymentSchema } from "./paymentType.schema.js";
 import { validate } from "@/middlewares/validation.middleware.js";
 import { idSchema } from "@/shared/common.schema.js";

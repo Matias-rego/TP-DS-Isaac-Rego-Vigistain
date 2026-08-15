@@ -16,7 +16,7 @@ interface Client {
   clientName: string;
   clientEmail: string;
   clientPhone: string;
-  dniCuit: string;
+  cuit: string;
   dateOfRegistration: string;
   categoryClientName?: string;
   lastRepair?: string;

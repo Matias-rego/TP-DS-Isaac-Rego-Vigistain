@@ -37,7 +37,7 @@ export interface Client {
   clientName:         string;
   clientEmail:        string;
   clientPhone:        string;
-  dniCuit:            string;
+  cuit:            string;
   dateOfRegistration: string;   // ISO string en el front
   status:             boolean;
   id_category_client: number;

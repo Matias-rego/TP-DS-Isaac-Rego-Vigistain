@@ -141,9 +141,8 @@ model Order {
   id_order           Int             @id @default(autoincrement())
   equipment          Equipment       @relation(fields: [id_equipment], references: [id_equipment])
   id_equipment       Int
-  user               User?           @relation(fields: [id_user], references: [id_user])
-  id_user            Int?
-  status             EnumOrderStatus @default(recibido)
+  user               User          @relation(fields: [id_user], references: [id_user])
+  id_user            Int
   observations       String?
   equipmentPhotoUrl  String?
   dateOfEntry        DateTime        @default(now())
@@ -159,8 +158,7 @@ model Status_History {
   id_status_history Int      @id @default(autoincrement())
   order             Order    @relation(fields: [id_order], references: [id_order])
   id_order          Int
-  previousStatus    String
-  newStatus         String
+  status            EnumOrderStatus @default(recibido)
   user              User     @relation(fields: [id_user], references: [id_user])
   id_user           Int
   dateOfChange      DateTime @default(now())

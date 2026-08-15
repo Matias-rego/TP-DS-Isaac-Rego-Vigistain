@@ -1,10 +1,11 @@
 import type { Request, Response } from 'express';
 import prisma from "@/database/prisma.js";
+import { createFirstStatus } from '../status/status.controller.js';
 import type { RegisterOrderDto } from './order.schema.js';
 
 export const registerOrder = async (req: Request, res: Response) => {
   try {
-    const { id_equipment, observations, equipmentPhotoUrl, estimatedDate }: RegisterOrderDto = req.body;
+    const { id_equipment, observations, equipmentPhotoUrl, estimatedDate, id_user }: RegisterOrderDto = req.body;
 
     const response = await prisma.order.create({
       data: {
@@ -12,12 +13,16 @@ export const registerOrder = async (req: Request, res: Response) => {
         observations: observations ?? null,
         equipmentPhotoUrl: equipmentPhotoUrl ?? null,
         estimatedDate: estimatedDate ? new Date(estimatedDate) : null,
+        id_user: id_user
       },
     });
-    return res.status(201).json({
-      message: "Orden registrada con éxito",
-      order: response,
-    });
+    if(response){
+      createFirstStatus(id_user, response.id_order);
+      return res.status(201).json({
+        message: "Orden registrada con éxito",
+        order: response,
+      });
+    }
   } catch (error) {
     console.error("Error :", error);
     return res.status(500).json({

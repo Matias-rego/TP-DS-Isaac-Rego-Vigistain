@@ -100,7 +100,7 @@ export const getPartialClient = async (req: Request, res: Response) => {
             OR: [
               { clientName: { contains: q as string } },
               { clientEmail: { contains: q as string } },
-              { dniCuit: { contains: q as string } },
+              { cuit: { contains: q as string } },
             ]
           } : {},
           categoryClient ? {

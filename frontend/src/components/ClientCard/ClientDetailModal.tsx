@@ -10,7 +10,7 @@ interface Client {
   clientName: string;
   clientEmail: string;
   clientPhone: string;
-  dniCuit: string;
+  cuit: string;
   dateOfRegistration: string;
   categoryClientName?: string;
   status?: boolean;
@@ -28,7 +28,7 @@ interface Equipment {
 const clientFields: DetailFieldConfig<Client>[] = [
   { name: 'clientName',    label: 'Nombre Completo' },
   { name: 'clientEmail',   label: 'Email' },
-  { name: 'dniCuit',       label: 'DNI/CUIT' },
+  { name: 'cuit',       label: 'CUIT' },
   { name: 'categoryClientName', label: 'Categoría' },
   { name: 'clientPhone',   label: 'Teléfono' },
   {
@@ -156,8 +156,8 @@ const ClientDetailModal = ({
             <input type="email" name="clientEmail" value={formData.clientEmail} onChange={handleChange} className={styles.formInput} />
           </div>
           <div className={styles.inputGroup}>
-            <label className={styles.inputLabel}>DNI/CUIT</label>
-            <input type="text" name="dniCuit" value={formData.dniCuit} onChange={handleChange} className={styles.formInput} />
+            <label className={styles.inputLabel}>CUIT</label>
+            <input type="text" name="cuit" value={formData.cuit} onChange={handleChange} className={styles.formInput} />
           </div>
           <div className={styles.inputGroup}>
             <label className={styles.inputLabel}>Teléfono</label>
