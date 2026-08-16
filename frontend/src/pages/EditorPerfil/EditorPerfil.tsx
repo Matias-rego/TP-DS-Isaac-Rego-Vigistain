@@ -9,7 +9,7 @@ import AlertSuccess from "@/components/Alert/AlertSuccess";
 import Alert from "@/components/Alert/Alert";
 import { useNavigate } from "react-router-dom";
 import { BACKEND_URL } from '@/lib/config';
-import ActionButton from "@/components/Buttons/ActionButton";
+import ActionButton from "@/components/Common/Buttons/ActionButton";
 
 const EditorPerfil = () => {
   const [usuario, setUsuario] = useState<User | null>(null);

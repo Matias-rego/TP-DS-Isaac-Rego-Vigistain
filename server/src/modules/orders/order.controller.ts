@@ -40,6 +40,10 @@ export const getOrderOfEquipment = async (req:Request, res:Response) => {
     const orders = await prisma.order.findMany({
       where:{
         id_equipment : id_equipment,
+      },
+      include:{
+        statusHistory: true,
+        
       }
     });
     return res.status(200).json(orders);

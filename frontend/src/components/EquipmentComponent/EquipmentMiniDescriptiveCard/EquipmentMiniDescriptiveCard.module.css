@@ -1,7 +1,9 @@
+/* EquipmentMiniDescriptiveCard.module.css */
+
 .card {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   padding: 10px 14px;
   border: 1px solid var(--tf-border);
   border-radius: var(--radius-md, 14px);
@@ -25,36 +27,29 @@
   outline-offset: 2px;
 }
 
-.avatar {
+.iconWrap {
+  flex-shrink: 0;
   width: 36px;
   height: 36px;
-  min-width: 36px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
-  font-weight: 700;
   background: var(--tf-primary-soft);
-  color: var(--tf-primary);
 }
 
-.avatarImg {
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 1px solid var(--tf-border);
+.icon {
+  color: var(--tf-primary);
 }
 
 .info {
   display: flex;
   flex-direction: column;
+  gap: 2px;
   min-width: 0;
 }
 
-.name {
+.title {
   font-size: 14px;
   font-weight: 700;
   color: var(--tf-text);
@@ -64,6 +59,11 @@
 }
 
 .subtitle {
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--tf-muted);
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }

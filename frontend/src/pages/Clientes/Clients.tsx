@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import SearchBar from '../../components/SearchBar/SearchBar';
 import type { FilterConfig } from '../../components/SearchBar/SearchBar';
 import ClientGrid from '../../components/ClientCard/ClientGrid';
-import ActionButton from '../../components/Buttons/ActionButton';
+import ActionButton from '../../components/Common/Buttons/ActionButton';
 import Nav from '../Nav/Nav';
 import Footer from '../../components/Footer/Footer';
 import styles from './Clients.module.css';

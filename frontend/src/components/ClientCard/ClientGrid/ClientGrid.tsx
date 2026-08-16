@@ -1,5 +1,5 @@
-import ClientCard from './ClientCard';
-import type { ClientCardProps } from './ClientCard';
+import ClientCard from './ClientCard/ClientCard';
+import type { ClientCardProps } from './ClientCard/ClientCard';
 import styles from './ClientGrid.module.css';
 
 interface ClientGridProps {

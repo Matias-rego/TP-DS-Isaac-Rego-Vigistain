@@ -4,7 +4,7 @@ import type { DetailFieldConfig, DetailItemConfig, DetailModalAction } from "../
 import styles from './UserDetailModal.module.css';
 import { eventBus } from "@/lib/eventBus";
 import { BACKEND_URL } from "@/lib/config";
-import ActionButton from "../Buttons/ActionButton";
+import ActionButton from "../Common/Buttons/ActionButton";
 
 interface User {
   id_user: number;

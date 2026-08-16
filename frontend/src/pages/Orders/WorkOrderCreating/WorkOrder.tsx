@@ -7,7 +7,7 @@ import EyeIcon from "@/assets/EyeIcon.svg";
 import DeviceIcon from "@/assets/DeviceIcon.svg"
 import SearchBar from "@/components/SearchBar/SearchBar";
 import ClientDetailModal from '@/components/ClientCard/ClientDetailModal';
-import ActionButton from '@/components/Buttons/ActionButton';
+import ActionButton from '@/components/Common/Buttons/ActionButton';
 import ClientRegister from '../../Clientes/ClientRegister';
 import DeviceForm, { type DeviceFormValues } from "@/components/DeviceForm/DeviceForm";
 import CautionIcon from "@/assets/caution.svg";

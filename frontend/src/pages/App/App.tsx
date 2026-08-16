@@ -14,6 +14,7 @@ import UserManagement from "../UserManagement/UserManagement";
 import { AuthProvider, useAuth } from "@/lib/AuthContext"; 
 import Validation from "@/pages/Validation/Validation";
 import { WebSocketManager } from "@/lib/WebSocketManager";
+import OrderDirectory from "../Orders/OrderDirectory/OrderDirectory";
 
 export const capitalize = (text: string): string => {
   if (!text) return ""; 
@@ -75,6 +76,7 @@ const App = () => {
           <Route path="/gestion" element={<RutaPrivada><Gestion /></RutaPrivada>} />
           <Route path="/clientes" element={<RutaPrivada><Clientes /></RutaPrivada>} />
           <Route path="/createOrder" element={<RutaPrivada><WorkOrder /></RutaPrivada>} />
+          <Route path="/manageOrder" element={<RutaPrivada><OrderDirectory/></RutaPrivada>} />
         </Route>
 
         {/* Ruta para capturar errores 404 */}
