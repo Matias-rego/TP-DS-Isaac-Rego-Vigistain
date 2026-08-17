@@ -10,6 +10,7 @@ interface User {
   id_user: number;
   userName: string;
   email: string;
+  password_hash: string;
   rol: string;
   status?: boolean;
   validationStatus?: boolean;
@@ -70,14 +71,17 @@ const UserDetailModal = ({
 
   const handleEdit = async (updatedUser: User): Promise<boolean> => {
     try {
+      // Excluimos las propiedades que el esquema del backend prohíbe explícitamente
+      const { id_user, password_hash, status, ...payload } = updatedUser;
+
       const response = await fetch(
-        `${BACKEND_URL}/api/users/${updatedUser.id_user}`,
+        `${BACKEND_URL}/api/users/${id_user}`,
         {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(updatedUser),
+          body: JSON.stringify(payload),
           credentials: 'include',
         }
       );

@@ -8,5 +8,7 @@ export const EVENTS = {
   paymentTypeChanged: 'paymentType:changed',
   paymentTypeDeleted: 'paymentType:deleted',        
   failureTypeChanged: 'failureType:changed',
-  failureTypeDeleted: 'failureType:deleted',  
+  failureTypeDeleted: 'failureType:deleted',
+  userChanged: 'user:changed',
+  statusChanged: 'status:changed',
 } as const;

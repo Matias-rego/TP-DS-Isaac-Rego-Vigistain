@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import DetailModal from "../Modals/DetailModal";
-import type { DetailFieldConfig, DetailItemConfig } from "../Modals/DetailModal";
+import DetailModal from "@/components/Modals/DetailModal";
+import type { DetailFieldConfig, DetailItemConfig } from "@/components/Modals/DetailModal";
 import styles from './ClientDetailModal.module.css';
 import { eventBus } from "@/lib/eventBus";
 import { BACKEND_URL } from "@/lib/config";

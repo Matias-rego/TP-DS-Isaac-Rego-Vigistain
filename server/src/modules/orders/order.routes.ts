@@ -1,10 +1,14 @@
 import {Router} from 'express';
-import { registerOrder , getOrderOfEquipment} from '@/modules/orders/order.controller.js';
+import { registerOrder , getOrderOfEquipment, getOrders, getPartialOrder} from '@/modules/orders/order.controller.js';
 import { validate } from '@/middlewares/validation.middleware.js';
 import { idSchema } from '@/shared/common.schema.js';
 import { registerOrderSchema } from './order.schema.js';
 
 const router = Router();
+
+router.get('/', getOrders);
+
+router.get('/search', getPartialOrder);
 
 router.get('/ofEquipment/:id', validate({params: idSchema}), getOrderOfEquipment);
 

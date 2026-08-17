@@ -1,5 +1,9 @@
 import {Router} from 'express';
+import { createStatus } from "@/modules/status/status.controller.js"
 
-const router = Router();
+const route = Router();
 
-router.get('/', )
+
+route.post('/', createStatus);
+
+export default route;

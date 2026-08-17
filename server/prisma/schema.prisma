@@ -143,6 +143,7 @@ model Order {
   id_equipment       Int
   user               User          @relation(fields: [id_user], references: [id_user])
   id_user            Int
+  currentStatus      EnumOrderStatus @default(recibido)
   observations       String?
   equipmentPhotoUrl  String?
   dateOfEntry        DateTime        @default(now())
