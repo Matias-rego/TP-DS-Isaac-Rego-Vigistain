@@ -64,3 +64,25 @@ export const getPartialEquipment = async (req: Request, res: Response) => {
     return res.status(500).json({ error: "Error en el getPartialEquipment" });
   }
 };
+
+export const getEquipmentOfClient = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params; 
+    const clientId = Number(id);
+
+    if (isNaN(clientId)) {
+      return res.status(400).json({ message: "ID de cliente inválido" });
+    }
+
+    const response = await prisma.equipment.findMany({
+      where: {
+        id_client: clientId,
+      },
+    });
+
+    return res.status(200).json(response);
+  } catch (e) {
+    console.error("Hay un error en server", e);
+    return res.status(500).json({ error: "Error interno del servidor", details: e });
+  }
+};
