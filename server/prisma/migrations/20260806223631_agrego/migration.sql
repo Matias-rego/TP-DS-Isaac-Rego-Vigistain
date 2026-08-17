@@ -1,2 +1,2 @@
 -- AlterTable
-ALTER TABLE `user` ADD COLUMN `validationStatus` BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE `User` ADD COLUMN `validationStatus` BOOLEAN NOT NULL DEFAULT false;

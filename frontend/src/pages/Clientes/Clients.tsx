@@ -1,14 +1,14 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import SearchBar from '../../components/SearchBar/SearchBar';
 import type { FilterConfig } from '../../components/SearchBar/SearchBar';
-import ClientGrid from '../../components/ClientCard/ClientGrid';
-import ActionButton from '../../components/Buttons/ActionButton';
+import ClientGrid from '@/components/ClientCard/ClientGrid/ClientGrid';
+import ActionButton from '../../components/Common/Buttons/ActionButton';
 import Nav from '../Nav/Nav';
 import Footer from '../../components/Footer/Footer';
 import styles from './Clients.module.css';
 import ClientRegister from './ClientRegister';
 import { eventBus, EVENTS } from '@/lib/eventBus';
-import ClientDetailModal from "@/components/ClientCard/ClientDetailModal";
+import ClientDetailModal from "@/components/ClientCard/ClientDetailModal/ClientDetailModal";
 import { BACKEND_URL } from '@/lib/config';
 
 interface Client {
@@ -16,7 +16,7 @@ interface Client {
   clientName: string;
   clientEmail: string;
   clientPhone: string;
-  dniCuit: string;
+  cuit: string;
   dateOfRegistration: string;
   categoryClientName?: string;
   lastRepair?: string;

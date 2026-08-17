@@ -9,7 +9,7 @@ import AlertSuccess from "@/components/Alert/AlertSuccess";
 import Alert from "@/components/Alert/Alert";
 import { useNavigate } from "react-router-dom";
 import { BACKEND_URL } from '@/lib/config';
-import ActionButton from "@/components/Buttons/ActionButton";
+import ActionButton from "@/components/Common/Buttons/ActionButton";
 
 const EditorPerfil = () => {
   const [usuario, setUsuario] = useState<User | null>(null);
@@ -109,11 +109,9 @@ const EditorPerfil = () => {
   useEffect(() => {
     const cargarPerfil = async () => {
       try {
-        const token = localStorage.getItem('token');
-        if (!token) throw new Error('No hay token');
 
         const response = await fetch(`${BACKEND_URL}/api/auth/me`,
-          { headers: { Authorization: `Bearer ${token}` }, credentials: 'include' });
+          { credentials: 'include' });
 
         if (!response.ok) throw new Error(`Error ${response.status}`);
 

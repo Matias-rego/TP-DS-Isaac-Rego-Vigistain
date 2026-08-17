@@ -6,8 +6,8 @@ import UserIcon from "@/assets/UserIcon.svg";
 import EyeIcon from "@/assets/EyeIcon.svg";
 import DeviceIcon from "@/assets/DeviceIcon.svg"
 import SearchBar from "@/components/SearchBar/SearchBar";
-import ClientDetailModal from '@/components/ClientCard/ClientDetailModal';
-import ActionButton from '@/components/Buttons/ActionButton';
+import ClientDetailModal from '@/components/ClientCard/ClientDetailModal/ClientDetailModal';
+import ActionButton from '@/components/Common/Buttons/ActionButton';
 import ClientRegister from '../../Clientes/ClientRegister';
 import DeviceForm, { type DeviceFormValues } from "@/components/DeviceForm/DeviceForm";
 import CautionIcon from "@/assets/caution.svg";
@@ -20,13 +20,14 @@ import FeedbackModal from "@/components/Modals/FeadbackModal/FeadbackModal";
 import EquimentDetailModal from "@/components/EquipmentComponent/EquipmentDetailModal/EquipmentDetailModal";
 import MonitorIcon from '@/assets/MonitorIcono.svg'
 import { type Equipment } from "@/types/types";
+import { useAuth } from "@/lib/AuthContext";
 
 interface Client {
   id_client: number;
   clientName: string;
   clientEmail: string;
   clientPhone: string;
-  dniCuit: string;
+  cuit: string;
   dateOfRegistration: string;
   categoryClientName?: string;
   lastRepair?: string;
@@ -96,7 +97,7 @@ const WorkOrder = () => {
   const puedeAvanzar = pasos[step].valido;
   const avanzar = () => { if (puedeAvanzar && step < pasos.length - 1) setStep(step + 1); };
   const retroceder = () => { if (step > 0) setStep(step - 1); };
-
+  const { user } = useAuth();
   const handleSelectClient = (client: Client) => {
     setSelectedClient(client);
     setShowDropdown(false);
@@ -192,8 +193,7 @@ const WorkOrder = () => {
       }
     }
       
-
-      const failuresPayload = fallas
+    const failuresPayload = fallas
         .filter((f) => f.id_failure_type !== null)
         .map(({ id_failure_type, description }) => ({
           id_failure_type,
@@ -205,9 +205,8 @@ const WorkOrder = () => {
         id_equipment,
         observations: orderObservations || null,
         equipmentPhotoUrl: equipmentPhotoUrl || null,
-        estimatedDate: estimatedDeliveryDate
-          ? new Date(estimatedDeliveryDate).toISOString()
-          : null,
+        estimatedDate: estimatedDeliveryDate || null,
+        id_user: user?.id_user,
       };
 
       const requests: Promise<Response>[] = [];
@@ -349,8 +348,8 @@ const WorkOrder = () => {
                   </div>
                   <div className={styles.infoGrid}>
                     <div className={styles.infoRow}>
-                      <span className={styles.label}>DNI / CUIT</span>
-                      <span className={styles.value}>{selectedClient.dniCuit}</span>
+                      <span className={styles.label}>CUIT</span>
+                      <span className={styles.value}>{selectedClient.cuit}</span>
                     </div>
                     <div className={styles.infoRow}>
                       <span className={styles.label}>Email</span>
@@ -509,8 +508,8 @@ const WorkOrder = () => {
                           <span className={styles.value}>{selectedEquipment.client?.clientName || "---"}</span>
                         </div>
                         <div className={styles.infoRow}>
-                          <span className={styles.label}>DNI/CUIT: </span>
-                          <span className={styles.value}>{selectedEquipment.client?.dniCuit || "---"}</span>
+                          <span className={styles.label}>CUIT: </span>
+                          <span className={styles.value}>{selectedEquipment.client?.cuit || "---"}</span>
                         </div>
                         <div className={styles.infoRow}>
                           <span className={styles.label}>Email: </span>

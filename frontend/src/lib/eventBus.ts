@@ -46,4 +46,5 @@ export const EVENTS = {
   failureTypeChanged: 'failureType:changed',
   failureTypeDeleted: 'failureType:deleted',
   userChanged: 'user:changed',
+  statusChanged: 'status:changed',
 } as const;

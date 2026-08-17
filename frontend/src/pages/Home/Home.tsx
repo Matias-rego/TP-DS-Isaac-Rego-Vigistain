@@ -100,7 +100,7 @@ const Home = () => {
 
             {esTecnico ? (
               <div className={styles.primaryActions}>
-                <button type="button" className={styles.mainAction}>
+                <button type="button" className={styles.mainAction} onClick={() => navigate('/manageOrder')}>
                   <span className={styles.actionIcon}><ClipboardList size={22} /></span>
                   <span>
                     <strong>Ver órdenes</strong>
@@ -171,7 +171,7 @@ const Home = () => {
                 </div>
 
                 <div className={styles.quickPanelList}>
-                  <button type="button" className={styles.quickPanelItem}>
+                  <button type="button" className={styles.quickPanelItem} onClick={() => navigate('/manageOrder')}>
                     <span><ClipboardList size={18} /></span>
                     <strong>Consultar órdenes</strong>
                   </button>
