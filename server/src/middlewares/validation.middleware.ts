@@ -11,6 +11,7 @@ type ValidationSchemas = Partial<
 export function validate(schemas: ValidationSchemas) {
   return (req: Request, res: Response, next: NextFunction) => {
     const errors: Record<string, unknown> = {};
+    const validated: Record<string, unknown> = {};
 
     for (const [part, schema] of Object.entries(schemas)) {
       const result = schema.safeParse(req[part as ReqPart]);
@@ -20,7 +21,7 @@ export function validate(schemas: ValidationSchemas) {
         continue;
       }
 
-      req[part as ReqPart] = result.data;
+      validated[part] = result.data;
     }
 
     if (Object.keys(errors).length > 0) {
@@ -29,6 +30,8 @@ export function validate(schemas: ValidationSchemas) {
         errors,
       });
     }
+
+    req.validated = validated;
 
     next();
   };

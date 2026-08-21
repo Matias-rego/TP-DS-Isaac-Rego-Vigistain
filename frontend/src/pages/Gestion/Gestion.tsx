@@ -38,6 +38,16 @@ const COLUMNS_TF: ColumnConfig<FailureType>[] = [
   },
 ];
 
+export interface PaginatedResult<T> {
+    data: T[];
+    metadata: {
+        page: number;
+        limit: number,
+        total: number;
+        totalPages: number;
+    }
+}
+
 interface ClientType {
   id_category_client: number;
   categoryClientName: string;
@@ -68,9 +78,9 @@ const COLUMNS_PT: ColumnConfig<PaymentType>[] = [
 const Gestion = () => {
   const { isAuth, loading: authLoading } = useAuth();
 
-  const [dataTF, setDataTF] = useState<FailureType[]>([]);
-  const [dataTC, setDataTC] = useState<ClientType[]>([]);
-  const [dataPT, setDataPT] = useState<PaymentType[]>([]);
+  const [dataTF, setDataTF] = useState<PaginatedResult<FailureType>>();
+  const [dataTC, setDataTC] = useState<PaginatedResult<ClientType>>();
+  const [dataPT, setDataPT] = useState<PaginatedResult<PaymentType>>();
   // Qué está seleccionado para gestionar: null = pantalla de opciones
   const [seleccion, setSeleccion] = useState<string | null>(null);
 
@@ -202,7 +212,7 @@ const Gestion = () => {
                 titulo="Tipo de Falla"
                 descripcion="Administrá los tipos de falla que pueden ocurrir en los dispositivos. Agregá, editá o eliminá categorías para mantener tu sistema organizado."
                 childrenTable={
-                  <TableRtl data={dataTF} idField="id_failure_type" columns={COLUMNS_TF} caption="Tabla de Tipos de Fallas" showTotal={false} />
+                  <TableRtl data={dataTF?.data ?? []} idField="id_failure_type" columns={COLUMNS_TF} caption="Tabla de Tipos de Fallas" showTotal={false} />
                 }
                 childrenFuncionAlta={<AltaTipoFalla />}
                 childrenFuncionBaja={<BajaTipoFalla />}
@@ -215,7 +225,7 @@ const Gestion = () => {
                 titulo="Tipo de Cliente"
                 descripcion="Administrá los tipos de cliente que interactúan con tu negocio. Agregá, editá o eliminá categorías para segmentar tus servicios."
                 childrenTable={
-                  <TableRtl data={dataTC} idField="id_category_client" columns={COLUMNS_TC} caption="Tabla de Tipos de Cliente" showTotal={false} />
+                  <TableRtl data={dataTC?.data ?? []} idField="id_category_client" columns={COLUMNS_TC} caption="Tabla de Tipos de Cliente" showTotal={false} />
                 }
                 childrenFuncionAlta={<AltaTipoCliente />}
                 childrenFuncionBaja={<BajaTipoCliente />}
@@ -228,7 +238,7 @@ const Gestion = () => {
                 titulo="Tipo de Pago"
                 descripcion="Administrá los métodos de pago que tus clientes pueden utilizar. Agregá, editá o eliminá métodos para dar más flexibilidad."
                 childrenTable={
-                  <TableRtl data={dataPT} idField="id_payment_type" columns={COLUMNS_PT} caption="Tabla de Tipos de Pago" showTotal={false} />
+                  <TableRtl data={dataPT?.data ?? []} idField="id_payment_type" columns={COLUMNS_PT} caption="Tabla de Tipos de Pago" showTotal={false} />
                 }
                 childrenFuncionAlta={<RegisterPaymentType />}
                 childrenFuncionBaja={<DeletePaymentType />}

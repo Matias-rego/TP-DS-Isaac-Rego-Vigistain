@@ -1,30 +1,30 @@
-import { Router } from 'express';
-import { getUser, modifyUser, getAllUsers, createUser, deleteUser, getPartialUser } from "./user.controller.js";
-import { upload } from '../../middlewares/upload.middleware.js';
-import { validate } from '@/middlewares/validation.middleware.js';
+import { modifyUserSchema, userQuerySchema } from './user.schema.js';
+import { UserController } from "./user.controller.js";
+import { UserRepository } from "./user.repository.js";
+import { UserService } from "./user.service.js";
 import { idSchema } from '@/shared/common.schema.js';
-import { modifyUserSchema } from './user.schema.js';
+import { validate } from '@/middlewares/validation.middleware.js';
+import { Router } from 'express';
+import prisma from '@/database/prisma.js';
+
+const ctrl = new UserController(
+    new UserService(
+        new UserRepository(
+            prisma
+        )))
 
 const router = Router();
 
-router.get('/', getAllUsers)
+router.get('/', validate({query: userQuerySchema}),ctrl.getAllUsers)
 
-router.post('/', createUser);
+router.post('/', ctrl.createUser);
 
-router.get('/search', getPartialUser);
+router.get('/:id', validate({ params: idSchema }), ctrl.getOneUser);
 
-router.get('/:id', validate({ params: idSchema }), getUser);
+router.put('/:id', validate({ params: idSchema, body: modifyUserSchema }), ctrl.modifyUser);
 
-router.put('/:id', 
-    upload.single('foto'), 
-    validate({ params: idSchema, body: modifyUserSchema }), 
-    modifyUser);
+router.patch('/:id', validate({ params: idSchema, body: modifyUserSchema }), ctrl.modifyUser);
 
-router.patch('/:id', 
-    upload.single('foto'), 
-    validate({ params: idSchema, body: modifyUserSchema }),
-    modifyUser);
-
-router.delete('/:id',validate({ params: idSchema }), deleteUser);
+router.delete('/:id', validate({ params: idSchema }), ctrl.deleteUser);
 
 export default router;

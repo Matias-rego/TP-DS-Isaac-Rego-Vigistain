@@ -1,21 +1,28 @@
-import { Router } from "express";
-import { createTypePayment, deleteTypePayment, getAllPaymentTypes, getPartialTypesPayment, modifyTypePayment } from "./paymentType.controllers.js";
-import { createTypePaymentSchema, modifyTypePaymentSchema } from "./paymentType.schema.js";
+import { newPaymentTypeSchema, modifyTypePaymentSchema, typePaymentQuerySchema } from "./paymentType.schema.js";
+import { PaymentTypeController } from "./paymentType.controller.js";
+import { PaymentTypeRepository } from "./paymentType.repository.js";
+import { PaymentTypeService } from "./paymentType.service.js";
 import { validate } from "@/middlewares/validation.middleware.js";
 import { idSchema } from "@/shared/common.schema.js";
+import { Router } from "express";
+import prisma from "@/database/prisma.js";
 
-const route = Router();
+const ctrl = new PaymentTypeController(
+    new PaymentTypeService(
+        new PaymentTypeRepository(
+            prisma
+        )))
 
-route.get('/', getAllPaymentTypes);
+const router = Router();
 
-route.post('/', validate({ body: createTypePaymentSchema }), createTypePayment);
+router.post('/', validate({ body: newPaymentTypeSchema }), ctrl.newTypePayment);
 
-route.get('/:query', getPartialTypesPayment);
+router.get('/', validate({ query: typePaymentQuerySchema }), ctrl.getAllPaymentTypes);
 
-route.delete('/:id', validate({ params: idSchema }), deleteTypePayment);
+router.get('/:id', validate({ params: idSchema }), ctrl.getOneTypePayment);
 
-route.put('/:id', 
-    validate({ params: idSchema, body: modifyTypePaymentSchema }),
-     modifyTypePayment);
+router.delete('/:id', validate({ params: idSchema }), ctrl.deleteTypePayment);
 
-export default route;
+router.put('/:id', validate({ params: idSchema, body: modifyTypePaymentSchema }), ctrl.modifyTypePayment);
+
+export default router;

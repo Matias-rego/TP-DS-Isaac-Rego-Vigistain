@@ -1,5 +1,6 @@
+import { id, observations, url, date, enumSchema } from "@/utils/fields.js";
+import { QuerySchema } from "@/shared/common.schema.js";
 import { z } from "zod";
-import { id, observations, url, date } from "@/utils/fields.js";
 
 export const registerOrderSchema = z.object({
     id_equipment: id,
@@ -9,3 +10,16 @@ export const registerOrderSchema = z.object({
 }).strict();
 
 export type RegisterOrderDto = z.infer<typeof registerOrderSchema>;
+
+export const orderQuerySchema = QuerySchema.extend({
+    sortBy: enumSchema([
+        "dateOfEntry",
+        "estimatedDate",
+        "deliveryDate",
+        "totalCharged",
+        "observations",
+        "id_equipment",
+    ], "sortBy").default("dateOfEntry"),
+});
+
+export type OrderQueryDto = z.infer<typeof orderQuerySchema>

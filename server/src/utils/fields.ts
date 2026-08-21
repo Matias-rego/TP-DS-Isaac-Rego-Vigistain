@@ -1,6 +1,43 @@
 import { z } from "zod";
 import { $Enums } from "@/database/prisma.js";
 
+type EnumLike = { [k: string]: string | number };
+
+export function enumSchema<const T extends readonly [string, ...string[]]>(
+  values: T,
+  label: string
+): z.ZodEnum<{ [K in T[number]]: K }>;
+
+export function enumSchema<T extends EnumLike>(
+  values: T,
+  label: string
+): z.ZodEnum<T>;
+
+export function enumSchema( values: readonly string[] | EnumLike,label: string): z.ZodType<string> {
+  const options = Array.isArray(values) ? values : Object.values(values);
+
+  return z.enum(values as [string, ...string[]], {
+    error: `${label} must be one of: ${options.join(", ")}`,
+  });
+}
+
+
+export const paymentMethod = enumSchema($Enums.EnumPaymentMethod, "Payment method");
+
+export const typeOfPayment = enumSchema($Enums.EnumPaymentType, "Type of payment");
+
+export const tipo_equipment = enumSchema($Enums.EnumEquipmentType, "Equipment type");
+
+export const EnumRol = enumSchema($Enums.EnumRol, "Role");
+
+export const EnumOrderStatus = enumSchema($Enums.EnumOrderStatus, "Order status");
+
+export const EnumBudgetStatus = enumSchema($Enums.EnumBudgetStatus, "Budget status");
+
+export const EnumFailureStatus = enumSchema($Enums.EnumFailureStatus, "Failure status");
+
+export const sortOrder = enumSchema(["asc", "desc"], "sortOrder" );
+
 export const username = z
     .string({
         error: (issue) => {
@@ -78,33 +115,84 @@ export const phone = z.e164({
     },
 });
 
-export const cant = z
+export const cant_s = (name: string) => z
     .number({
         error: (issue) => {
-            if (issue.code === "invalid_type") return "Cant must be a number";
-            return "Cant is required";
+            if (issue.code === "invalid_type") {
+                return `${name} must be a number`;
+            }
+
+            return `${name} is required`;
         },
     })
     .int({
-        error: "Cant must be an integer",
+        error: `${name} must be an integer`,
     })
     .nonnegative({
-        error: "Cant must be zero or greater",
+        error: `${name} must be zero or greater`,
     });
 
-export const id = z.coerce
+export const cant_n = (name: string) => z.coerce
     .number({
         error: (issue) => {
-            if (issue.code === "invalid_type") return "Id must be a number";
+            if (issue.code === "invalid_type") {
+                return `${name} must be a number`;
+            }
+
+            return `${name} is required`;
+        },
+    })
+    .int({
+        error: `${name} must be an integer`,
+    })
+    .nonnegative({
+        error: `${name} must be zero or greater`,
+    });
+
+export const page = z.coerce
+    .number({
+        error: (issue) => {
+            if (issue.code === "invalid_type") {
+                return "Page must be a number";
+            }
+
+            return "Page is required";
+        },
+    })
+    .int({
+        error: "Page must be an integer",
+    })
+    .positive({
+        error: "Page must be greater than 0",
+    });
+
+export const limit = z.coerce
+    .number({
+        error: (issue) => {
+            if (issue.code === "invalid_type") {
+                return "Limit must be a number";
+            }
+
+            return "Limit is required";
+        },
+    })
+    .int({
+        error: "Limit must be an integer",
+    })
+    .positive({
+        error: "Limit must be greater than 0",
+    })
+    .max(1000, "Limit cannot be greater than 100");
+
+export const id = z
+    .uuidv7({
+        error: (issue) => {
+            if (issue.code === "invalid_type") return "Id must be a string";
+            if (issue.code === "invalid_format") return "Id must be a valid UUID v7";
             return "Id is required";
         },
     })
-    .int({
-        error: "Id must be an integer",
-    })
-    .positive({
-        error: "Id must be greater than 0",
-    });
+
 
 export const percentaje = z
     .number({
@@ -116,33 +204,6 @@ export const percentaje = z
     .min(0, "Percentage must be at least 0")
     .max(100, "Percentage cannot be greater than 100");
 
-export const paymentMethod = z.enum($Enums.EnumPaymentMethod, {
-    error: `Payment method must be one of: ${Object.values($Enums.EnumPaymentMethod).join(", ")}`,
-});
-
-export const typeOfPayment = z.enum($Enums.EnumPaymentType, {
-    error: `Type of payment must be one of: ${Object.values($Enums.EnumPaymentType).join(", ")}`,
-});
-
-export const tipo_equipment = z.enum($Enums.EnumEquipmentType, {
-    error: `Equipment type must be one of: ${Object.values($Enums.EnumEquipmentType).join(", ")}`,
-});
-
-export const EnumRol = z.enum($Enums.EnumRol, {
-    error: `Role must be one of: ${Object.values($Enums.EnumRol).join(", ")}`,
-});
-
-export const EnumOrderStatus = z.enum($Enums.EnumOrderStatus, {
-    error: `Order status must be one of: ${Object.values($Enums.EnumOrderStatus).join(", ")}`,
-});
-
-export const EnumBudgetStatus = z.enum($Enums.EnumBudgetStatus, {
-    error: `Budget status must be one of: ${Object.values($Enums.EnumBudgetStatus).join(", ")}`,
-});
-
-export const EnumFailureStatus = z.enum($Enums.EnumFailureStatus, {
-    error: `Failure status must be one of: ${Object.values($Enums.EnumFailureStatus).join(", ")}`,
-});
 
 export const brand = z
     .string({
@@ -221,3 +282,17 @@ export const isActive = z.boolean({
         return "Is active is required";
     },
 });
+
+export const search = z
+    .string({
+        error: (issue) => {
+            if (issue.code === "invalid_type") {
+                return "Search must be a string";
+            }
+
+            return "Search is required";
+        },
+    })
+    .trim()
+    .min(1, "Search cannot be empty")
+    .max(100, "Search cannot be longer than 100 characters");

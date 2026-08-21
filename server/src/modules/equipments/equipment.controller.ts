@@ -1,66 +1,40 @@
-import type { Request, Response } from 'express';
-import prisma from '@/database/prisma.js';
-import type { RegisterEquipmentDto } from './equipment.schema.js';
+import type { NextFunction, Request, Response } from 'express';
+import type { RegisterEquipmentDto, EquipmentQueryDto } from './equipment.schema.js';
+import type { IdDto } from "@/shared/common.schema.js";
+import type { EquipmentService } from './equipment.service.js';
 
+export class EquipmentController {
+  constructor(private service: EquipmentService) { }
 
-export const uploadPhotoCloud = async (req: Request, res: Response) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ message: 'No se recibió ninguna imagen.' });
+  public registerEquipment = async (req: Request, res: Response, next: NextFunction) => {
+    const data = req.validated.body as RegisterEquipmentDto;
+
+    try {
+      const newEquipment = await this.service.create(data);
+      return res.status(201).json(newEquipment)
+
+    } catch (error) {
+      next(error)
     }
-    return res.status(200).json({
-      url: req.file.path
-    });
-  } catch (error) {
-    console.error('Error en el endpoint de subida:', error);
-    return res.status(500).json({ message: 'Error interno del servidor al procesar la foto.' });
   }
-};
 
-export const registerEquipment = async (req: Request, res: Response) => {
-  try {
-    const { tipo_equipment, brand, model, observations, id_client }: RegisterEquipmentDto = req.body;
-    const result = await prisma.equipment.create({
-      data: {
-        tipo_equipment,
-        brand,
-        model,
-        observations,
-        id_client
-      }
-    });
-    return res.status(201).json(result)
-  } catch (error) {
-    console.error("Error: ", error);
-    return res.status(500).json({
-      message: "Error al registrar el Equipo",
-    });
-  }
-}
+  public getOneEquipment = async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.validated.params as IdDto;
 
-export const getPartialEquipment = async (req: Request, res: Response) => {
-  try {
-    const { q } = req.query;
-    if (!q || typeof q !== 'string' || q.trim() === '') {
-      return res.status(200).json([]);
+    try {
+      res.json(await this.service.findById(id));
+    } catch (error) {
+      next(error)
     }
-    const searchTerm = q.trim();
-    const equipments = await prisma.equipment.findMany({
-      where: {
-        OR: [
-          { brand: { contains: searchTerm } },
-          { model: { contains: searchTerm } },
-          { tipo_equipment: { contains: searchTerm } },
-        ],
-      },
-      include: {
-        client: true,
-      }
-    });
+  };
 
-    return res.status(200).json(equipments);
-  } catch (e) {
-    console.error("Error en la busqueda parcial de equipos server: ", e);
-    return res.status(500).json({ error: "Error en el getPartialEquipment" });
-  }
+  public getAllEquipment = async (req: Request, res: Response, next: NextFunction) => {
+    const query = req.validated.query as EquipmentQueryDto;
+
+    try {
+      res.json(await this.service.findAll(query));
+    } catch (error) {
+      next(error)
+    }
+  };
 };

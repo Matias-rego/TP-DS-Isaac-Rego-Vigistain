@@ -16,12 +16,12 @@ router.get('/status', (_req: express.Request, res: express.Response) =>
     res.send('ok'));
 router.use('/auth', authRoutes);
 router.use('/users', authenticate([]), userRoutes);
-router.use('/clients', authenticate([]), clientRoutes);
-router.use('/failures', authenticate([]), failureRoutes);
+//router.use('/clients', authenticate([]), clientRoutes);
+//router.use('/failures', authenticate([]), failureRoutes);
 router.use('/client-types', authenticate([]), clientTypeRoutes);
 router.use('/failure-types', authenticate([]), failureTypeRoutes);
 router.use('/payment-types', authenticate([]), paymentTypeRoutes);
 router.use('/equipments', authenticate([]), equipmentRoutes);
-router.use('/orders', authenticate([]), orderRouter);
+//router.use('/orders', authenticate([]), orderRouter);
 
 export default router;

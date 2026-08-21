@@ -10,7 +10,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url=  env("DATABASE_URL") 
+  url      = env("DATABASE_URL")
 }
 
 enum EnumRol {
@@ -49,6 +49,7 @@ enum EnumPaymentMethod {
   EFECTIVO
   CREDITO
 }
+
 enum EnumPaymentType {
   Descuento
   Recargo
@@ -59,144 +60,144 @@ enum EnumFailureStatus {
   diagnosticada
 }
 
-
-
-
 model User {
-  id_user        Int           @id @default(autoincrement())
-  userName       String        @unique
-  email          String        @unique
-  password_hash  String
-  rol            EnumRol
-  status         Boolean       @default(false)
-  validationStatus Boolean       @default(false)
-  urlPicture     String        @default("https://res.cloudinary.com/dcgvogduy/image/upload/v1778239413/taller-mecanico/j4fv1vtqqrhskyw0owms.png")  
-  orders         Order[]
-  statusHistory  Status_History[]
-  
+  id_user                 String                @id @db.Char(36)
+  userName                String                @unique
+  email                   String                @unique
+  password_hash           String
+  rol                     EnumRol
+  status                  Boolean               @default(false)
+  validationStatus        Boolean               @default(false)
+  urlPicture              String                @default("https://res.cloudinary.com/dcgvogduy/image/upload/v1778239413/taller-mecanico/j4fv1vtqqrhskyw0owms.png")
+  orders                  Order[]
+  statusHistory           Status_History[]
 
   @@map("User")
 }
 
 model Client {
-  id_client           Int             @id @default(autoincrement())
-  clientName          String          @unique
-  clientEmail         String          @unique
-  clientPhone         String
-  cuit                String          @unique
-  dateOfRegistration  DateTime        @default(now())
-  status              Boolean         @default(true)
-  category_client     Category_Client @relation(fields: [id_category_client], references: [id_category_client])
-  id_category_client  Int
-  equipments          Equipment[]
+  id_client               String                @id @db.Char(36)
+  clientName              String
+  clientEmail             String                @unique
+  clientPhone             String
+  cuit                    String                @unique
+  dateOfRegistration      DateTime              @default(now())
+  status                  Boolean               @default(true)
+  client_type             Client_Type           @relation(fields: [id_client_type], references: [id_client_type])
+  id_client_type          String                @db.Char(36)
+  equipments              Equipment[]
 
   @@map("Client")
 }
 
-model Category_Client {
-  id_category_client    Int     @id @default(autoincrement())
-  categoryClientName    String  @unique
-  amountForCategoryUp   Int
-  clients               Client[]
+model Client_Type {
+  id_client_type          String                @id @db.Char(36)
+  clientTypeName          String                @unique
+  amountForCategoryUp     Int
+  clients                 Client[]
 
-  @@map("Category_Client")
+  @@map("Client_Type")
 }
 
 model Failure_Type {
-  id_failure_type    Int     @id @default(autoincrement())
-  failureDescription String  @unique
-  estimatedImport    Float
-  failures           Failure[]
+  id_failure_type         String                @id @db.Char(36)
+  failureDescription      String                @unique
+  estimatedImport         Decimal               @db.Decimal(12, 2)
+  failures                Failure[]
 
   @@map("Failure_Type")
 }
 
 model Failure {
-  id_failure      Int          @id @default(autoincrement())
-  failureType     Failure_Type @relation(fields: [id_failure_type], references: [id_failure_type])
-  id_failure_type Int
-  equipment       Equipment    @relation(fields: [id_equipment], references: [id_equipment])
-  id_equipment    Int
-  description     String
-  dateOfFailure   DateTime     @default(now())
-  status          EnumFailureStatus @default(diagnosticada)
+  id_failure              String                @id @db.Char(36)
+  failureType             Failure_Type          @relation(fields: [id_failure_type], references: [id_failure_type])
+  id_failure_type         String                @db.Char(36)
+  equipment               Equipment             @relation(fields: [id_equipment], references: [id_equipment])
+  id_equipment            String                @db.Char(36)
+  description             String
+  dateOfFailure           DateTime              @default(now())
+  status                  EnumFailureStatus     @default(diagnosticada)
 
   @@map("Failure")
 }
 
 model Equipment {
-  id_equipment    Int               @id @default(autoincrement())
-  tipo_equipment  String
-  brand           String
-  model           String
-  observations    String?
-  client          Client            @relation(fields: [id_client], references: [id_client])
-  id_client       Int
-  failures        Failure[]
-  orders          Order[]
+  id_equipment            String                @id @db.Char(36)
+  tipo_equipment          EnumEquipmentType
+  brand                   String
+  model                   String
+  observations            String?
+  client                  Client                @relation(fields: [id_client], references: [id_client])
+  id_client               String                @db.Char(36)
+  failures                Failure[]
+  orders                  Order[]
 
   @@map("Equipment")
 }
+
 model Order {
-  id_order           Int             @id @default(autoincrement())
-  equipment          Equipment       @relation(fields: [id_equipment], references: [id_equipment])
-  id_equipment       Int
-  user               User?           @relation(fields: [id_user], references: [id_user])
-  id_user            Int?
-  status             EnumOrderStatus @default(recibido)
-  observations       String?
-  equipmentPhotoUrl  String?
-  dateOfEntry        DateTime        @default(now())
-  estimatedDate      DateTime?
-  deliveryDate       DateTime?
-  totalCharged       Float?
-  statusHistory      Status_History[]
-  budget             Budget?
+  id_order                String                @id @db.Char(36)
+  equipment               Equipment             @relation(fields: [id_equipment], references: [id_equipment])
+  id_equipment            String                @db.Char(36)
+  user                    User?                 @relation(fields: [id_user], references: [id_user])
+  id_user                 String?               @db.Char(36)
+  status                  EnumOrderStatus       @default(recibido)
+  observations            String?
+  equipmentPhotoUrl       String?
+  dateOfEntry             DateTime              @default(now())
+  estimatedDate           DateTime?
+  deliveryDate            DateTime?
+  totalCharged            Decimal?              @db.Decimal(12, 2)
+  statusHistory           Status_History[]
+  budget                  Budget?
 
   @@map("Order")
 }
+
 model Status_History {
-  id_status_history Int      @id @default(autoincrement())
-  order             Order    @relation(fields: [id_order], references: [id_order])
-  id_order          Int
-  previousStatus    String
-  newStatus         String
-  user              User     @relation(fields: [id_user], references: [id_user])
-  id_user           Int
-  dateOfChange      DateTime @default(now())
-  comment           String?
+  id_status_history       String                @id @db.Char(36)
+  order                   Order                 @relation(fields: [id_order], references: [id_order])
+  id_order                String                @db.Char(36)
+  previousStatus          String
+  newStatus               String
+  user                    User                  @relation(fields: [id_user], references: [id_user])
+  id_user                 String                @db.Char(36)
+  dateOfChange            DateTime              @default(now())
+  comment                 String?
 
   @@map("Status_History")
 }
+
 model Budget {
-  id_budget       Int              @id @default(autoincrement())
-  order           Order            @relation(fields: [id_order], references: [id_order])
-  id_order        Int              @unique
-  laborCost       Float
-  discount        Float            @default(0)
-  estimatedTotal  Float
-  status          EnumBudgetStatus @default(pendiente)
-  payments        Payment[]
+  id_budget               String                @id @db.Char(36)
+  order                   Order                 @relation(fields: [id_order], references: [id_order])
+  id_order                String                @unique @db.Char(36)
+  laborCost               Decimal               @db.Decimal(12, 2)
+  discount                Decimal               @db.Decimal(12, 2) @default(0)
+  estimatedTotal          Decimal               @db.Decimal(12, 2)
+  status                  EnumBudgetStatus      @default(pendiente)
+  payments                Payment[]
 
   @@map("Budget")
 }
+
 model Payment_Type {
-  id_payment_type  Int               @id @default(autoincrement())
-  paymentTypeName String            @unique
-  paymentMethod   EnumPaymentMethod 
-  type_of_payment EnumPaymentType  
-  percentaje     Float             @default(0)
-  payments        Payment[]
+  id_payment_type         String                @id @db.Char(36)
+  paymentTypeName         String                @unique
+  paymentMethod           EnumPaymentMethod
+  type_of_payment         EnumPaymentType
+  percentage              Decimal               @db.Decimal(5, 2) @default(0)
+  payments                Payment[]
 
   @@map("Payment_Type")
 }
 
 model Payment {
-  id_payment       Int          @id @default(autoincrement())
-  paymentType      Payment_Type @relation(fields: [id_payment_type], references: [id_payment_type])
-  id_payment_type  Int
-  budget           Budget       @relation(fields: [id_budget], references: [id_budget])
-  id_budget        Int
-  dateOfPayment    DateTime     @default(now())
-  amount           Float
+  id_payment              String                @id @db.Char(36)
+  paymentType             Payment_Type          @relation(fields: [id_payment_type], references: [id_payment_type])
+  id_payment_type         String                @db.Char(36)
+  budget                  Budget                @relation(fields: [id_budget], references: [id_budget])
+  id_budget               String                @db.Char(36)
+  dateOfPayment           DateTime              @default(now())
+  amount                  Decimal               @db.Decimal(12, 2)
 }
