@@ -160,3 +160,35 @@ export const updateOrderCurrentStatus = async (id_order:number, status: EnumOrde
       data: { currentStatus: status },
     });
 };
+
+export const getOrderStats = async (_req: Request, res: Response) => {
+  try {
+    const ahora = new Date();
+    const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+    const inicioMesSiguiente = new Date(ahora.getFullYear(), ahora.getMonth() + 1, 1);
+
+    const [activas, pendientesPresupuesto, enReparacion, entregadasMes] = await Promise.all([
+      prisma.order.count({
+        where: { currentStatus: { notIn: [EnumOrderStatus.entregado, EnumOrderStatus.cancelado] } },
+      }),
+      prisma.order.count({
+        where: { currentStatus: { in: [EnumOrderStatus.recibido, EnumOrderStatus.diagnostico] } },
+      }),
+      prisma.order.count({
+        where: { currentStatus: EnumOrderStatus.reparacion },
+      }),
+      prisma.order.count({
+        where: {
+          currentStatus: EnumOrderStatus.entregado,
+          deliveryDate: { gte: inicioMes, lt: inicioMesSiguiente },
+        },
+      }),
+    ]);
+
+    return res.status(200).json({ activas, pendientesPresupuesto, enReparacion, entregadasMes });
+  } catch (e) {
+    console.error("Error en getOrderStats:", e);
+    return res.status(500).json({ message: "Error al obtener las estadísticas de órdenes" });
+  }
+};
+

@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const [usuario, setUsuario] = useState<User | null>(null);
+  const [stats, setStats] = useState({ activas: 0, pendientesPresupuesto: 0, enReparacion: 0, entregadasMes: 0 });
   //const [mostrarToast, setMostrarToast] = useState<boolean>(true);
   const navigate = useNavigate();
   const [mostrarToast, setMostrarToast] = useState<boolean>(() => {
@@ -34,6 +35,20 @@ const Home = () => {
     };
 
     cargarUsuario();
+  }, []);
+
+  useEffect(() => {
+    const cargarStats = async () => {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/orders/stats`, { credentials: 'include' });
+        if (!response.ok) return;
+        const data = await response.json();
+        setStats(data);
+      } catch (error) {
+        console.error("Error al cargar estadísticas:", error);
+      }
+    };
+    cargarStats();
   }, []);
 
   useEffect(() => {
@@ -194,25 +209,25 @@ const Home = () => {
           <section className={styles.quickGrid}>
             <div className={styles.quickCard}>
               <FileText className={styles.quickIcon} size={20} />
-              <span className={styles.quickNumber}>24</span>
+              <span className={styles.quickNumber}>{stats.activas}</span>
               <span className={styles.quickLabel}>Órdenes activas</span>
             </div>
 
             <div className={styles.quickCard}>
               <Clock className={styles.quickIcon} size={20} />
-              <span className={styles.quickNumber}>7</span>
+              <span className={styles.quickNumber}>{stats.pendientesPresupuesto}</span>
               <span className={styles.quickLabel}>Pendientes de presupuesto</span>
             </div>
 
             <div className={styles.quickCard}>
               <Wrench className={styles.quickIcon} size={20} />
-              <span className={styles.quickNumber}>15</span>
+              <span className={styles.quickNumber}>{stats.enReparacion}</span>
               <span className={styles.quickLabel}>En reparación</span>
             </div>
 
             <div className={styles.quickCard}>
               <CircleCheck className={styles.quickIcon} size={20} />
-              <span className={styles.quickNumber}>32</span>
+              <span className={styles.quickNumber}>{stats.entregadasMes}</span>
               <span className={styles.quickLabel}>Entregadas este mes</span>
             </div>
           </section>
