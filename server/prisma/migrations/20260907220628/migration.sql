@@ -33,10 +33,10 @@ CREATE TABLE `Client` (
 -- CreateTable
 CREATE TABLE `Client_Type` (
     `id_client_type` CHAR(36) NOT NULL,
-    `categoryClientName` VARCHAR(191) NOT NULL,
+    `clientTypeName` VARCHAR(191) NOT NULL,
     `amountForCategoryUp` INTEGER NOT NULL,
 
-    UNIQUE INDEX `Client_Type_categoryClientName_key`(`categoryClientName`),
+    UNIQUE INDEX `Client_Type_clientTypeName_key`(`clientTypeName`),
     PRIMARY KEY (`id_client_type`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

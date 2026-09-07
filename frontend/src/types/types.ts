@@ -127,3 +127,13 @@ export interface Payment {
   amount:          number;
   paymentType?:    Payment_Type;
 }
+
+export interface PaginatedResponse<T> {
+    data: T[];
+    metadata: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
+};

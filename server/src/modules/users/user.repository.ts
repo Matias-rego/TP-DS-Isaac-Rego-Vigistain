@@ -110,7 +110,27 @@ export class UserRepository extends BaseRepository<User, UserQueryDto> {
             id: user.id_user,
         };
     }
+    public async findByUsername(userName: string): Promise<User | undefined> {
+        const user = await this.prisma.user.findFirst({
+            where: { userName },
+        });
+        return user ? this.toDomain(user) : undefined;
+    }
 
+    public async findByEmail(email: string): Promise<User | undefined> {
+        const user = await this.prisma.user.findUnique({
+            where: { email },
+        });
+        return user ? this.toDomain(user) : undefined;
+    }
+
+    public async updatePassword(id_user: string, password_hash: string): Promise<User | undefined> {
+        const user = await this.prisma.user.update({
+            where: { id_user },
+            data: { password_hash },
+        });
+        return this.toDomain(user);
+    }
     private toDomain(user: User_P): User {
         return new User(
             user.userName,
