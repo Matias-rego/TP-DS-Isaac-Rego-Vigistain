@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import Nav from "@/pages/Nav/Nav";
 import styles from "./Home.module.css";
-import type { User } from "@/types/types";
+import type { User, Order } from "@/types/types";
 import Footer from "@/components/Footer/Footer";
+import OrderMiniCard from "@/components/OrderComponent/OrderMiniCard/OrderMiniCard";
 import { BACKEND_URL } from '@/lib/config';
 import { ClipboardList, Plus, Wallet, Zap, Search, Check, FileText, Clock, Wrench, CircleCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 const Home = () => {
   const [usuario, setUsuario] = useState<User | null>(null);
   const [stats, setStats] = useState({ activas: 0, pendientesPresupuesto: 0, enReparacion: 0, entregadasMes: 0 });
+  const [ordenes, setOrdenes] = useState<Order[]>([]);
   //const [mostrarToast, setMostrarToast] = useState<boolean>(true);
   const navigate = useNavigate();
   const [mostrarToast, setMostrarToast] = useState<boolean>(() => {
@@ -52,6 +54,20 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
+    const cargarOrdenes = async () => {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/orders`, { credentials: 'include' });
+        if (!response.ok) return;
+        const data: Order[] = await response.json();
+        setOrdenes(data);
+      } catch (error) {
+        console.error("Error al cargar órdenes:", error);
+      }
+    };
+    cargarOrdenes();
+  }, []);
+
+  useEffect(() => {
     if (!mostrarToast) return;
 
     sessionStorage.removeItem('showLoginToast');
@@ -72,6 +88,7 @@ const Home = () => {
   }, [mostrarToast]);
 
   const esTecnico = usuario?.rol === "tecnico" || usuario?.rol === "admin";
+  const ultimasOrdenes = [...ordenes].sort((a, b) => b.id_order - a.id_order).slice(0, 6);
 
   /*
     TODO CLIENTE:
@@ -229,6 +246,22 @@ const Home = () => {
               <CircleCheck className={styles.quickIcon} size={20} />
               <span className={styles.quickNumber}>{stats.entregadasMes}</span>
               <span className={styles.quickLabel}>Entregadas este mes</span>
+            </div>
+          </section>
+        )}
+
+        {esTecnico && ultimasOrdenes.length > 0 && (
+          <section className={styles.ordenesSection}>
+            <div className={styles.ordenesHeader}>
+              <h2 className={styles.ordenesTitle}>Últimas órdenes</h2>
+              <button type="button" className={styles.ordenesVerTodas} onClick={() => navigate('/manageOrder')}>
+                Ver todas
+              </button>
+            </div>
+            <div className={styles.ordenesGrid}>
+              {ultimasOrdenes.map((orden) => (
+                <OrderMiniCard key={orden.id_order} order={orden} onClick={() => navigate('/manageOrder')} />
+              ))}
             </div>
           </section>
         )}
