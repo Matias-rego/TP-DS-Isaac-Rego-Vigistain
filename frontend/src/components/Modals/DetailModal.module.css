@@ -9,19 +9,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(15, 23, 42, 0.4); /* slate-900/40 */
+  background-color: rgba(15, 23, 42, 0.4);
   padding: 1rem;
 }
 
 .modal {
   width: 100%;
   border-radius: 1.5rem; /* rounded-3xl */
-  background-color: #ffffff;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); /* shadow-xl */
+  background-color: var(--tf-card);
+  box-shadow: var(--shadow-medium, 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04));
   overflow: hidden;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
+  transition: background-color 0.35s ease, border-color 0.35s ease;
 }
 
 .maxW-lg {
@@ -41,7 +42,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 1.25rem 1.5rem; /* px-6 py-5 */
-  border-bottom: 1px solid #f1f5f9; /* border-slate-100 */
+  border-bottom: 1px solid var(--tf-border);
 }
 
 .headerLeft {
@@ -51,31 +52,31 @@
 }
 
 .headerIcon {
-  color: #172554; /* text-blue-950 */
+  color: var(--tf-primary);
 }
 
 .title {
   font-size: 1.25rem; /* text-xl */
   font-weight: 700;
-  color: #172554; /* text-blue-950 */
+  color: var(--tf-text);
   line-height: 1.25;
 }
 
 .subtitle {
   font-size: 0.875rem; /* text-sm */
-  color: #94a3b8; /* text-slate-400 */
+  color: var(--tf-muted);
 }
 
 .closeButton {
-  color: #94a3b8; /* text-slate-400 */
+  color: var(--tf-muted);
   background: none;
   border: none;
   cursor: pointer;
-  transition: color 0.2s;
+  transition: color 0.2s ease;
 }
 
 .closeButton:hover {
-  color: #475569; /* hover:text-slate-600 */
+  color: var(--tf-text);
 }
 
 /* ============================================================================
@@ -87,7 +88,6 @@
   overflow-y: auto;
 }
 
-/* Usamos un contenedor con margen en vez de space-y-6 para modularidad */
 .bodySection {
   margin-bottom: 1.5rem;
 }
@@ -119,19 +119,19 @@
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.05em;
-  color: #94a3b8; /* text-slate-400 */
+  color: var(--tf-muted);
   text-transform: uppercase;
   margin-bottom: 0.25rem;
 }
 
 .fieldValue {
-  color: #334155; /* text-slate-800 */
+  color: var(--tf-text);
   font-size: 15px;
   line-height: 1.375; /* leading-snug */
 }
 
 .fieldEmpty {
-  color: #cbd5e1; /* text-slate-300 */
+  color: color-mix(in srgb, var(--tf-muted) 55%, transparent);
 }
 
 /* ============================================================================
@@ -141,13 +141,13 @@
 .listTitle {
   font-size: 15px;
   font-weight: 700;
-  color: #172554; /* text-blue-950 */
+  color: var(--tf-text);
   margin-bottom: 0.75rem;
 }
 
 .divider {
   height: 1px;
-  background-color: #f1f5f9; /* bg-slate-100 */
+  background-color: var(--tf-border);
   margin-bottom: 1rem;
 }
 
@@ -159,7 +159,7 @@
 
 .emptyLabel {
   font-size: 0.875rem; /* text-sm */
-  color: #94a3b8; /* text-slate-400 */
+  color: var(--tf-muted);
 }
 
 /* Fila de Item */
@@ -168,22 +168,23 @@
   align-items: center;
   gap: 0.75rem;
   border-radius: 1rem; /* rounded-2xl */
-  background-color: rgba(239, 246, 255, 0.7); /* bg-blue-50/70 */
+  background-color: color-mix(in srgb, var(--tf-primary) 8%, var(--tf-card));
   padding: 0.75rem 1rem; /* px-4 py-3 */
+  transition: background-color 0.2s ease;
 }
 
 .itemRowClickable {
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s ease;
 }
 
 .itemRowClickable:hover {
-  background-color: rgba(219, 234, 254, 0.8); /* hover:bg-blue-100/80 */
+  background-color: color-mix(in srgb, var(--tf-primary) 16%, var(--tf-card));
 }
 
 .itemRowClickable:focus {
   outline: none;
-  box-shadow: 0 0 0 2px #93c5fd; /* focus:ring-2 focus:ring-blue-300 */
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--tf-primary) 45%, transparent);
 }
 
 .itemIconWrapper {
@@ -194,19 +195,19 @@
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  background-color: #e2e8f0; /* bg-slate-200 */
-  color: #64748b; /* text-slate-500 */
+  background-color: var(--tf-border);
+  color: var(--tf-muted);
 }
 
 .itemContent {
   min-width: 0;
-  flex-1: 1 1 0%;
+  flex: 1 1 0%;
 }
 
 .itemPrimary {
   font-size: 14px;
   font-weight: 500;
-  color: #334155; /* text-slate-800 */
+  color: var(--tf-text);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; /* truncate */
@@ -214,14 +215,14 @@
 
 .itemSecondary {
   font-size: 12px;
-  color: #94a3b8; /* text-slate-400 */
+  color: var(--tf-muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; /* truncate */
 }
 
 .chevron {
-  color: #cbd5e1; /* text-slate-300 */
+  color: color-mix(in srgb, var(--tf-muted) 55%, transparent);
   flex-shrink: 0;
 }
 
@@ -235,22 +236,22 @@
   justify-content: flex-end;
   gap: 1rem;
   padding: 1rem 1.5rem; /* px-6 py-4 */
-  border-top: 1px solid #f1f5f9; /* border-t */
-  background-color: rgba(248, 250, 252, 0.5); /* bg-slate-50/50 */
+  border-top: 1px solid var(--tf-border);
+  background-color: color-mix(in srgb, var(--tf-bg) 50%, transparent);
 }
 
 .cancelButton {
-  color: #64748b; /* text-slate-500 */
+  color: var(--tf-muted);
   background: none;
   border: none;
   font-weight: 500;
   font-size: 0.875rem; /* text-sm */
   cursor: pointer;
-  transition: color 0.2s;
+  transition: color 0.2s ease;
 }
 
 .cancelButton:hover {
-  color: #334155; /* hover:text-slate-700 */
+  color: var(--tf-text);
 }
 
 .actionButton {
@@ -263,36 +264,36 @@
   padding: 0.625rem 1.25rem; /* px-5 py-2.5 */
   border: none;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s ease;
 }
 
 /* Variantes de Botones */
 .actionPrimary {
-  background-color: #172554; /* bg-blue-950 */
+  background-color: var(--tf-primary);
   color: #ffffff;
 }
 .actionPrimary:hover {
-  background-color: #1e3a8a; /* hover:bg-blue-900 */
+  background-color: color-mix(in srgb, var(--tf-primary) 85%, black);
 }
 
 .actionSecondary {
-  background-color: #f1f5f9; /* bg-slate-100 */
-  color: #334155; /* text-slate-700 */
+  background-color: var(--tf-bg);
+  color: var(--tf-text);
 }
 .actionSecondary:hover {
-  background-color: #e2e8f0; /* hover:bg-slate-200 */
+  background-color: var(--tf-border);
 }
 
 .actionDanger {
-  background-color: #dc2626; /* bg-red-600 */
+  background-color: var(--tf-danger);
   color: #ffffff;
 }
 .actionDanger:hover {
-  background-color: #b91c1c; /* hover:bg-red-700 */
+  background-color: color-mix(in srgb, var(--tf-danger) 85%, black);
 }
 
 /* ============================================================================
-   BADGE (Se mantiene nativo con estilos inline como lo tenías)
+   BADGE
    ============================================================================ */
 .badgeBase {
   display: inline-flex;
