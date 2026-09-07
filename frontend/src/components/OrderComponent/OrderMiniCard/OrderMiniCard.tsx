@@ -1,14 +1,5 @@
-import { type Order } from "@/types/types";
+import { type Order, type Status_History, type EnumOrderStatus } from "@/types/types";
 import styles from './OrderMiniCard.module.css';
-export type EnumOrderStatus =
-  | 'recibido'
-  | 'diagnostico'
-  | 'presupuestado'
-  | 'aprobado'
-  | 'reparacion'
-  | 'listo'
-  | 'entregado'
-  | 'cancelado';
 
 const STATUS_CONFIG: Record<EnumOrderStatus, { label: string; className: string }> = {
   recibido:      { label: 'Recibido',      className: 'pending' },
@@ -29,25 +20,40 @@ export interface OrderMiniCardProps {
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(value);
 
-const formatDate = (value: string | null) => {
+const formatDate = (value?: string | null) => {
   if (!value) return '—';
   const date = new Date(value);
   if (isNaN(date.getTime())) return value;
   return date.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 };
 
+// Busca el status_history cuya fecha esté más cerca de "ahora" (no necesariamente el último por orden de array)
+const getCurrentStatus = (history?: Status_History[]): Status_History | null => {
+  if (!history || history.length === 0) return null;
+
+  const now = Date.now();
+
+  return history.reduce((closest, current) => {
+    const closestDiff = Math.abs(new Date(closest.dateOfChange).getTime() - now);
+    const currentDiff = Math.abs(new Date(current.dateOfChange).getTime() - now);
+    return currentDiff < closestDiff ? current : closest;
+  });
+};
+
 const OrderMiniCard = ({ order, onClick }: OrderMiniCardProps) => {
   const clickable = typeof onClick === 'function';
-  const statusInfo = STATUS_CONFIG[order.status as unknown as EnumOrderStatus] ?? {
-    label: String(order.status),
-    className: 'pending',
-  };
+
+  const currentStatus = getCurrentStatus(order.statusHistory);
+  const statusInfo = currentStatus
+    ? STATUS_CONFIG[currentStatus.status]
+    : { label: 'Sin estado', className: 'pending' };
 
   const equipmentLabel = order.equipment
     ? `${order.equipment.brand ?? ''} ${order.equipment.model ?? ''}`.trim()
     : `Equipo #${order.id_equipment}`;
 
   const clientLabel = order.user?.userName;
+  const hasAmount = order.totalCharged !== null && order.totalCharged !== undefined;
 
   return (
     <div
@@ -58,23 +64,25 @@ const OrderMiniCard = ({ order, onClick }: OrderMiniCardProps) => {
     >
       <div className={styles.header}>
         <div className={styles.titleBlock}>
-          <span className={styles.orderId}>Orden #{order.id_order}</span>
-          <span className={styles.equipment}>{equipmentLabel}</span>
+          <span className={styles.orderId}>#{order.id_order}</span>
+          <span className={styles.equipment} title={equipmentLabel}>{equipmentLabel}</span>
         </div>
         <span className={`${styles.badge} ${styles[statusInfo.className]}`}>
           {statusInfo.label}
         </span>
       </div>
 
-      <p className={styles.failure}>{order.failureReported}</p>
+      {order.observations && (
+        <p className={styles.failure}>{order.observations}</p>
+      )}
 
       <div className={styles.footer}>
         <div className={styles.footerLeft}>
           {clientLabel && <span className={styles.client}>{clientLabel}</span>}
           <span className={styles.date}>{formatDate(order.dateOfEntry)}</span>
         </div>
-        {order.totalCharged !== null && order.totalCharged !== undefined && (
-          <span className={styles.amount}>{formatCurrency(order.totalCharged)}</span>
+        {hasAmount && (
+          <span className={styles.amount}>{formatCurrency(order.totalCharged as number)}</span>
         )}
       </div>
     </div>

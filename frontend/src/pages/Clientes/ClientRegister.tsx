@@ -17,23 +17,23 @@ const FIELDS: FieldConfig[] = [
     label: "Email",
     type: "email",
     placeholder: "juanPerez@gmail.com",
-    required:true,
-    minLength:7
+    required: true,
+    minLength: 7
   },
   {
     name: "clientPhone",
     label: "Telefono",
     type: "tel",
-    placeholder: "(codArea)-xxx-yyyy",
-    required:false,
+    placeholder: "+54(codArea)-xxx-yyyy",
+    required: true, 
     minLength: 7,
   },
   {
-    name: "dniCuit",
-    label: "DNI / CUIT",
+    name: "cuit",
+    label: "CUIT",
     type: "text",
-    placeholder:"Ingrese su DNI o CUIT ej: 12345678",
-    required:true,
+    placeholder: "Ej: 12-3456789-1 / 1234567891",
+    required: true,
     minLength: 6,
   },
 ];

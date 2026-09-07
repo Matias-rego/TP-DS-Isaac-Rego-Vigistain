@@ -3,7 +3,7 @@ import { useState } from "react";
 import Alert from "../../components/Alert/Alert";
 import AlertSuccess from "../../components/Alert/AlertSuccess";
 import { BACKEND_URL } from '@/lib/config';
-import CustomButton1 from "../../components/Buttons/Button1";
+import CustomButton1 from "../../components/Common/Buttons/Button1";
 import { PasswordInput } from "../../components/ui/PasswordInput";
 import { X, Camera } from "lucide-react";
 

@@ -6,7 +6,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import AlertSuccess from '../../components/Alert/AlertSuccess';
 import { BACKEND_URL } from '@/lib/config';
 import { PasswordInput } from '@/components/ui/PasswordInput';
-import ActionButton from '@/components/Buttons/ActionButton';
+import ActionButton from '@/components/Common/Buttons/ActionButton';
 import { useAuth } from '@/lib/AuthContext';
 
 

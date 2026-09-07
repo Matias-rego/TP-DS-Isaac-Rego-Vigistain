@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
-import prisma from "@/database/prisma.js";
+import prisma, { $Enums } from "@/database/prisma.js";
+import { createFirstStatus } from '../status/status.controller.js';
 import type { RegisterOrderDto } from './order.schema.js';
 import type { OrderService } from './order.service.js';
 

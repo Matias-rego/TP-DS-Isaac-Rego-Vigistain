@@ -35,7 +35,84 @@ export class AuthController {
             return res.status(400).json(result);
         }
 
-        return res.status(200).json(result);
+        const match = await bcrypt.compare(password, user.password_hash);
+
+        if (!match) {
+            res.status(401).json({ message: 'Usuario o contraseña incorrectos' });
+            return;
+        }
+
+        if (!user.status) {
+            res.status(403).json({ message: 'Usuario inactivo. Revise su email para activar su cuenta.' });
+            return;
+        }
+
+        if (!user.validationStatus) {
+            res.status(403).json({ message: 'Su cuenta se encuentra activa, espere la validacion del administrador para poder iniciar sesión.' });
+            return;
+        }
+
+        const token = jwt.sign(
+            { id: user.id_user, userName: user.userName, rol: user.rol } as AccessTokenPayload,
+            config.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
+
+        res.cookie('access_token', token, {
+            httpOnly: true,
+            secure: config.NODE_ENV === 'production', // Solo en producción
+            sameSite: 'lax', // el sameSite puede ser 'strict', 'lax' o 'none' dependiendo de tus necesidades
+            maxAge: 3600000, // 1 hora
+        }).json({ message: 'Login successful', });
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
+    const { email }: ForgotPasswordDto = req.body;
+    try {
+        const user = await prisma.user.findUnique({ where: { email } });
+        if (!user) {
+            res.status(404).json({ error: 'Usuario no encontrado' });
+            return;
+        }
+        const resetToken = jwt.sign({ id_user: user.id_user, userName: user.userName } as ResetPasswordPayload, config.JWT_SECRET + user.password_hash, { expiresIn: '1h' });
+        await enviarMailResetPassword(email, resetToken);
+
+        if (!user) {
+            res.status(404).json({ error: 'Usuario no registrado con ese email' });
+            return;
+        }
+        res.status(200).json({ message: 'Correo de recuperación enviado' });
+    } catch (error) {
+        next(error);
+    }
+}
+
+
+export const registerUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+    const { username, email, password }: RegisterDto = req.body;
+
+    const userCount = await prisma.user.count();
+    const role = userCount === 0 ? EnumRol.admin : EnumRol.tecnico;    
+    const adminValidation = role === EnumRol.admin ? true : false;
+    // Si el usuario subió foto, multer ya la mandó a Cloudinary y dejó la URL en req.file.path
+    // Si no subió nada, req.file es undefined → guardamos null
+    const fotoUrl = (req.file)?.path;
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const data = {
+        userName: username,
+        email: email,
+        password_hash: hashedPassword,
+        rol: role,
+        status: false,
+        ...(fotoUrl && { urlPicture: fotoUrl }),
+        validationStatus: adminValidation,
     };
 
     public validateAccount = async (token: string) => {

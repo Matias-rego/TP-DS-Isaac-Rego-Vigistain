@@ -16,6 +16,9 @@ const ctrl = new EquipmentController(
 )
 
 const router = Router();
+router.get('/equipmentForClient/:id',validate({params: idSchema}), getEquipmentOfClient)
+
+router.get('/search', getPartialEquipment);
 
 router.get('/', validate({ query: equipmentQuerySchema}), ctrl.getAllEquipment)
 

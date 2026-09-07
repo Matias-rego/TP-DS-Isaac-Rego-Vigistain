@@ -7,7 +7,7 @@ export interface ClientCardProps {
   clientName: string;
   clientEmail: string;
   clientPhone: string;
-  dniCuit: string;
+  cuit: string;
   dateOfRegistration: string;
   status?: boolean;
   categoryClientName?: string;
@@ -51,7 +51,7 @@ export default function ClientCard({
   id_client,
   clientName,
   clientPhone,
-  dniCuit,
+  cuit,
   lastRepair,
   categoryClientName,
   tags = [],
@@ -76,7 +76,7 @@ export default function ClientCard({
         </div>
         <div className={styles.identity}>
           <h3 className={styles.nombre}>{clientName}</h3>
-          <span className={styles.dni}>DNI: {dniCuit}</span>
+          <span className={styles.dni}>CUIT: {cuit}</span>
         </div>
       </div>
 

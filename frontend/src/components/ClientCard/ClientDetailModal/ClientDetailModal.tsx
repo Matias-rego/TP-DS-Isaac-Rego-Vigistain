@@ -1,16 +1,18 @@
 import { useState, useEffect } from "react";
-import DetailModal from "../Modals/DetailModal";
-import type { DetailFieldConfig, DetailItemConfig } from "../Modals/DetailModal";
+import DetailModal from "@/components/Modals/DetailModal";
+import type { DetailFieldConfig, DetailItemConfig } from "@/components/Modals/DetailModal";
 import styles from './ClientDetailModal.module.css';
 import { eventBus } from "@/lib/eventBus";
 import { BACKEND_URL } from "@/lib/config";
+import type { Equipment } from "@/types/types";
+import EquipmentMiniDescriptiveCard from "@/components/EquipmentComponent/EquipmentMiniDescriptiveCard/EquipmentMiniDescriptiveCard";
 
 interface Client {
   id_client: number;
   clientName: string;
   clientEmail: string;
   clientPhone: string;
-  dniCuit: string;
+  cuit: string;
   dateOfRegistration: string;
   categoryClientName?: string;
   status?: boolean;
@@ -19,16 +21,11 @@ interface Client {
   onClick?: (id: number) => void;
 }
 
-interface Equipment {
-  id: string;
-  model: string;
-  serialNumber: string;
-}
 
 const clientFields: DetailFieldConfig<Client>[] = [
   { name: 'clientName',    label: 'Nombre Completo' },
   { name: 'clientEmail',   label: 'Email' },
-  { name: 'dniCuit',       label: 'DNI/CUIT' },
+  { name: 'cuit',       label: 'CUIT' },
   { name: 'categoryClientName', label: 'Categoría' },
   { name: 'clientPhone',   label: 'Teléfono' },
   {
@@ -41,15 +38,14 @@ const clientFields: DetailFieldConfig<Client>[] = [
 ];
 
 const equipmentItemConfig: DetailItemConfig<Equipment> = {
-  getKey: (item) => item.id,
-  primary: (item) => item.model,
-  secondary: (item) => `SN: ${item.serialNumber}`,
-  onClick: (item) => console.log('abrir equipo', item.id),
+  getKey: (item) => item.id_equipment,
+  primary: (item) => item.tipo_equipment,
+  secondary: (item) => `Modelo: ${item.model}`,
+  onClick: (item) => console.log('Equipo', item.id_equipment) ,
 };
 
 interface ClientDetailModalProps {
   client: Client;
-  equipos: Equipment[];
   open: boolean;
   onClose: () => void;
   entityEvent?: string;
@@ -57,18 +53,44 @@ interface ClientDetailModalProps {
 
 const ClientDetailModal = ({
   client,
-  equipos,
   open,
   onClose,
   entityEvent,
 }: ClientDetailModalProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData]   = useState<Client>(client);
+  const [equipments, setEquipments] = useState<Equipment[]>([]);
 
   // Sincronizar formData cuando el padre actualiza client (post-guardado)
   useEffect(() => {
     setFormData(client);
   }, [client]);
+  
+  useEffect(() => {
+    if (!open || !client?.id_client) return;
+
+    const searchEquipments = async () => {
+      try {
+        const response = await fetch(
+          `${BACKEND_URL}/api/equipments/equipmentForClient/${client.id_client}`,
+          {
+            method: 'GET',
+            credentials: 'include',
+          }
+        );
+
+        if (!response.ok) throw new Error('Error al obtener equipos');
+
+        const data: Equipment[] = await response.json();
+        setEquipments(data);
+      } catch (e) {
+        console.error('Error fetching equipments:', e);
+        setEquipments([]);
+      }
+    };
+
+    searchEquipments();
+  }, [client.id_client, open]);
 
   // Resetear modo edición al cerrar
   useEffect(() => {
@@ -134,7 +156,7 @@ const ClientDetailModal = ({
       statusLabel={(value) => (value === true ? "Activo" : "Inactivo")}
       statusTone={(value) => (value === true ? "active" : "inactive")}
       listTitle="Equipos asociados"
-      items={isEditing ? [] : equipos}
+      items={isEditing ? [] : equipments}
       itemConfig={isEditing ? undefined : equipmentItemConfig}
       actions={
         isEditing
@@ -156,8 +178,8 @@ const ClientDetailModal = ({
             <input type="email" name="clientEmail" value={formData.clientEmail} onChange={handleChange} className={styles.formInput} />
           </div>
           <div className={styles.inputGroup}>
-            <label className={styles.inputLabel}>DNI/CUIT</label>
-            <input type="text" name="dniCuit" value={formData.dniCuit} onChange={handleChange} className={styles.formInput} />
+            <label className={styles.inputLabel}>CUIT</label>
+            <input type="text" name="cuit" value={formData.cuit} onChange={handleChange} className={styles.formInput} />
           </div>
           <div className={styles.inputGroup}>
             <label className={styles.inputLabel}>Teléfono</label>

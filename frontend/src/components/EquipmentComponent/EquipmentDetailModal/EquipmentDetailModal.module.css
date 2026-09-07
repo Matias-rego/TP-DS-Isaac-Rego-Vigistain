@@ -136,3 +136,13 @@
     grid-template-columns: 1fr;
   }
 }
+
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 12px;
+}
+
+.cardsGrid > * {
+  min-width: 0; /* evita que el ellipsis/line-clamp de las cards se rompa dentro del grid item */
+}

@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { X, Wrench, User, AlertTriangle, FileText } from 'lucide-react';
 import styles from './EquipmentDetailModal.module.css';
 import { type Equipment } from '@/types/types';
 import { type Client } from '@/types/types';
 import { type Failure } from '@/types/types';
-import {type Order} from '@/types/types'
+import { type Order } from '@/types/types'
 import SmallClientCard from '@/components/ClientCard/SmallClientCard/SmallClientCard';
-import ClientDetailModal from '@/components/ClientCard/ClientDetailModal';
+import ClientDetailModal from '@/components/ClientCard/ClientDetailModal/ClientDetailModal';
 import BACKEND_URL from '@/lib/config';
 import FailureMiniCard from '@/components/Failure/FailureMiniCard/FailureMiniCard';
 import OrderMiniCard from '@/components/OrderComponent/OrderMiniCard/OrderMiniCard';
@@ -26,68 +26,85 @@ const EquipmentDetailModal = ({
 }: EquipmentDetailModalProps) => {
   const [showModalClient, setShowModalClient] = useState(false);
   const [dataClient, setDataClient] = useState<Client | null>(null);
-  const [dataFailures, setDataFailures] = useState<Failure []>([]);
+  const [dataFailures, setDataFailures] = useState<Failure[]>([]);
   const [dataOrders, setDataOrders] = useState<Order[]>([]);
 
+  // Más reciente primero. Falla "más reciente" = mayor dateOfFailure.
+  const sortedFailures = useMemo(
+    () =>
+      [...dataFailures].sort(
+        (a, b) => new Date(b.dateOfFailure).getTime() - new Date(a.dateOfFailure).getTime()
+      ),
+    [dataFailures]
+  );
 
-  if (!open) return null;
+  // Mismo criterio para órdenes, usando la fecha de ingreso.
+  const sortedOrders = useMemo(
+    () =>
+      [...dataOrders].sort(
+        (a, b) => new Date(b.dateOfEntry).getTime() - new Date(a.dateOfEntry).getTime()
+      ),
+    [dataOrders]
+  );
 
-  useEffect(()=>{
-    const fetchClient = async () => {    
-        try{
-            const { id_client } = equipment;
-            const client = await fetch(`${BACKEND_URL}/api/clients/${id_client}`,{
-                method: "GET",
-                credentials:'include',
-            });
-            const dataClient : Client = await client.json();
-            setDataClient(dataClient);
-        }catch(e){
-            setDataClient(null);
-        }
+  useEffect(() => {
+    const fetchClient = async () => {
+      try {
+        const { id_client } = equipment;
+        const client = await fetch(`${BACKEND_URL}/api/clients/${id_client}`, {
+          method: "GET",
+          credentials: 'include',
+        });
+        const dataClient: Client = await client.json();
+        setDataClient(dataClient);
+      } catch (e) {
+        setDataClient(null);
+      }
     }
     const fetchFailures = async () => {
-        try{
-            const id_equipment = equipment?.id_equipment;
-            if (!id_equipment) return;
-            const failures = await fetch(
-                `${BACKEND_URL}/api/failures/ofEquipment/${id_equipment}`,{
-                    method:"GET",
-                    credentials:'include',
-                }
-            );
-          if (!failures.ok) {
-            throw new Error('Error al obtener las fallas');
-          }
-          const dataFailures = await failures.json();
-          setDataFailures(dataFailures);
-        }catch(e){
-            setDataFailures([]);
+      try {
+        const id_equipment = equipment?.id_equipment;
+        if (!id_equipment) return;
+        const failures = await fetch(
+          `${BACKEND_URL}/api/failures/ofEquipment/${id_equipment}`, {
+          method: "GET",
+          credentials: 'include',
         }
+        );
+        if (!failures.ok) {
+          throw new Error('Error al obtener las fallas');
+        }
+        const dataFailures = await failures.json();
+        setDataFailures(dataFailures);
+      } catch (e) {
+        setDataFailures([]);
+      }
     };
     const fetchOrders = async () => {
-      try{
+      try {
         const id_equipment = equipment?.id_equipment;
-        if(!id_equipment) return;
-        const orders = await fetch(`${BACKEND_URL}/api/orders/ofEquipment/${id_equipment}`, 
+        if (!id_equipment) return;
+        const orders = await fetch(`${BACKEND_URL}/api/orders/ofEquipment/${id_equipment}`,
           {
-            method:"GET",
+            method: "GET",
             credentials: 'include',
           }
         );
         if (!orders.ok) {
-            throw new Error('Error al obtener las fallas');
+          throw new Error('Error al obtener las fallas');
         };
         const dataOrders = await orders.json();
         setDataOrders(dataOrders);
-      } catch(e){
+      } catch (e) {
         setDataOrders([]);
-      }     
+      }
     }
     fetchFailures();
     fetchClient();
     fetchOrders();
-    },[equipment])
+  }, [equipment])
+
+  if (!open) return null;
 
   return (
     <>
@@ -101,7 +118,6 @@ const EquipmentDetailModal = ({
           className={styles.modal}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Botón para cerrar */}
           <button
             className={styles.closeBtn}
             onClick={onClose}
@@ -113,7 +129,6 @@ const EquipmentDetailModal = ({
           <h2 className={styles.modalTitle}>Detalles del Equipo</h2>
 
           <div className={styles.contentGrid}>
-            {/* Información Técnica */}
             <section className={styles.section}>
               <div className={styles.sectionHeader}>
                 <Wrench size={18} className={styles.icon} />
@@ -135,7 +150,6 @@ const EquipmentDetailModal = ({
               </div>
             </section>
 
-            {/* Propietario */}
             <section className={styles.section}>
               <div className={styles.sectionHeader}>
                 <User size={18} className={styles.icon} />
@@ -153,34 +167,31 @@ const EquipmentDetailModal = ({
               )}
             </section>
 
-            {/* Fallas Registradas */}
             <section className={styles.section}>
               <div className={styles.sectionHeader}>
                 <AlertTriangle size={18} className={styles.icon} />
                 <h3>Fallas Registradas</h3>
               </div>
-              {dataFailures && dataFailures.length > 0 ? (
-                <div>
-                  {dataFailures.map((failure) => (
-                    <FailureMiniCard failure={failure} />
+              {sortedFailures.length > 0 ? (
+                <div className={styles.cardsGrid}>
+                  {sortedFailures.map((failure) => (
+                    <FailureMiniCard key={failure.id_failure} failure={failure} />
                   ))}
                 </div>
               ) : (
                 <p className={styles.emptyText}>No hay fallas registradas asociadas.</p>
               )}
-              
             </section>
 
-            {/* Órdenes Registradas */}
             <section className={styles.section}>
               <div className={styles.sectionHeader}>
                 <FileText size={18} className={styles.icon} />
                 <h3>Órdenes Registradas</h3>
               </div>
-              {dataOrders && dataOrders.length > 0 ? (
+              {sortedOrders.length > 0 ? (
                 <div>
-                  {dataOrders.map((order) => (
-                    <OrderMiniCard order={order}/>
+                  {sortedOrders.map((order) => (
+                    <OrderMiniCard key={order.id_order} order={order} />
                   ))}
                 </div>
               ) : (
@@ -191,7 +202,6 @@ const EquipmentDetailModal = ({
         </div>
       </div>
 
-      {/* Modal Secundario de Cliente */}
       {showModalClient && dataClient && (
         <ClientDetailModal
           client={dataClient}

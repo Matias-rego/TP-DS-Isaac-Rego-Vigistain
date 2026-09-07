@@ -5,8 +5,9 @@ import { z } from "zod";
 export const registerOrderSchema = z.object({
     id_equipment: id,
     observations: observations.optional(),
-    equipmentPhotoUrl: url.optional(),
+    equipmentPhotoUrl: url.nullable().optional(),
     estimatedDate: date.optional(),
+    id_user: id,
 }).strict();
 
 export type RegisterOrderDto = z.infer<typeof registerOrderSchema>;

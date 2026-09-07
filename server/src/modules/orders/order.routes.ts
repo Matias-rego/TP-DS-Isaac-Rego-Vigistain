@@ -1,4 +1,5 @@
-import { Router } from 'express';
+import {Router} from 'express';
+import { registerOrder , getOrderOfEquipment, getOrders, getPartialOrder} from '@/modules/orders/order.controller.js';
 import { validate } from '@/middlewares/validation.middleware.js';
 import { idSchema } from '@/shared/common.schema.js';
 import { registerOrderSchema } from './order.schema.js';
@@ -15,7 +16,11 @@ const ctrl = new OrderController(
 
 const router = Router();
 
-router.get('/ofEquipment/:id', validate({ params: idSchema }), ctrl.getOrderOfEquipment);
+router.get('/', getOrders);
+
+router.get('/search', getPartialOrder);
+
+router.get('/ofEquipment/:id', validate({params: idSchema}), getOrderOfEquipment);
 
 router.post('/', validate({ body: registerOrderSchema }), ctrl.registerOrder);
 

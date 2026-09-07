@@ -2,9 +2,9 @@ import { newPaymentTypeSchema, modifyTypePaymentSchema, typePaymentQuerySchema }
 import { PaymentTypeController } from "./paymentType.controller.js";
 import { PaymentTypeRepository } from "./paymentType.repository.js";
 import { PaymentTypeService } from "./paymentType.service.js";
+import { Router } from "express";
 import { validate } from "@/middlewares/validation.middleware.js";
 import { idSchema } from "@/shared/common.schema.js";
-import { Router } from "express";
 import prisma from "@/database/prisma.js";
 
 const ctrl = new PaymentTypeController(

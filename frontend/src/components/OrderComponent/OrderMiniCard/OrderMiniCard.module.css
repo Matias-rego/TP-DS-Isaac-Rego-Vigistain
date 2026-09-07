@@ -3,10 +3,12 @@
   flex-direction: column;
   gap: 6px;
   padding: 12px 14px;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  background: #ffffff;
+  border: 1px solid var(--tf-border);
+  border-radius: var(--radius-md, 14px);
+  background: var(--tf-card);
+  box-shadow: var(--shadow-soft);
   max-width: 340px;
+  transition: background-color 0.35s ease, border-color 0.35s ease, box-shadow 0.2s ease;
 }
 
 .clickable {
@@ -14,8 +16,13 @@
 }
 
 .clickable:hover {
-  border-color: #cbd5e1;
-  background: #f8fafc;
+  border-color: var(--tf-primary);
+  background: var(--tf-primary-soft);
+}
+
+.clickable:focus-visible {
+  outline: 2px solid var(--tf-primary);
+  outline-offset: 2px;
 }
 
 .header {
@@ -34,17 +41,18 @@
 .orderId {
   font-size: 14px;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--tf-text);
 }
 
 .equipment {
   font-size: 12px;
-  color: #64748b;
+  color: var(--tf-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+/* --- Badges de estado --- */
 .badge {
   flex-shrink: 0;
   font-size: 11px;
@@ -52,36 +60,59 @@
   padding: 3px 8px;
   border-radius: 999px;
   white-space: nowrap;
+  border: 1px solid transparent;
 }
 
 .pending {
-  background: #fef3c7;
-  color: #92400e;
+  --status: #d97706;
+  background: color-mix(in srgb, var(--status) 18%, var(--tf-card));
+  border-color: color-mix(in srgb, var(--status) 35%, transparent);
+  color: var(--status);
 }
 
 .inProgress {
-  background: #dbeafe;
-  color: #1e40af;
+  --status: #2563eb;
+  background: color-mix(in srgb, var(--status) 18%, var(--tf-card));
+  border-color: color-mix(in srgb, var(--status) 35%, transparent);
+  color: var(--status);
+}
+
+.quoted {
+  --status: #7c3aed;
+  background: color-mix(in srgb, var(--status) 18%, var(--tf-card));
+  border-color: color-mix(in srgb, var(--status) 35%, transparent);
+  color: var(--status);
+}
+
+.approved {
+  --status: #0d9488;
+  background: color-mix(in srgb, var(--status) 18%, var(--tf-card));
+  border-color: color-mix(in srgb, var(--status) 35%, transparent);
+  color: var(--status);
 }
 
 .resolved {
-  background: #dcfce7;
-  color: #166534;
+  background: color-mix(in srgb, var(--tf-success) 18%, var(--tf-card));
+  border-color: color-mix(in srgb, var(--tf-success) 35%, transparent);
+  color: var(--tf-success);
 }
 
 .delivered {
-  background: #e0e7ff;
-  color: #3730a3;
+  --status: #4f46e5;
+  background: color-mix(in srgb, var(--status) 18%, var(--tf-card));
+  border-color: color-mix(in srgb, var(--status) 35%, transparent);
+  color: var(--status);
 }
 
 .cancelled {
-  background: #fee2e2;
-  color: #991b1b;
+  background: color-mix(in srgb, var(--tf-danger) 18%, var(--tf-card));
+  border-color: color-mix(in srgb, var(--tf-danger) 35%, transparent);
+  color: var(--tf-danger);
 }
 
 .failure {
   font-size: 13px;
-  color: #475569;
+  color: var(--tf-muted);
   line-height: 1.4;
   margin: 0;
   display: -webkit-box;
@@ -106,25 +137,16 @@
 .client {
   font-size: 12px;
   font-weight: 600;
-  color: #334155;
+  color: var(--tf-text);
 }
 
 .date {
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--tf-muted);
 }
 
 .amount {
   font-size: 13px;
   font-weight: 700;
-  color: #16a34a;
-}
-.quoted {
-  background: #ede9fe;
-  color: #5b21b6;
-}
-
-.approved {
-  background: #ccfbf1;
-  color: #115e59;
+  color: var(--tf-success);
 }

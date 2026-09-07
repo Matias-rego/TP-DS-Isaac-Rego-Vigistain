@@ -6,7 +6,7 @@ export const registerEquipmentSchema = z.object({
     tipo_equipment: tipo_equipment,
     brand: brand,
     model: model,
-    observations: observations.optional(),
+    observations: observations ?? null,
     id_client: id,
 }).strict();
 
