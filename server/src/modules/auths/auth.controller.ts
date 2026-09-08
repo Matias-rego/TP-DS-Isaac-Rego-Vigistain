@@ -4,20 +4,19 @@ import jwt from 'jsonwebtoken';
 import enviarMailResetPassword from '@/service/mailRec.service.js';
 import bcrypt from 'bcrypt';
 import { config } from '@/utils/config.js';
-import type { AccessTokenPayload, ResetPasswordPayload } from './auth.type.js'
+import type { AccessTokenPayload, ResetPasswordPayload } from './auth.type.js';
 import enviarMailVerificador from '@/service/mail.service.js';
 import { EnumRol } from "@/generated/prisma/browser.js";
 import type { ForgotPasswordDto, LoginDto, RegisterDto, ResetPasswordDto } from './auth.schema.js';
 import type { UserService } from "@/modules/users/user.service.js";
 import { User } from '../users/user.entity.js';
 
-
 interface DecodedToken {
     userName: string;
-};
+}
 
 export class AuthController {
-    constructor(private service: UserService) { }
+    constructor(private service: UserService) {}
 
     public validateAccountController = async (req: Request, res: Response) => {
         const token = req.params.token;
@@ -35,89 +34,11 @@ export class AuthController {
             return res.status(400).json(result);
         }
 
-        const match = await bcrypt.compare(password, user.password_hash);
-
-        if (!match) {
-            res.status(401).json({ message: 'Usuario o contraseña incorrectos' });
-            return;
-        }
-
-        if (!user.status) {
-            res.status(403).json({ message: 'Usuario inactivo. Revise su email para activar su cuenta.' });
-            return;
-        }
-
-        if (!user.validationStatus) {
-            res.status(403).json({ message: 'Su cuenta se encuentra activa, espere la validacion del administrador para poder iniciar sesión.' });
-            return;
-        }
-
-        const token = jwt.sign(
-            { id: user.id_user, userName: user.userName, rol: user.rol } as AccessTokenPayload,
-            config.JWT_SECRET,
-            { expiresIn: '1h' }
-        );
-
-        res.cookie('access_token', token, {
-            httpOnly: true,
-            secure: config.NODE_ENV === 'production', // Solo en producción
-            sameSite: 'lax', // el sameSite puede ser 'strict', 'lax' o 'none' dependiendo de tus necesidades
-            maxAge: 3600000, // 1 hora
-        }).json({ message: 'Login successful', });
-
-    } catch (error) {
-        next(error);
-    }
-}
-
-export const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
-    const { email }: ForgotPasswordDto = req.body;
-    try {
-        const user = await prisma.user.findUnique({ where: { email } });
-        if (!user) {
-            res.status(404).json({ error: 'Usuario no encontrado' });
-            return;
-        }
-        const resetToken = jwt.sign({ id_user: user.id_user, userName: user.userName } as ResetPasswordPayload, config.JWT_SECRET + user.password_hash, { expiresIn: '1h' });
-        await enviarMailResetPassword(email, resetToken);
-
-        if (!user) {
-            res.status(404).json({ error: 'Usuario no registrado con ese email' });
-            return;
-        }
-        res.status(200).json({ message: 'Correo de recuperación enviado' });
-    } catch (error) {
-        next(error);
-    }
-}
-
-
-export const registerUser = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-    const { username, email, password }: RegisterDto = req.body;
-
-    const userCount = await prisma.user.count();
-    const role = userCount === 0 ? EnumRol.admin : EnumRol.tecnico;    
-    const adminValidation = role === EnumRol.admin ? true : false;
-    // Si el usuario subió foto, multer ya la mandó a Cloudinary y dejó la URL en req.file.path
-    // Si no subió nada, req.file es undefined → guardamos null
-    const fotoUrl = (req.file)?.path;
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const data = {
-        userName: username,
-        email: email,
-        password_hash: hashedPassword,
-        rol: role,
-        status: false,
-        ...(fotoUrl && { urlPicture: fotoUrl }),
-        validationStatus: adminValidation,
+        return res.status(200).json(result);
     };
 
-    public validateAccount = async (token: string) => {
+    private validateAccount = async (token: string) => {
         try {
-
             const decoded = jwt.verify(token, config.JWT_SECRET) as DecodedToken;
 
             if (!decoded || !decoded.userName) {
@@ -126,14 +47,9 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
 
             const userN = decoded.userName;
 
-            // 2. Actualizar el estado del usuario a 1 en la base de datos con Prisma
             const usuarioActualizado = await prisma.user.update({
-                where: {
-                    userName: userN,
-                },
-                data: {
-                    status: true,
-                },
+                where: { userName: userN },
+                data: { status: true },
             });
 
             console.log(`Usuario con Nombre ${userN} validado correctamente.`);
@@ -142,7 +58,6 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
                 message: "Cuenta validada con éxito",
                 usuario: usuarioActualizado
             };
-
         } catch (error: unknown) {
             const message =
                 error instanceof Error
@@ -156,13 +71,11 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
                 message
             };
         }
-    }
-
+    };
 
     public loginUser = async (req: Request, res: Response, next: NextFunction) => {
         const { username, password }: LoginDto = req.body;
         try {
-            // Reemplaza el SELECT * FROM usuario WHERE nombre_usuario = ?
             const user = await prisma.user.findFirst({
                 where: { userName: username }
             });
@@ -198,14 +111,14 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
             res.cookie('access_token', token, {
                 httpOnly: true,
                 secure: config.NODE_ENV === 'production', // Solo en producción
-                sameSite: 'lax', // el sameSite puede ser 'strict', 'lax' o 'none' dependiendo de tus necesidades
+                sameSite: 'lax',
                 maxAge: 3600000, // 1 hora
-            }).json({ message: 'Login successful', });
+            }).json({ message: 'Login successful' });
 
         } catch (error) {
             next(error);
         }
-    }
+    };
 
     public forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
         const { email }: ForgotPasswordDto = req.body;
@@ -215,51 +128,19 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
                 res.status(404).json({ error: 'Usuario no encontrado' });
                 return;
             }
-            const resetToken = jwt.sign({ id_user: user.id_user, userName: user.userName } as ResetPasswordPayload, config.JWT_SECRET + user.password_hash, { expiresIn: '1h' });
+
+            const resetToken = jwt.sign(
+                { id_user: user.id_user, userName: user.userName } as ResetPasswordPayload,
+                config.JWT_SECRET + user.password_hash,
+                { expiresIn: '1h' }
+            );
             await enviarMailResetPassword(email, resetToken);
 
-            if (!user) {
-                res.status(404).json({ error: 'Usuario no registrado con ese email' });
-                return;
-            }
             res.status(200).json({ message: 'Correo de recuperación enviado' });
         } catch (error) {
             next(error);
         }
-    }
-
-
-    public registerUser = async (req: Request, res: Response, next: NextFunction) => {
-        try {
-
-            const { username, email, password }: RegisterDto = req.body;
-
-            // Si el usuario subió foto, multer ya la mandó a Cloudinary y dejó la URL en req.file.path
-            // Si no subió nada, req.file es undefined → guardamos null
-
-            const hashedPassword = await bcrypt.hash(password, 10);
-
-
-            const user = new User(
-                username,
-                email,
-                hashedPassword,
-                EnumRol.tecnico,
-                true,
-                true,
-            )
-
-            this.service.create(user)
-
-            const tokenVerificacion = jwt.sign({ userName: username }, config.JWT_SECRET, { expiresIn: '24h' });
-            await enviarMailVerificador(email, tokenVerificacion);
-
-            res.json({ message: 'Usuario registrado exitosamente, valida tu cuenta a través del enlace enviado a tu correo electrónico' });
-        } catch (error) {
-            next(error);
-        }
     };
-
 
     public resetPassword = async (req: Request, res: Response, _next: NextFunction) => {
         const token = String(req.params.token);
@@ -284,7 +165,7 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
             });
             if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
 
-            jwt.verify(token, (config.JWT_SECRET + user.password_hash) as string); // ← as string
+            jwt.verify(token, config.JWT_SECRET + user.password_hash);
 
             const newHash = await bcrypt.hash(password, 10);
 
@@ -301,8 +182,56 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
         }
     };
 
-    public getMe = async (req: Request, res: Response) => {
 
+    public registerUser = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { username, email, password }: RegisterDto = req.body;
+
+            // El primer usuario registrado en el sistema queda como admin
+            // y auto-validado; el resto entra como "tecnico" pendiente de
+            // validación por parte de un administrador.
+            const userCount = await prisma.user.count();
+            const role = userCount === 0 ? EnumRol.admin : EnumRol.tecnico;
+            const adminValidation = role === EnumRol.admin;
+
+            // Si el usuario subió foto, multer ya la mandó a Cloudinary y
+            // dejó la URL en req.file.path. Si no subió nada, req.file es
+            // undefined y no seteamos urlPicture.
+            const fotoUrl = (req.file as Express.Multer.File | undefined)?.path;
+
+            const hashedPassword = await bcrypt.hash(password, 10);
+
+            // NOTA: ajustá este constructor a la firma real de tu entidad
+            // User si difiere (por ejemplo, si no acepta urlPicture como
+            // último parámetro).
+            const user = new User(
+                username,
+                email,
+                hashedPassword,
+                role,
+                false,           // status: inactivo hasta validar el email
+                adminValidation, // validationStatus
+                fotoUrl
+            );
+
+            await this.service.create(user);
+
+            const tokenVerificacion = jwt.sign(
+                { userName: username },
+                config.JWT_SECRET,
+                { expiresIn: '24h' }
+            );
+            await enviarMailVerificador(email, tokenVerificacion);
+
+            res.json({
+                message: 'Usuario registrado exitosamente, valida tu cuenta a través del enlace enviado a tu correo electrónico'
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    public getMe = async (req: Request, res: Response) => {
         const user = await prisma.user.findUnique({
             where: {
                 id_user: req.user?.id
@@ -327,7 +256,6 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
     };
 
     public logout = async (req: Request, res: Response) => {
-        res.clearCookie('access_token').json({ message: 'Logout successful' })
+        res.clearCookie('access_token').json({ message: 'Logout successful' });
     };
-
 }

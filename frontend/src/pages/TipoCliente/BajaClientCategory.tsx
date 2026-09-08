@@ -1,15 +1,10 @@
 import BajaForm from "../CRUDS/Baja/BajaForm";
 import type { DetailFieldConfig } from "../CRUDS/Baja/BajaForm";
 import { EVENTS } from "../../lib/eventBus";
-
-interface ClientCategory {
-  id_category_client: number;
-  categoryClientName: string;
-  amountForCategoryUp: number;
-}
+import type { Client_Type } from "@/types/types";
 const FIELDS: DetailFieldConfig[] = [
   {
-    name: "categoryClientName",
+    name: "clientTypeName",
     label: "Nombre",
   },
   {
@@ -38,7 +33,7 @@ interface BajaClientCategoryProps {
 
 export default function BajaClientCategory({ onSuccess }: BajaClientCategoryProps) {
   return (
-    <BajaForm<ClientCategory>
+    <BajaForm<Client_Type>
       title="Eliminar Categoría de Cliente"
       subtitle="Buscá la categoría de cliente que querés eliminar"
       searchPlaceholder="Busca tu categoría de cliente por descripción..."
@@ -48,8 +43,8 @@ export default function BajaClientCategory({ onSuccess }: BajaClientCategoryProp
       successMessage="Categoría de cliente eliminada correctamente."
       icon={ICON}
       detailFields={FIELDS}
-      idField="id_category_client"
-      previewField="categoryClientName"
+      idField="id_client_type"
+      previewField="clientTypeName"
       onSuccess={onSuccess}
     />
   );

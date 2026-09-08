@@ -5,11 +5,9 @@ import { BaseRepository } from "@/shared/base.repository.js";
 import { Equipment } from "./equipment.entity.js";
 import { v7 as uuidv7 } from "uuid";
 
-
 export class EquipmentRepository extends BaseRepository<Equipment, EquipmentQueryDto> {
 
     public async findAll(query?: EquipmentQueryDto): Promise<PaginatedResult<Equipment>> {
-
         const { page, limit, skip } = this.getPagination(
             query?.page,
             query?.limit,
@@ -25,11 +23,11 @@ export class EquipmentRepository extends BaseRepository<Equipment, EquipmentQuer
                             brand: {
                                 contains: query?.search,
                             },
-                        },{
+                        }, {
                             model: {
                                 contains: query?.search,
                             },
-                        },{
+                        }, {
                             observations: {
                                 contains: query?.search,
                             },
@@ -87,6 +85,20 @@ export class EquipmentRepository extends BaseRepository<Equipment, EquipmentQuer
         return equipment
             ? this.toDomain(equipment)
             : undefined;
+    }
+
+    // Nuevo: reemplaza al viejo `getEquipmentOfClient` que pegaba
+    // directo a prisma desde el controller. Sin paginar, igual que
+    // hacía la versión anterior; si después necesitás paginación acá
+    // también, se puede adaptar con this.getPagination() como en findAll.
+    public async findByClientId(clientId: string): Promise<Equipment[]> {
+        const equipments = await this.prisma.equipment.findMany({
+            where: {
+                id_client: clientId,
+            },
+        });
+
+        return equipments.map((equipment) => this.toDomain(equipment));
     }
 
     public async create(item: Equipment): Promise<Equipment> {

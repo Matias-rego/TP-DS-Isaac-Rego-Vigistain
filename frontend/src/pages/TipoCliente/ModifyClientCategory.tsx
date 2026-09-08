@@ -1,16 +1,12 @@
 import ModForm from './../CRUDS/Modify/ModForm';
 import type { FieldConfig } from './../CRUDS/Alta/AltaForm';
 import { EVENTS } from '../../lib/eventBus';
+import type { Client_Type } from '@/types/types';
 
-interface ClientCategory {
-  id_category_client: number;
-  categoryClientName: string;
-  amountForCategoryUp: number;
-}
 
 const FIELDS: FieldConfig[] = [
   {
-    name: 'categoryClientName',
+    name: 'clientTypeName',
     label: 'Nombre/Descripcion',
     type: 'text',
     placeholder: 'Ej: Normal, Premium...',
@@ -31,14 +27,14 @@ interface ModifyClientCategoryProps {
 
 export default function ModifyClientCategory({ onSuccess }: ModifyClientCategoryProps) {
   return (
-    <ModForm<ClientCategory>
+    <ModForm<Client_Type>
       title="Modificar Categoria de Cliente"
       subtitle="Buscá la categoría de cliente que querés editar"
       searchPlaceholder="Buscar categoría de cliente..."
       searchEndpoint="/api/client-types"
       modifyEndpoint="/api/client-types"
-      idField="id_category_client"
-      previewField="categoryClientName"
+      idField="id_client_type"
+      previewField="clientTypeName"
       fields={FIELDS}
       entityEvent={EVENTS.clientCategoryChanged}
       successMessage="Categoria de cliente modificada correctamente."

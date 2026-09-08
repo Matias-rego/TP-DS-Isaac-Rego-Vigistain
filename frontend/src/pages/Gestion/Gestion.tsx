@@ -18,16 +18,12 @@ import ModifyPaymentType from "../TipoPago/ModifyPaymentType";
 import { Wrench, Users, CreditCard, ArrowLeft } from "lucide-react";
 import Footer from "@/components/Footer/Footer";
 import { useAuth } from "@/lib/AuthContext";
-
+import type { Client_Type, Payment_Type, Failure_Type } from "@/types/types";
+import type { PaginatedResponse } from "@/types/types";
 
 // ─── Tipos y columnas ─────────────────────────────────────────────────────────
-interface FailureType {
-  id_failure_type: number;
-  failureDescription: string;
-  estimatedImport: number;
-}
 
-const COLUMNS_TF: ColumnConfig<FailureType>[] = [
+const COLUMNS_TF: ColumnConfig<Failure_Type>[] = [
   { key: 'id_failure_type', label: 'ID' },
   { key: 'failureDescription', label: 'Descripción' },
   {
@@ -38,49 +34,26 @@ const COLUMNS_TF: ColumnConfig<FailureType>[] = [
   },
 ];
 
-export interface PaginatedResult<T> {
-    data: T[];
-    metadata: {
-        page: number;
-        limit: number,
-        total: number;
-        totalPages: number;
-    }
-}
-
-interface ClientType {
-  id_category_client: number;
-  categoryClientName: string;
-  amountForCategoryUp: number;
-}
-
-const COLUMNS_TC: ColumnConfig<ClientType>[] = [
-  { key: 'id_category_client', label: 'ID' },
-  { key: 'categoryClientName', label: 'Nombre' },
+const COLUMNS_TC: ColumnConfig<Client_Type>[] = [
+  { key: 'id_client_type', label: 'ID' },
+  { key: 'clientTypeName', label: 'Nombre' },
   { key: 'amountForCategoryUp', label: 'Órdenes requeridas' },
 ];
 
-interface PaymentType {
-  id_payment_type: number;
-  paymentTypeName: string;
-  paymentMethod: string;
-  type_of_payment: string;
-  percentaje: number;
-}
 
-const COLUMNS_PT: ColumnConfig<PaymentType>[] = [
+const COLUMNS_PT: ColumnConfig<Payment_Type>[] = [
   { key: 'id_payment_type', label: 'ID' },
   { key: 'paymentTypeName', label: 'Nombre' },
-  { key: 'percentaje', label: 'Porcentaje', format: (value) => `${(Number(value) * 100).toLocaleString('es-AR')}%` },
+  { key: 'percentage', label: 'Porcentaje', format: (value) => `${(Number(value) * 100).toLocaleString('es-AR')}%` },
   { key: 'paymentMethod', label: 'Método de Pago' },
 ];
 
 const Gestion = () => {
   const { isAuth, loading: authLoading } = useAuth();
 
-  const [dataTF, setDataTF] = useState<PaginatedResult<FailureType>>();
-  const [dataTC, setDataTC] = useState<PaginatedResult<ClientType>>();
-  const [dataPT, setDataPT] = useState<PaginatedResult<PaymentType>>();
+  const [dataTF, setDataTF] = useState<PaginatedResponse<Failure_Type> | Failure_Type[]>();
+  const [dataTC, setDataTC] = useState<PaginatedResponse<Client_Type> | Client_Type[]>();
+  const [dataPT, setDataPT] = useState<PaginatedResponse<Payment_Type> | Payment_Type[]>();
   // Qué está seleccionado para gestionar: null = pantalla de opciones
   const [seleccion, setSeleccion] = useState<string | null>(null);
 
@@ -96,7 +69,7 @@ const Gestion = () => {
       console.error('Error al buscar TF:', e);
     }
   }, []);
-
+  const failureTypesData = Array.isArray(dataTF) ? dataTF : (dataTF?.data ?? []);
   const busquedaTC = useCallback(async () => {
     try {
       const result = await fetch(`${BACKEND_URL}/api/client-types/`,
@@ -109,7 +82,7 @@ const Gestion = () => {
       console.error('Error al buscar TC:', e);
     }
   }, []);
-
+  const clientTypesData = Array.isArray(dataTC) ? dataTC : (dataTC?.data ?? []);
   const busquedaTP = useCallback(async () => {
     try {
       const result = await fetch(`${BACKEND_URL}/api/payment-types/`,
@@ -122,7 +95,7 @@ const Gestion = () => {
       console.error('Error al buscar TP:', e);
     }
   }, []);
-
+  const paymentTypesData = Array.isArray(dataPT) ? dataPT : (dataPT?.data ?? []);
 
   useEffect(() => {
     if (!authLoading && isAuth) {
@@ -212,7 +185,7 @@ const Gestion = () => {
                 titulo="Tipo de Falla"
                 descripcion="Administrá los tipos de falla que pueden ocurrir en los dispositivos. Agregá, editá o eliminá categorías para mantener tu sistema organizado."
                 childrenTable={
-                  <TableRtl data={dataTF?.data ?? []} idField="id_failure_type" columns={COLUMNS_TF} caption="Tabla de Tipos de Fallas" showTotal={false} />
+                  <TableRtl data={failureTypesData} idField="id_failure_type" columns={COLUMNS_TF} caption="Tabla de Tipos de Fallas" showTotal={false} />
                 }
                 childrenFuncionAlta={<AltaTipoFalla />}
                 childrenFuncionBaja={<BajaTipoFalla />}
@@ -225,7 +198,7 @@ const Gestion = () => {
                 titulo="Tipo de Cliente"
                 descripcion="Administrá los tipos de cliente que interactúan con tu negocio. Agregá, editá o eliminá categorías para segmentar tus servicios."
                 childrenTable={
-                  <TableRtl data={dataTC?.data ?? []} idField="id_category_client" columns={COLUMNS_TC} caption="Tabla de Tipos de Cliente" showTotal={false} />
+                  <TableRtl data={clientTypesData} idField="id_client_type" columns={COLUMNS_TC} caption="Tabla de Tipos de Cliente" showTotal={false} />
                 }
                 childrenFuncionAlta={<AltaTipoCliente />}
                 childrenFuncionBaja={<BajaTipoCliente />}
@@ -238,7 +211,7 @@ const Gestion = () => {
                 titulo="Tipo de Pago"
                 descripcion="Administrá los métodos de pago que tus clientes pueden utilizar. Agregá, editá o eliminá métodos para dar más flexibilidad."
                 childrenTable={
-                  <TableRtl data={dataPT?.data ?? []} idField="id_payment_type" columns={COLUMNS_PT} caption="Tabla de Tipos de Pago" showTotal={false} />
+                  <TableRtl data={paymentTypesData} idField="id_payment_type" columns={COLUMNS_PT} caption="Tabla de Tipos de Pago" showTotal={false} />
                 }
                 childrenFuncionAlta={<RegisterPaymentType />}
                 childrenFuncionBaja={<DeletePaymentType />}

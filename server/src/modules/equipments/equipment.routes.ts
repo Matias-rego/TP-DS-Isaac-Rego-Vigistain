@@ -16,14 +16,13 @@ const ctrl = new EquipmentController(
 )
 
 const router = Router();
-router.get('/equipmentForClient/:id',validate({params: idSchema}), getEquipmentOfClient)
 
-router.get('/search', getPartialEquipment);
+router.get('/equipmentForClient/:id', validate({ params: idSchema }), ctrl.getEquipmentOfClient);
 
-router.get('/', validate({ query: equipmentQuerySchema}), ctrl.getAllEquipment)
+router.get('/', validate({ query: equipmentQuerySchema }), ctrl.getAllEquipment);
 
 router.post('/', validate({ body: registerEquipmentSchema }), ctrl.registerEquipment);
 
-router.get('/:id', validate({ params: idSchema }), ctrl.getOneEquipment)
+router.get('/:id', validate({ params: idSchema }), ctrl.getOneEquipment);
 
 export default router;

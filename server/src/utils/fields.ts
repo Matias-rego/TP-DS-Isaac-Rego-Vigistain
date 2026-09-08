@@ -194,7 +194,7 @@ export const id = z
     })
 
 
-export const percentaje = z
+export const percentage = z
     .number({
         error: (issue) => {
             if (issue.code === "invalid_type") return "Percentage must be a number";

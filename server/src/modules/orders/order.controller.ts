@@ -1,51 +1,64 @@
-import type { Request, Response } from 'express';
-import prisma, { $Enums } from "@/database/prisma.js";
-import { createFirstStatus } from '../status/status.controller.js';
-import type { RegisterOrderDto } from './order.schema.js';
+import type { NextFunction, Request, Response } from 'express';
+import { $Enums } from "@/database/prisma.js";
+import type { IdDto } from "@/shared/common.schema.js";
+import type { RegisterOrderDto, OrderQueryDto } from './order.schema.js';
 import type { OrderService } from './order.service.js';
 
 export class OrderController {
-  constructor(private service: OrderService);
+  constructor(private service: OrderService) { }
 
-  public async registerOrder(req: Request, res: Response) {
+  public registerOrder = async (req: Request, res: Response, next: NextFunction) => {
+    const data = req.validated.body as RegisterOrderDto;
+
     try {
-      const { id_equipment, observations, equipmentPhotoUrl, estimatedDate }: RegisterOrderDto = req.body;
-
-      const response = await prisma.order.create({
-        data: {
-          id_equipment,
-          observations: observations ?? null,
-          equipmentPhotoUrl: equipmentPhotoUrl ?? null,
-          estimatedDate: estimatedDate ? new Date(estimatedDate) : null,
-        },
+      const newOrder = await this.service.create({
+        ...data,
+        status: $Enums.EnumOrderStatus.recibido,
+        dateOfEntry: new Date(),
+        estimatedDate: data.estimatedDate ? new Date(data.estimatedDate) : undefined,
+        equipmentPhotoUrl: data.equipmentPhotoUrl ?? undefined,
       });
       return res.status(201).json({
         message: "Orden registrada con éxito",
-        order: response,
+        order: newOrder,
       });
     } catch (error) {
-      console.error("Error :", error);
-      return res.status(500).json({
-        message: "Error al registrar la orden",
-      });
+      next(error);
     }
   };
 
-  public async getOrderOfEquipment(req: Request, res: Response) {
+  public getOneOrder = async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.validated.params as IdDto;
+
     try {
-      const id_equipment = Number(req.params.id);
-      if (isNaN(id_equipment)) {
-        return res.status(400).json({ message: "El ID de equipo no es válido" });
-      };
-      const orders = await prisma.order.findMany({
-        where: {
-          id_equipment: id_equipment,
-        }
-      });
-      return res.status(200).json(orders);
-    } catch (e) {
-      console.error("Error : ", e);
-      res.status(500).json({ message: "Error en el getOrderOfEquipment" })
+      res.json(await this.service.findById(id));
+    } catch (error) {
+      next(error);
     }
-  }
-};
+  };
+
+  // Cubre tanto el listado general como la búsqueda parcial: OrderQueryDto
+  // trae "search" y el repository lo aplica con `contains` sobre
+  // observations. No hace falta un endpoint /search aparte (mismo criterio
+  // que se usó en equipment.controller.ts).
+  public getAllOrders = async (req: Request, res: Response, next: NextFunction) => {
+    const query = req.validated.query as OrderQueryDto;
+
+    try {
+      res.json(await this.service.findAll(query));
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getOrderOfEquipment = async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.validated.params as IdDto;
+
+    try {
+      const orders = await this.service.findByEquipmentId(id);
+      return res.status(200).json(orders);
+    } catch (error) {
+      next(error);
+    }
+  };
+}

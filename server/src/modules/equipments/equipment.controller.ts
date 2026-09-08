@@ -11,12 +11,12 @@ export class EquipmentController {
 
     try {
       const newEquipment = await this.service.create(data);
-      return res.status(201).json(newEquipment)
+      return res.status(201).json(newEquipment);
 
     } catch (error) {
-      next(error)
+      next(error);
     }
-  }
+  };
 
   public getOneEquipment = async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.validated.params as IdDto;
@@ -24,44 +24,33 @@ export class EquipmentController {
     try {
       res.json(await this.service.findById(id));
     } catch (error) {
-      next(error)
+      next(error);
     }
   };
 
+  // getAllEquipment ya cubre la búsqueda parcial: EquipmentQueryDto trae
+  // "search" y el repository lo aplica con `contains` sobre brand/model/
+  // observations. No hace falta un endpoint aparte para eso.
   public getAllEquipment = async (req: Request, res: Response, next: NextFunction) => {
     const query = req.validated.query as EquipmentQueryDto;
 
     try {
       res.json(await this.service.findAll(query));
     } catch (error) {
-      next(error)
+      next(error);
     }
   };
-    return res.status(200).json(equipments);
-  } catch (e) {
-    console.error("Error en la busqueda parcial de equipos server: ", e);
-    return res.status(500).json({ error: "Error en el getPartialEquipment" });
-  }
-};
 
-export const getEquipmentOfClient = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params; 
-    const clientId = Number(id);
+  // NOTA: requiere que EquipmentService tenga un método findByClientId
+  // (ver snippet aparte para el repository y el service).
+  public getEquipmentOfClient = async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.validated.params as IdDto;
 
-    if (isNaN(clientId)) {
-      return res.status(400).json({ message: "ID de cliente inválido" });
+    try {
+      const equipments = await this.service.findByClientId(id);
+      return res.status(200).json(equipments);
+    } catch (error) {
+      next(error);
     }
-
-    const response = await prisma.equipment.findMany({
-      where: {
-        id_client: clientId,
-      },
-    });
-
-    return res.status(200).json(response);
-  } catch (e) {
-    console.error("Hay un error en server", e);
-    return res.status(500).json({ error: "Error interno del servidor", details: e });
-  }
-};
+  };
+}

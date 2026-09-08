@@ -1,6 +1,6 @@
 import type { Order as Order_P } from "@/generated/prisma/client.js";
 import type { PaginatedResult } from "@/shared/base.repository.js";
-import type { OrderQueryDto } from "./order.schema.js"
+import type { OrderQueryDto } from "./order.schema.js";
 import { BaseRepository } from "@/shared/base.repository.js";
 import { v7 as uuidv7 } from "uuid";
 import { Order } from "./order.entity.js";
@@ -63,6 +63,19 @@ export class OrderRepository extends BaseRepository<Order, OrderQueryDto> {
             : undefined;
     }
 
+    // Nuevo: reemplaza al viejo getOrderOfEquipment que pegaba directo a
+    // prisma desde el controller y casteaba el id a Number (estaba mal,
+    // id_equipment es un uuid string, igual que id_order).
+    public async findByEquipmentId(equipmentId: string): Promise<Order[]> {
+        const orders = await this.prisma.order.findMany({
+            where: {
+                id_equipment: equipmentId,
+            },
+        });
+
+        return orders.map((order) => this.toDomain(order));
+    }
+
     public async create(item: Order): Promise<Order> {
         const order = await this.prisma.order.create({
             data: {
@@ -109,16 +122,7 @@ export class OrderRepository extends BaseRepository<Order, OrderQueryDto> {
             order.dateOfEntry,
             order.estimatedDate ?? undefined,
             order.deliveryDate ?? undefined,
-            order.totalCharged?.toNumber(),);
+            order.totalCharged?.toNumber(),
+        );
     }
 }
-
-
-
-
-
-
-
-
-
-
