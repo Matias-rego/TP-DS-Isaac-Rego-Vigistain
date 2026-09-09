@@ -81,8 +81,7 @@ const WorkOrder = () => {
   const [step, setStep] = useState(0);
   const [equipoTab, setEquipoTab] = useState<'nuevo' | 'buscar'>('nuevo');
   const [agregando, setAgregando] = useState(true);
-  const tipoEquipoElegido =
-    deviceValues.deviceType === "otro" ? deviceValues.deviceTypeOther : deviceValues.deviceType;
+  const tipoEquipoElegido = deviceValues.deviceType;
   const equipoValido =
     selectedEquipment != null ||
     Boolean(tipoEquipoElegido && deviceValues.brand && deviceValues.model);
@@ -126,21 +125,24 @@ const WorkOrder = () => {
     let equipmentData;
 
     if (selectedEquipment == null) {
-      const tipoEquipoFinal =
-        deviceValues.deviceType !== "otro"
-          ? deviceValues.deviceType
-          : deviceValues.deviceTypeOther;
+      const tipoEquipoFinal = deviceValues.deviceType;
 
       if (!tipoEquipoFinal || !deviceValues.brand || !deviceValues.model) {
         setSubmitError("Completá el tipo, marca y modelo del equipo.");
         return;
       }
 
+      // Si eligió "otro", guardamos el tipo escrito a mano dentro de las observaciones
+      const observacionesEquipo =
+        deviceValues.deviceType === "otro" && deviceValues.deviceTypeOther.trim()
+          ? `Tipo: ${deviceValues.deviceTypeOther.trim()}. ${deviceValues.observations}`.trim()
+          : deviceValues.observations;
+
       equipmentData = {
         tipo_equipment: tipoEquipoFinal,
         brand: deviceValues.brand,
         model: deviceValues.model,
-        observations: deviceValues.observations,
+        observations: observacionesEquipo,
         id_client: selectedClient.id_client,
       };
     } else {
