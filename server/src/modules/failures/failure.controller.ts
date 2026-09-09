@@ -1,48 +1,34 @@
-import type { Request, Response } from "express";
-import prisma from "@/database/prisma.js"; 
+import type { NextFunction, Request, Response } from "express";
+import type { IdDto } from "@/shared/common.schema.js";
 import type { CreateFailuresDto } from "./failure.schema.js";
+import type { FailureService } from "./failure.service.js";
 
-export const createFailures = async (req: Request, res: Response) => {
-  const failures: CreateFailuresDto = req.body;
+export class FailureController {
+  constructor(private service: FailureService) { }
 
-  try {
-    const resultado = await prisma.failure.createMany({
-      data: failures.map((f) => ({
-        id_failure_type: f.id_failure_type,
-        id_equipment: f.id_equipment,
-        description: f.failureDescription,
-      })),
-    });
+  public createFailures = async (req: Request, res: Response, next: NextFunction) => {
+    const failures = req.validated.body as CreateFailuresDto;
 
-    return res.status(201).json({
-      message: "Fallas registradas con éxito",
-      count: resultado.count,
-    });
-  } catch (error) {
-    console.error("Error al crear fallas:", error);
-    return res.status(500).json({
-      message: "Error al registrar las fallas",
-    });
-  }
-};
+    try {
+      const created = await this.service.createMany(failures);
 
-export const getFailureOfEquipment = async (req: Request, res: Response) => {
-  try {
-    const id_equipment = Number(req.params.id);
-    if (isNaN(id_equipment)) {
-      return res.status(400).json({ message: "El ID de equipo no es válido" });
+      return res.status(201).json({
+        message: "Fallas registradas con éxito",
+        failures: created,
+      });
+    } catch (error) {
+      next(error);
     }
-    const failures = await prisma.failure.findMany({
-      where: {
-        id_equipment: id_equipment,
-      },
-      include: {
-        failureType: true,
-      },
-    });
-    return res.status(200).json(failures);
-  } catch (e) {
-    console.error("Error en el getFailureOfEquipment: ", e);
-    return res.status(500).json({ message: "Error al obtener las fallas de un equipo" });
-  }
-};
+  };
+
+  public getFailureOfEquipment = async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.validated.params as IdDto;
+
+    try {
+      const failures = await this.service.findByEquipmentId(id);
+      return res.status(200).json(failures);
+    } catch (error) {
+      next(error);
+    }
+  };
+}

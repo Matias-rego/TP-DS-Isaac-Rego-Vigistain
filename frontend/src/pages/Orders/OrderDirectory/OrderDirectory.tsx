@@ -2,7 +2,7 @@ import Nav from "@/pages/Nav/Nav";
 import Footer from "@/components/Footer/Footer";
 import styles from "./OrderDirectory.module.css";
 import '../../../index.css';
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import type { Order, EnumOrderStatus, Status_History } from "@/types/types";
 import { Wrench, FileText, AlertTriangle, Banknote } from "lucide-react";
 import DescriptiveMiniCard from "@/components/Common/Cards/DescriptiveMiniCard/DescriptiveMiniCard";
@@ -12,6 +12,7 @@ import OrderDescription from "@/components/OrderComponent/OrderDescription/Order
 import { BACKEND_URL } from "@/lib/config";
 import UpdateStatusModal from "@/components/Status/UpdateStatusModal/UpdateStatusModal";
 import { eventBus, EVENTS } from '@/lib/eventBus';
+import type { PaginatedResponse } from "@/types/types";
 
 
 // Mismo tono que venimos usando en OrderCard / StatusMiniDescriptiveCard
@@ -32,7 +33,7 @@ const STATUS_FILTER_OPTIONS = Object.entries(STATUS_META).map(([value, meta]) =>
 }));
 
 interface OrderRow {
-  id_order: number;
+  id_order: string;
   orderLabel: string;
   customer: string;
   device: string;
@@ -49,9 +50,9 @@ const getCurrentStatus = (history?: Status_History[]): Status_History | null => 
   )[0];
 };
 
-const formatElapsed = (value: string) => {
-  const date = new Date(value);
-  if (isNaN(date.getTime())) return '—';
+const formatElapsed = (value: Date | string) => {
+  const date = typeof value === 'string' ? new Date(value) : value;
+  if (!date || isNaN(date.getTime())) return '—';
 
   const diffHrs = Math.floor((Date.now() - date.getTime()) / 3600000);
   if (diffHrs < 1) return 'Hace instantes';
@@ -70,7 +71,7 @@ const toRow = (order: Order): OrderRow => {
     device: order.equipment
       ? `${order.equipment.brand ?? ''} ${order.equipment.model ?? ''}`.trim()
       : `Equipo #${order.id_equipment}`,
-    status: currentStatus?.status ?? 'recibido',
+    status: (currentStatus?.newStatus ?? 'recibido') as EnumOrderStatus,
     elapsed: formatElapsed(order.dateOfEntry),
     raw: order,
   };
@@ -82,9 +83,8 @@ const OrderDirectory = () => {
   const [loading, setLoading] = useState(true);
   const [showModalActStatus, setShowModalActStatus] = useState(false);
 
-  // fetchOrders vive en el nivel del componente, no dentro de un useEffect,
-  // así puede reusarse tanto al montar como al limpiar el filtro (onClear)
-  const fetchOrders = async () => {
+  // 1. Envolver fetchOrders en useCallback y asegurar que la respuesta sea un Array
+  const fetchOrders = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch(`${BACKEND_URL}/api/orders/`, {
@@ -92,24 +92,36 @@ const OrderDirectory = () => {
         credentials: 'include',
       });
       if (!res.ok) throw new Error('Error al obtener las órdenes');
-      const data: Order[] = await res.json();
-      setOrders(data);
+
+      // Tipamos la respuesta con tu interfaz
+      const responseData: PaginatedResponse<Order> = await res.json();
+
+      // Guardamos la propiedad .data
+      setOrders(responseData.data ?? []);
     } catch (e) {
+      console.error('Error fetching orders:', e);
       setOrders([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
+  // 2. Suscripción limpia al eventBus
   useEffect(() => {
     const unsubscribe = eventBus.on(EVENTS.statusChanged, () => fetchOrders());
     return unsubscribe;
   }, [fetchOrders]);
+
+  // 3. Carga inicial
   useEffect(() => {
     fetchOrders();
-  }, []);
+  }, [fetchOrders]);
 
-  const rows = useMemo(() => orders.map(toRow), [orders]);
+  // 4. Mappings blindados con verificación de array
+  const rows = useMemo(() => {
+    if (!Array.isArray(orders)) return [];
+    return orders.map(toRow);
+  }, [orders]);
 
   const activeRepairs = useMemo(
     () => rows.filter(r => r.status !== 'entregado' && r.status !== 'cancelado').length,
@@ -122,6 +134,7 @@ const OrderDirectory = () => {
   );
 
   const dailyRevenue = useMemo(() => {
+    if (!Array.isArray(orders)) return 0;
     const today = new Date().toDateString();
     return orders
       .filter(o => o.deliveryDate && new Date(o.deliveryDate).toDateString() === today)
@@ -170,11 +183,11 @@ const OrderDirectory = () => {
 
       <div className={styles.orderSection}>
         <div className={styles.searchOrderSection}>
-          <SearchBar
+          <SearchBar<Order>
             searchPlaceholder="Buscar por ID, cliente, equipo..."
-            searchEndpoint="/api/orders/search"
+            searchEndpoint="/api/orders"
             filters={filters}
-            onResults={(results) => setOrders(results as Order[])}
+            onResults={(results) => setOrders(results.data)}
             onClear={fetchOrders}
           />
         </div>

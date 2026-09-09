@@ -2,10 +2,10 @@ import AltaForm from './../CRUDS/Alta/AltaForm';
 import type { FieldConfig } from './../CRUDS/Alta/AltaForm';
 import { EVENTS } from '../../lib/eventBus';
 
-// Ajustá los campos que necesites para tu entidad Client
+
 const FIELDS: FieldConfig[] = [
   {
-    name: 'categoryClientName',
+    name: 'clientTypeName',
     label: 'Nombre/Descripcion',
     type: 'text',
     placeholder: 'Ej: Normal, Premium...',
@@ -20,7 +20,6 @@ const FIELDS: FieldConfig[] = [
     required: true,
   },
 ];
-
 const ICON = (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />

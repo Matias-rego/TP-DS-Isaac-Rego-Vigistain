@@ -4,52 +4,46 @@ import type { DetailFieldConfig, DetailItemConfig } from "@/components/Modals/De
 import styles from './ClientDetailModal.module.css';
 import { eventBus } from "@/lib/eventBus";
 import { BACKEND_URL } from "@/lib/config";
+import type { Equipment as EquipmentBase } from "@/types/types";
+import EquipmentMiniDescriptiveCard from "@/components/EquipmentComponent/EquipmentMiniDescriptiveCard/EquipmentMiniDescriptiveCard";
+import type { Client as BaseClient } from "@/types/types";
+import EquipmentDetailModal from "@/components/EquipmentComponent/EquipmentDetailModal/EquipmentDetailModal
 
-interface Client {
-  id_client: number;
-  clientName: string;
-  clientEmail: string;
-  clientPhone: string;
-  cuit: string;
-  dateOfRegistration: string;
-  categoryClientName?: string;
-  status?: boolean;
-  lastRepair?: string;
-  tags?: string[];
-  onClick?: (id: number) => void;
+// Extendemos la interfaz BaseClient para agregar la propiedad aplanada
+interface Client extends BaseClient {
+  clientTypeName?: string;
 }
-
-interface Equipment {
-  id: string;
-  model: string;
-  serialNumber: string;
+interface Equipment extends EquipmentBase {
+  onClick?: (id: string) => void;
 }
 
 const clientFields: DetailFieldConfig<Client>[] = [
-  { name: 'clientName',    label: 'Nombre Completo' },
-  { name: 'clientEmail',   label: 'Email' },
-  { name: 'cuit',       label: 'CUIT' },
-  { name: 'categoryClientName', label: 'Categoría' },
-  { name: 'clientPhone',   label: 'Teléfono' },
+  { name: 'clientName', label: 'Nombre Completo' },
+  { name: 'clientEmail', label: 'Email' },
+  { name: 'cuit', label: 'CUIT' },
+  { name: 'clientTypeName', label: 'Categoría' },
+  { name: 'clientPhone', label: 'Teléfono' },
   {
     name: 'dateOfRegistration',
     label: 'Fecha de registro',
-    format: (value) => new Date(value).toLocaleDateString('en-US', {
-      year: 'numeric', month: 'short', day: 'numeric',
-    }),
+    format: (value) =>
+      new Date(value as string | Date).toLocaleDateString('es-AR', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      }),
   },
 ];
 
 const equipmentItemConfig: DetailItemConfig<Equipment> = {
-  getKey: (item) => item.id,
-  primary: (item) => item.model,
-  secondary: (item) => `SN: ${item.serialNumber}`,
-  onClick: (item) => console.log('abrir equipo', item.id),
+  getKey: (item) => item.id_equipment,
+  primary: (item) => item.tipo_equipment,
+  secondary: (item) => `Modelo: ${item.model}`,
+  onClick: (item) => console.log('Equipo', item.id_equipment) ,
 };
 
 interface ClientDetailModalProps {
   client: Client;
-  equipos: Equipment[];
   open: boolean;
   onClose: () => void;
   entityEvent?: string;
@@ -57,18 +51,45 @@ interface ClientDetailModalProps {
 
 const ClientDetailModal = ({
   client,
-  equipos,
   open,
   onClose,
   entityEvent,
 }: ClientDetailModalProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData]   = useState<Client>(client);
+  const [equipments, setEquipments] = useState<Equipment[]>([]);
+  const [showDetailModalEquipment, setShowDetailModalEquipment] = useState(false);
 
   // Sincronizar formData cuando el padre actualiza client (post-guardado)
   useEffect(() => {
     setFormData(client);
   }, [client]);
+  
+  useEffect(() => {
+    if (!open || !client?.id_client) return;
+
+    const searchEquipments = async () => {
+      try {
+        const response = await fetch(
+          `${BACKEND_URL}/api/equipments/equipmentForClient/${client.id_client}`,
+          {
+            method: 'GET',
+            credentials: 'include',
+          }
+        );
+
+        if (!response.ok) throw new Error('Error al obtener equipos');
+
+        const data: Equipment[] = await response.json();
+        setEquipments(data);
+      } catch (e) {
+        console.error('Error fetching equipments:', e);
+        setEquipments([]);
+      }
+    };
+
+    searchEquipments();
+  }, [client.id_client, open]);
 
   // Resetear modo edición al cerrar
   useEffect(() => {
@@ -77,6 +98,13 @@ const ClientDetailModal = ({
 
   const handleEdit = async (data: Client): Promise<boolean> => {
     try {
+      // 1. Extraemos solo los campos permitidos por el schema de actualización del backend
+      const payload = {
+        clientName: data.clientName,
+        clientEmail: data.clientEmail,
+        clientPhone: data.clientPhone,
+        cuit: data.cuit,
+      };
 
       const response = await fetch(
         `${BACKEND_URL}/api/clients/${data.id_client}`,
@@ -85,7 +113,7 @@ const ClientDetailModal = ({
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(data),
+          body: JSON.stringify(payload), // Enviamos únicamente el payload limpio
           credentials: 'include',
         }
       );
@@ -98,7 +126,7 @@ const ClientDetailModal = ({
       const result = await response.json();
       console.log('Cliente editado con éxito:', result);
 
-      // Emitir evento → Clientes.tsx refrescará la lista y el cliente del modal
+      // Emitir evento para refrescar la vista
       if (entityEvent) eventBus.emit(entityEvent, result);
 
       return true;
@@ -134,7 +162,7 @@ const ClientDetailModal = ({
       statusLabel={(value) => (value === true ? "Activo" : "Inactivo")}
       statusTone={(value) => (value === true ? "active" : "inactive")}
       listTitle="Equipos asociados"
-      items={isEditing ? [] : equipos}
+      items={isEditing ? [] : equipments}
       itemConfig={isEditing ? undefined : equipmentItemConfig}
       actions={
         isEditing

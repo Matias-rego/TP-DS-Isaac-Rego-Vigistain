@@ -15,7 +15,7 @@ const STATUS_META: Record<EnumOrderStatus, { label: string; tone: 'info' | 'warn
 export interface StatusMiniDescriptiveCardProps {
   statusHistory: Status_History;
   active?: boolean; // true = evento más reciente (con borde), false = evento pasado (más sutil)
-  onClick?: (id_status_history: number) => void;
+  onClick?: (id_status_history: string) => void;
 }
 
 const formatRelativeTime = (value: string) => {
@@ -43,6 +43,7 @@ const getInitial = (name?: string) => (name?.trim()?.[0] ?? '?').toUpperCase();
 const StatusMiniDescriptiveCard = ({ statusHistory, active = true, onClick }: StatusMiniDescriptiveCardProps) => {
   const clickable = typeof onClick === 'function';
 
+  // El campo real es "status" (ya no existen previousStatus/newStatus).
   const statusInfo = STATUS_META[statusHistory.status] ?? {
     label: String(statusHistory.status),
     tone: 'info' as const,

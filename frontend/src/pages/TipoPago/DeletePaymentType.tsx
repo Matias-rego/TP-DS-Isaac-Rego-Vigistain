@@ -24,7 +24,7 @@ const FIELDS: DetailFieldConfig[] = [
         label: 'Tipo de Pago',
     },
     {
-        name: 'percentaje',
+        name: 'percentage',
         label: 'Porcentaje',
         format: (value) => `${(Number(value)*100).toLocaleString('es-AR')}%`,
     },

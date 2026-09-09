@@ -8,22 +8,17 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { BACKEND_URL } from "@/lib/config";
 import { eventBus, EVENTS } from "@/lib/eventBus";
 import UserDetailModal from "@/components/UserCard/UserDetailModel";
-
-
-type User = {
-  id_user: number;
-  userName: string;
-  email: string;
-  rol: string;
-  status: boolean;
-  validationStatus: boolean;
-  urlPicture?: string;
-  onClick?: (id: number) => void;
-};
-
+import type { PaginatedResponse, User } from "@/types/types";
+{/*
+type User = UserBase & {
+  onClick?: (id: string) => void;
+};  
+ */}
 
 const UserManagement = () => {
-  const [results, setResults] = useState<User[]>([]);
+  // OJO: el genérico va sobre el tipo del elemento (User), no sobre el
+  // array (User[]) — PaginatedResponse<T> ya trae "data: T[]" adentro.
+  const [results, setResults] = useState<PaginatedResponse<User> | null>(null);
   const [users, setAllUsers] = useState<User[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [user, setOneUser] = useState<User | null>(null);
@@ -48,8 +43,9 @@ const UserManagement = () => {
         throw new Error(`Error del servidor: ${res.status}`);
       }
 
-      const data = await res.json();
-      setAllUsers(Array.isArray(data) ? data : []);
+      // El findAll paginado devuelve { data, metadata }, no un array suelto.
+      const responseData: PaginatedResponse<User> = await res.json();
+      setAllUsers(Array.isArray(responseData.data) ? responseData.data : []);
     } catch (e) {
       console.error('Error al obtener usuarios:', e);
       setError('No se pudieron cargar los usuarios. Intentá de nuevo.');
@@ -57,7 +53,7 @@ const UserManagement = () => {
     }
   }, []);
 
-  const fetchOneUser = useCallback(async (id: number): Promise<User | null> => {
+  const fetchOneUser = useCallback(async (id: string): Promise<User | null> => {
     try {
       const res = await fetch(
         `${BACKEND_URL}/api/users/${id}`,
@@ -88,7 +84,7 @@ const UserManagement = () => {
 
   // ─── Acciones ──────────────────────────────────────────────────────────────
 
-  const openModal = async (id: number) => {
+  const openModal = async (id: string) => {
     const data = await fetchOneUser(id);
     if (data) {
       setOneUser(data);
@@ -150,13 +146,13 @@ const UserManagement = () => {
         </div>
 
         <div className={styles.searchRow}>
-          <SearchBar
+          <SearchBar<User>
             showFilters={true}
             filters={USER_FILTERS}
-            searchEndpoint="/api/users/search"
+            searchEndpoint="/api/users"
             searchPlaceholder="Buscar usuarios por nombre de usuario o correo electrónico"
-            onResults={(data) => setResults(data as User[])}
-            onClear={() => setResults([])}
+            onResults={(data) => setResults(data)}
+            onClear={() => setResults(null)}
           />
         </div>
 
@@ -175,9 +171,9 @@ const UserManagement = () => {
         <div className={styles.mainContent} style={{ display: 'block' }}>
           <div className={styles.gridSection}>
             <UserGrid
-              users={results.length > 0 ? results : users}
+              users={results?.data || users}
               columns={4}
-              onCardClick={(id: number) => openModal(id)}
+              onCardClick={(id: string) => openModal(id)}
             />
           </div>
         </div>

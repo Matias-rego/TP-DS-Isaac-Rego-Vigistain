@@ -2,15 +2,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./FallaForm.module.css";
 import { BACKEND_URL } from "@/lib/config";
 import { useAuth } from "@/lib/AuthContext";
-
-interface FailureType {
-  id_failure_type: number;
-  failureDescription: string;
-  estimatedImport: number;
-}
+import type { Failure_Type } from "@/types/types";
 
 export interface NuevaFalla {
-  id_failure_type: number;
+  id_failure_type: string;
   description: string;
   failureName: string;
 }
@@ -21,10 +16,10 @@ interface FallaFormProps {
 }
 
 const FallaForm = ({ onGuardar, onCancelar }: FallaFormProps) => {
-  const [tipos, setTipos] = useState<FailureType[]>([]);
+  const [tipos, setTipos] = useState<Failure_Type[]>([]);
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState<FailureType | null>(null);
+  const [selected, setSelected] = useState<Failure_Type | null>(null);
   const [description, setDescription] = useState("");
   const [error, setError] = useState<string | null>(null);
   const { isAuth, loading: authLoading } = useAuth();
@@ -35,7 +30,7 @@ const FallaForm = ({ onGuardar, onCancelar }: FallaFormProps) => {
       const res = await fetch(`${BACKEND_URL}/api/failure-types/`, { credentials: "include" });
       if (!res.ok) return;
       const data = await res.json();
-      setTipos(data);
+      setTipos(data.data);
     } catch (e) {
       console.error("Error al traer tipos de falla:", e);
     }
@@ -61,7 +56,7 @@ const FallaForm = ({ onGuardar, onCancelar }: FallaFormProps) => {
     return tipos.filter((t) => t.failureDescription.toLowerCase().includes(q));
   }, [tipos, query]);
 
-  const elegir = (t: FailureType) => {
+  const elegir = (t: Failure_Type) => {
     setSelected(t);
     setQuery(t.failureDescription);
     setOpen(false);

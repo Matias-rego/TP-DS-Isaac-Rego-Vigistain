@@ -1,24 +1,35 @@
 import { z } from "zod";
-import { id, description } from "@/utils/fields.js";
+import { id, description, enumSchema } from "@/utils/fields.js";
+import { QuerySchema } from "@/shared/common.schema.js";
 
 export const createFailuresSchema = z.array(
     z.object({
         id_failure_type: id,
         failureDescription: description,
         id_equipment: id,
-      }).strict(),
+    }).strict(),
     {
-      error: (issue) => {
-        if (issue.code === "invalid_type") {
-          return "The body must be an array of failures";
-        }
+        error: (issue) => {
+            if (issue.code === "invalid_type") {
+                return "The body must be an array of failures";
+            }
 
-        return "Invalid failures body format";
-      },
+            return "Invalid failures body format";
+        },
     }
-  )
-  .min(1, {
-    error: "At least one failure is required",
-  });
+)
+    .min(1, {
+        error: "At least one failure is required",
+    });
 
 export type CreateFailuresDto = z.infer<typeof createFailuresSchema>;
+
+export const failureQuerySchema = QuerySchema.extend({
+    sortBy: enumSchema([
+        "dateOfFailure",
+        "description",
+        "status",
+    ], "sortBy").default("dateOfFailure"),
+});
+
+export type FailureQueryDto = z.infer<typeof failureQuerySchema>;

@@ -1,12 +1,13 @@
+import { description, price, enumSchema } from "@/utils/fields.js";
+import { QuerySchema } from "@/shared/common.schema.js"
 import { z } from "zod";
-import { description, price} from "@/utils/fields.js";
 
-export const registerFailureTypeSchema = z.object({
+export const newFailureTypeSchema = z.object({
     failureDescription: description,
     estimatedImport: price,
 }).strict();
 
-export type RegisterFailureTypeDto = z.infer<typeof registerFailureTypeSchema>;
+export type NewFailureTypeDto = z.infer<typeof newFailureTypeSchema>;
 
 export const modifyFailureTypeSchema = z.object({
     failureDescription: description.optional(),
@@ -14,3 +15,13 @@ export const modifyFailureTypeSchema = z.object({
 }).strict();
 
 export type ModifyFailureTypeDto = z.infer<typeof modifyFailureTypeSchema>;
+
+export const failureTypeQuerySchema = QuerySchema.extend({
+    sortBy: enumSchema([
+        "failureDescription",
+        "estimatedImport",
+        "id_failure_type",
+    ], "sortBy").default("estimatedImport"),
+});
+
+export type FailureTypeQueryDto = z.infer<typeof failureTypeQuerySchema>
