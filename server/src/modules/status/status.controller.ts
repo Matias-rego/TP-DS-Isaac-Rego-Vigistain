@@ -19,7 +19,7 @@ export class StatusController {
       const entry = await this.service.createStatus({
         id_order: data.id_order,
         id_user: req.user.id,
-        newStatus: data.newStatus,
+        status: data.status,
         comment: data.comment,
       });
 

@@ -1,125 +1,63 @@
-import type { Request, Response } from "express";
-import prisma from "@/database/prisma.js";
+import type { NextFunction, Request, Response } from "express";
 import { emitEvent } from "@/websocket.js";
 import { EVENTS } from "@/shared/events.js";
-import type { ModifyClientDto, CreateClientDto } from "./client.schema.js";
-import type { ClientService } from "./client.service.js"
+import type { IdDto } from "@/shared/common.schema.js";
+import type { ModifyClientDto, CreateClientDto, ClientQueryDto } from "./client.schema.js";
+import type { ClientService } from "./client.service.js";
 
 export class ClientController {
     constructor(private service: ClientService) { }
 
-    private async getCategoryClientByOrders(orderCount: number) {
-        try {
-            const category = await prisma.client_Type.findFirst({
-                where: {
-                    amountForCategoryUp: {
-                        lte: orderCount,
-                    },
-                },
-            });
-
-            return category;
-        } catch (error) {
-            console.error("Error al encontrar la categoría del cliente", error);
-            return null;
-        }
-    }
-
-    public async createNewClient (req: Request, res: Response) {
+    public createClient = async (req: Request, res: Response, next: NextFunction) => {
+        const data = req.validated.body as CreateClientDto;
 
         try {
-            const { clientName, clientEmail, clientPhone, cuit }: CreateClientDto = req.body;
-            const category = await this.getCategoryClientByOrders(0);
-            console.log(category);
-            const newClient = await prisma.client.create({
-                data: {
-                    clientName,
-                    clientEmail,
-                    clientPhone,
-                    cuit,
-                    client_type: {
-                        connect: {
-                            id_client_type: category?.id_client_type,
-                        },
-                    },
-                }
-            })
+            const newClient = await this.service.create(data);
             emitEvent(EVENTS.clientChanged, newClient);
-            return res.status(201).json(newClient)
+            return res.status(201).json(newClient);
         } catch (error) {
-            console.error(`Error en el createNewClient, ${error}`);
-            return res.status(500).json({ message: "Error del servidor" })
+            next(error);
         }
-    }
+    };
 
-    public async getAllClients (req: Request, res: Response) {
-        try {
-            const clients = await prisma.client.findMany();
-            res.json(clients);
-        } catch (error) {
-            console.error(`Error getting all clients, ${error}`);
-            res.status(500).json({ error: "Error al obtener todos los clientes" })
-        }
-    }
+    // Cubre listado, búsqueda por nombre/email/cuit y filtro por categoría
+    // (lo que antes era getPartialClient) en un solo endpoint.
+    public getAllClients = async (req: Request, res: Response, next: NextFunction) => {
+        const query = req.validated.query as ClientQueryDto;
 
-    public async getOneClient (req: Request, res: Response) {
         try {
-            const client = await prisma.client.findUnique({
-                where: {
-                    id_client: req.params.id.toString(),
-                }
-            });
-            res.json(client);
+            res.json(await this.service.findAll(query));
         } catch (error) {
-            console.error("Error en el getOneClient, Server");
-            res.status(500).json({ error: "Error al obtener un cliente", errorData: error })
+            next(error);
         }
-    }
-    public async modifyClient (req: Request, res: Response) {
-        const data: ModifyClientDto = {};
-        if (req.body.clientName) data.clientName = req.body.clientName;
-        if (req.body.clientEmail) data.clientEmail = req.body.clientEmail;
-        if (req.body.cuit) data.cuit = req.body.cuit;
-        if (req.body.clientPhone) data.clientPhone = req.body.clientPhone;
-        try {
-            const modifyClient = await prisma.client.update({
-                where: { id_client: req.params.id.toString() },
-                data: data,
-            })
-            emitEvent(EVENTS.clientChanged, modifyClient);
-            res.json(modifyClient);
-        } catch (error) {
-            console.error("Error en el modifyClient", error);
-            res.status(500).json({ error: "Error modificando al cliente" });
-        }
-    }
+    };
 
-    public async getPartialClient (req: Request, res: Response) {
+    public getOneClient = async (req: Request, res: Response, next: NextFunction) => {
+        const { id } = req.validated.params as IdDto;
+
         try {
-            const { q, categoryClient } = req.query;
-            const clients = await prisma.client.findMany({
-                where: {
-                    AND: [
-                        q ? {
-                            OR: [
-                                { clientName: { contains: q as string } },
-                                { clientEmail: { contains: q as string } },
-                                { cuit: { contains: q as string } },
-                            ]
-                        } : {},
-                        categoryClient ? {
-                            client_type: { clientTypeName: { contains: categoryClient as string } }
-                        } : {},
-                    ]
-                },
-                include: {
-                    client_type: { select: { clientTypeName: true } }
-                }
-            });
-            return res.status(200).json(clients);
+            const client = await this.service.findById(id);
+
+            if (!client) {
+                return res.status(404).json({ message: "Cliente no encontrado" });
+            }
+
+            return res.json(client);
         } catch (error) {
-            console.error("Error fetching partial clients:", error);
-            res.status(500).json({ error: "Error en el getPartialClient" });
+            next(error);
+        }
+    };
+
+    public modifyClient = async (req: Request, res: Response, next: NextFunction) => {
+        const { id } = req.validated.params as IdDto;
+        const data = req.validated.body as ModifyClientDto;
+
+        try {
+            const modifiedClient = await this.service.update(id, data);
+            emitEvent(EVENTS.clientChanged, modifiedClient);
+            return res.json(modifiedClient);
+        } catch (error) {
+            next(error);
         }
     };
 }

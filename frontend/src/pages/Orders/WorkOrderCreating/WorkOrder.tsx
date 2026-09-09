@@ -21,31 +21,26 @@ import EquimentDetailModal from "@/components/EquipmentComponent/EquipmentDetail
 import MonitorIcon from '@/assets/MonitorIcono.svg'
 import { type Equipment } from "@/types/types";
 import { useAuth } from "@/lib/AuthContext";
+import type { Client as BaseClient, PaginatedResponse} from "@/types/types";
 
-interface Client {
-  id_client: number;
-  clientName: string;
-  clientEmail: string;
-  clientPhone: string;
-  cuit: string;
-  dateOfRegistration: string;
+interface Client extends BaseClient {
   categoryClientName?: string;
   lastRepair?: string;
   tags?: string[];
-  onClick?: (id: number) => void;
+  onClick?: (id: string) => void;
 }
 
 
 
 interface FailureEntry {
-  id_failure_type: number;
+  id_failure_type: string;
   description: string;
   failureName: string;
 }
 
 const WorkOrder = () => {
-  const [results, setResults] = useState<Client[]>([]);
-  const [resultsEquipment, setResultsEquipment]= useState<Equipment[]>([]);
+  const [results, setResults] = useState<PaginatedResponse<Client> | null>(null);
+  const [resultsEquipment, setResultsEquipment] = useState<PaginatedResponse<Equipment> | null>(null);
   const [showDropdownEquipment, setShowDropdownEquipment] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
@@ -306,38 +301,60 @@ const WorkOrder = () => {
               <div className={styles.searchContainer}>
                 <ActionButton label="" onClick={() => setRegisterClient(true)} variant="ghost"  />
                 <div className={styles.searchRow}>
-                  <SearchBar
-                    showFilters={false}
-                    searchEndpoint="/api/clients/search"
-                    searchPlaceholder="Busca Clientes por nombre, apellido o correo electrónico"
-                    onResults={(data) => { setResults(data as Client[]); setShowDropdown(data.length > 0); }}
-                    onClear={() => { setResults([]); setShowDropdown(false); }}
-                  />
+                <SearchBar<Client>
+                  showFilters={false}
+                  searchEndpoint="/api/clients"
+                  searchPlaceholder="Busca Clientes por nombre, apellido o correo electrónico"
+                  onResults={(data) => {
+                    setResults(data);
+                    setShowDropdown(data.data.length > 0);
+                  }}
+                  onClear={() => {
+                    setResults(null);
+                    setShowDropdown(false);
+                  }}
+                />
                   
                 </div>
-                {showDropdown && (
-                  <ul className={styles.resultsDropdown}>
-                    {results.map((client) => (
-                      <li
-                        key={client.id_client}
-                        className={styles.dropdownItem}
-                        onClick={() => handleSelectClient(client)}
-                      >
+               {showDropdown && results && (
+                <ul className={styles.resultsDropdown}>
+                  {results.data.map((client) => (
+                    <li
+                      key={client.id_client}
+                      className={styles.dropdownItem}
+                      onClick={() => handleSelectClient(client)}
+                    >
                         <div className={styles.dropdownDist}>
                           <div className={styles.itemContainer}>
-                            <span className={styles.itemName}>{client.clientName}</span>
-                            <span className={styles.itemEmail}>{client.clientEmail}</span>
+                            <span className={styles.itemName}>
+                              {client.clientName}
+                            </span>
+
+                            <span className={styles.itemEmail}>
+                              {client.clientEmail}
+                            </span>
                           </div>
+
                           <div>
-                            <button onClick={() => setShowClientModal(true)}>
-                              <img src={EyeIcon} alt="IconoOjo" className={styles.eyeIconImg} />
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedClient(client);
+                                setShowClientModal(true);
+                              }}
+                            >
+                              <img
+                                src={EyeIcon}
+                                alt="IconoOjo"
+                                className={styles.eyeIconImg}
+                              />
                             </button>
                           </div>
                         </div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                     </li>
+                  ))}
+                </ul>
+              )}
               </div>
 
               {selectedClient && (
@@ -375,7 +392,7 @@ const WorkOrder = () => {
               {showClientModal && selectedClient &&
                 <ClientDetailModal
                   client={selectedClient}
-                  equipos={[]}
+                  //equipos={[]}
                   open={showClientModal}
                   onClose={() => setShowClientModal(false)}
                 />
@@ -446,26 +463,38 @@ const WorkOrder = () => {
                   </CardHeader>
                   <CardContent className={styles.formContainer}>
                     <div className={styles.searchContainer}>
-                      <SearchBar
-                      showFilters={false}
-                      searchEndpoint="/api/equipments/search"
-                      searchPlaceholder="Busca Equipos por tipo, marca o modelo"
-                      onResults={(data) => {setResultsEquipment(data as Equipment[]); setShowDropdownEquipment(data.length > 0);}}
-                      onClear={() => { setResultsEquipment([]); setShowDropdownEquipment(false); }}
+                      <SearchBar<Equipment>
+                        showFilters={false}
+                        searchEndpoint="/api/equipments/search"
+                        searchPlaceholder="Busca Equipos por tipo, marca o modelo"
+                        onResults={(data) => {
+                          setResultsEquipment(data);
+                          setShowDropdownEquipment(data.data.length > 0);
+                        }}
+                        onClear={() => {
+                          setResultsEquipment(null);
+                          setShowDropdownEquipment(false);
+                        }}
                       />
-                    {showDropdownEquipment && (
-                      <ul className={styles.resultsDropdown}>
-                        {resultsEquipment.map((equipment) => (
-                          <li
-                            key={equipment.id_equipment}
-                            className={styles.dropdownItem}
-                            onClick={() => handleSelectEquipment(equipment)}
-                          >
+                      {showDropdownEquipment && resultsEquipment && (
+                        <ul className={styles.resultsDropdown}>
+                          {resultsEquipment.data.map((equipment) => (
+                            <li
+                              key={equipment.id_equipment}
+                              className={styles.dropdownItem}
+                              onClick={() => handleSelectEquipment(equipment)}
+                            >
                             <div className={styles.dropdownDist}>
                               <div className={styles.itemContainer}>
-                                <span className={styles.itemName}>Marca: {equipment.brand}</span>
-                                <span className={styles.itemEmail}>Modelo: {equipment.model}</span>
+                                <span className={styles.itemName}>
+                                  Marca: {equipment.brand}
+                                </span>
+
+                                <span className={styles.itemEmail}>
+                                  Modelo: {equipment.model}
+                                </span>
                               </div>
+
                               <button
                                 type="button"
                                 onClick={(e) => {
@@ -474,10 +503,13 @@ const WorkOrder = () => {
                                   setShowEquipmentModal(true);
                                 }}
                               >
-                                <img src={MonitorIcon} alt="Logo equipo" className={styles.eyeIconImg}/>
+                                <img
+                                  src={MonitorIcon}
+                                  alt="Logo equipo"
+                                  className={styles.eyeIconImg}
+                                />
                               </button>
                             </div>
-
                           </li>
                         ))}
                       </ul>

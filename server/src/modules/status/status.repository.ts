@@ -62,10 +62,20 @@ export class StatusHistoryRepository extends BaseRepository<StatusHistory, Statu
     }
 
     // Historial completo de una orden, ordenado del más viejo al más nuevo.
+    // Incluye el usuario que hizo el cambio (nombre + foto) para que el
+    // frontend no caiga siempre al fallback "Usuario".
     public async findByOrderId(id_order: string): Promise<StatusHistory[]> {
         const entries = await this.prisma.status_History.findMany({
             where: { id_order },
             orderBy: { dateOfChange: 'asc' },
+            include: {
+                user: {
+                    select: {
+                        userName: true,
+                        urlPicture: true,
+                    },
+                },
+            },
         });
 
         return entries.map((entry) => this.toDomain(entry));
@@ -75,7 +85,10 @@ export class StatusHistoryRepository extends BaseRepository<StatusHistory, Statu
         const entry = await this.prisma.status_History.create({
             data: {
                 id_status_history: uuidv7(),
-                ...item,
+                id_order: item.id_order,
+                id_user: item.id_user,
+                status: item.status,
+                comment: item.comment,
             },
         });
 
@@ -107,15 +120,17 @@ export class StatusHistoryRepository extends BaseRepository<StatusHistory, Statu
         };
     }
 
-    private toDomain(entry: StatusHistory_P): StatusHistory {
+    private toDomain(entry: StatusHistory_P & { user?: { userName: string; urlPicture: string | null } }): StatusHistory {
         return new StatusHistory(
             entry.id_order,
             entry.id_user,
-            entry.previousStatus,
-            entry.newStatus,
+            entry.status,
             entry.id_status_history,
             entry.dateOfChange,
             entry.comment ?? undefined,
+            entry.user
+                ? { userName: entry.user.userName, urlPicture: entry.user.urlPicture ?? undefined }
+                : undefined,
         );
     }
 }

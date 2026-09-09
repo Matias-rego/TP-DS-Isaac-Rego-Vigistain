@@ -1,9 +1,19 @@
-import type { Order as Order_P } from "@/generated/prisma/client.js";
+import type { Order as Order_P, Prisma } from "@/generated/prisma/client.js";
 import type { PaginatedResult } from "@/shared/base.repository.js";
 import type { OrderQueryDto } from "./order.schema.js";
 import { BaseRepository } from "@/shared/base.repository.js";
 import { v7 as uuidv7 } from "uuid";
 import { Order } from "./order.entity.js";
+
+// Relaciones que el frontend necesita para armar la fila de la tabla y el
+// detalle de la orden (OrderDirectory usa order.equipment?.client y
+// order.statusHistory para mostrar cliente, equipo y estado actual).
+const orderInclude = {
+    equipment: { include: { client: true } },
+    statusHistory: true,
+} satisfies Prisma.OrderInclude;
+
+type OrderWithRelations = Order_P & Prisma.OrderGetPayload<{ include: typeof orderInclude }>;
 
 export class OrderRepository extends BaseRepository<Order, OrderQueryDto> {
 
@@ -28,6 +38,7 @@ export class OrderRepository extends BaseRepository<Order, OrderQueryDto> {
                         [query.sortBy]: query.sortOrder,
                     }
                     : undefined,
+                include: orderInclude,
             }),
 
             this.prisma.order.count({
@@ -56,6 +67,7 @@ export class OrderRepository extends BaseRepository<Order, OrderQueryDto> {
             where: {
                 id_order: id,
             },
+            include: orderInclude,
         });
 
         return order
@@ -111,7 +123,10 @@ export class OrderRepository extends BaseRepository<Order, OrderQueryDto> {
         };
     }
 
-    private toDomain(order: Order_P): Order {
+    // Acepta tanto el resultado con relaciones (findAll/findById, que
+    // usan `include`) como el plano de create/update/delete (que no lo
+    // necesitan) — equipment/statusHistory quedan undefined en ese caso.
+    private toDomain(order: Order_P | OrderWithRelations): Order {
         return new Order(
             order.id_equipment,
             order.id_order,
@@ -123,6 +138,8 @@ export class OrderRepository extends BaseRepository<Order, OrderQueryDto> {
             order.estimatedDate ?? undefined,
             order.deliveryDate ?? undefined,
             order.totalCharged?.toNumber(),
+            "equipment" in order ? order.equipment ?? undefined : undefined,
+            "statusHistory" in order ? order.statusHistory ?? undefined : undefined,
         );
     }
 }

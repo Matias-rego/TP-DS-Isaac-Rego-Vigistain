@@ -1,4 +1,5 @@
 import type { $Enums } from "@/database/prisma.js";
+import type { Equipment, Client, Status_History } from "@/generated/prisma/client.js";
 
 export class Order {
     constructor(
@@ -12,5 +13,10 @@ export class Order {
         public estimatedDate?: Date,
         public deliveryDate?: Date,
         public totalCharged?: number,
+        // Relaciones opcionales: solo vienen pobladas cuando el repository
+        // las pide con `include` (findAll/findById). En create/update van
+        // undefined.
+        public equipment?: Equipment & { client?: Client | null },
+        public statusHistory?: Status_History[],
     ) { }
 }

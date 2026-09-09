@@ -6,34 +6,28 @@ import { eventBus } from "@/lib/eventBus";
 import { BACKEND_URL } from "@/lib/config";
 import type { Equipment } from "@/types/types";
 import EquipmentMiniDescriptiveCard from "@/components/EquipmentComponent/EquipmentMiniDescriptiveCard/EquipmentMiniDescriptiveCard";
+import type { Client as BaseClient } from "@/types/types";
 
-interface Client {
-  id_client: number;
-  clientName: string;
-  clientEmail: string;
-  clientPhone: string;
-  cuit: string;
-  dateOfRegistration: string;
-  categoryClientName?: string;
-  status?: boolean;
-  lastRepair?: string;
-  tags?: string[];
-  onClick?: (id: number) => void;
+// Extendemos la interfaz BaseClient para agregar la propiedad aplanada
+interface Client extends BaseClient {
+  clientTypeName?: string;
 }
 
-
 const clientFields: DetailFieldConfig<Client>[] = [
-  { name: 'clientName',    label: 'Nombre Completo' },
-  { name: 'clientEmail',   label: 'Email' },
-  { name: 'cuit',       label: 'CUIT' },
-  { name: 'categoryClientName', label: 'Categoría' },
-  { name: 'clientPhone',   label: 'Teléfono' },
+  { name: 'clientName', label: 'Nombre Completo' },
+  { name: 'clientEmail', label: 'Email' },
+  { name: 'cuit', label: 'CUIT' },
+  { name: 'clientTypeName', label: 'Categoría' },
+  { name: 'clientPhone', label: 'Teléfono' },
   {
     name: 'dateOfRegistration',
     label: 'Fecha de registro',
-    format: (value) => new Date(value).toLocaleDateString('en-US', {
-      year: 'numeric', month: 'short', day: 'numeric',
-    }),
+    format: (value) =>
+      new Date(value as string | Date).toLocaleDateString('es-AR', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      }),
   },
 ];
 
@@ -99,6 +93,13 @@ const ClientDetailModal = ({
 
   const handleEdit = async (data: Client): Promise<boolean> => {
     try {
+      // 1. Extraemos solo los campos permitidos por el schema de actualización del backend
+      const payload = {
+        clientName: data.clientName,
+        clientEmail: data.clientEmail,
+        clientPhone: data.clientPhone,
+        cuit: data.cuit,
+      };
 
       const response = await fetch(
         `${BACKEND_URL}/api/clients/${data.id_client}`,
@@ -107,7 +108,7 @@ const ClientDetailModal = ({
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(data),
+          body: JSON.stringify(payload), // Enviamos únicamente el payload limpio
           credentials: 'include',
         }
       );
@@ -120,7 +121,7 @@ const ClientDetailModal = ({
       const result = await response.json();
       console.log('Cliente editado con éxito:', result);
 
-      // Emitir evento → Clientes.tsx refrescará la lista y el cliente del modal
+      // Emitir evento para refrescar la vista
       if (entityEvent) eventBus.emit(entityEvent, result);
 
       return true;

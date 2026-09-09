@@ -10,4 +10,3 @@ export class Failure {
         public status?: $Enums.EnumFailureStatus,
     ) { }
 }
- 

@@ -4,7 +4,7 @@ import { z } from "zod";
 
 export const registerStatusSchema = z.object({
     id_order: id,
-    newStatus: enumSchema([
+    status: enumSchema([
         "recibido",
         "diagnostico",
         "presupuestado",
@@ -13,7 +13,7 @@ export const registerStatusSchema = z.object({
         "listo",
         "entregado",
         "cancelado",
-    ], "newStatus"),
+    ], "status"),
     comment: observations.optional(),
     // TODO: usar este flag en el controller para disparar la notificación
     // al cliente (mail/whatsapp/etc) cuando corresponda.
@@ -25,8 +25,7 @@ export type RegisterStatusDto = z.infer<typeof registerStatusSchema>;
 export const statusQuerySchema = QuerySchema.extend({
     sortBy: enumSchema([
         "dateOfChange",
-        "previousStatus",
-        "newStatus",
+        "status",
     ], "sortBy").default("dateOfChange"),
 });
 

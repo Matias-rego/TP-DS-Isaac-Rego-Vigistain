@@ -13,6 +13,9 @@ export const EnumEquipmentType = {
   computadora: "computadora",
   tablet: "tablet",
   consola: "consola",
+  televisor: "televisor",
+  notebook: "notebook",
+  impresora: "impresora",
   otro: "otro",
 } as const;
 export type EnumEquipmentType = (typeof EnumEquipmentType)[keyof typeof EnumEquipmentType];
@@ -144,8 +147,7 @@ export interface Status_History {
   id_status_history: string;
   id_order: string;
   order?: Order;
-  previousStatus: string;
-  newStatus: string;
+  status: EnumOrderStatus;
   id_user: string;
   user?: User;
   dateOfChange: Date;

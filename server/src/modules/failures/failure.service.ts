@@ -1,24 +1,43 @@
-import type { BaseRepository } from "@/shared/base.repository.js"; 
-import type { Failure } from "./failure.entity.js"; 
+import type { PaginatedResult } from "@/shared/base.repository.js";
+import type { CreateFailuresDto, FailureQueryDto } from "./failure.schema.js";
+import type { FailureRepository } from "./failure.repository.js";
+import { Failure } from "./failure.entity.js";
 
 export class FailureService {
-    constructor(private repo: BaseRepository<Failure>) { } 
+    constructor(private repo: FailureRepository) { }
 
-    findAll(): Promise<Failure[] | undefined> { 
-        return this.repo.findAll();
+    findAll(query?: FailureQueryDto): Promise<PaginatedResult<Failure>> {
+        return this.repo.findAll(query);
     }
-    findById(id: string): Promise<Failure | undefined> { 
+
+    findById(id: string): Promise<Failure | undefined> {
         return this.repo.findById(id);
     }
-    create(input: Omit<Failure, "id">): Promise<Failure | undefined> { 
-        return this.repo.create(input);
+
+    findByEquipmentId(id_equipment: string): Promise<Failure[]> {
+        return this.repo.findByEquipmentId(id_equipment);
     }
 
-    update(id: string, input: Partial<Failure>): Promise<Failure | undefined> { 
+    // Mapea "failureDescription" (nombre del campo en el DTO) a
+    // "description" (nombre real del campo en el entity/modelo). Sin
+    // status: no hay un estado "recién creada" en tu enum (solo
+    // diagnosticada/resuelta), así que queda sin definir hasta que se
+    // diagnostique.
+    createMany(items: CreateFailuresDto): Promise<Failure[]> {
+        const failures = items.map((item) => new Failure(
+            item.id_failure_type,
+            item.id_equipment,
+            item.failureDescription,
+        ));
+
+        return this.repo.createMany(failures);
+    }
+
+    update(id: string, input: Partial<Failure>): Promise<Failure | undefined> {
         return this.repo.update(id, input);
     }
-    
-    delete(id: string): Promise<{ id: string } | undefined> { 
+
+    delete(id: string): Promise<{ id: string } | undefined> {
         return this.repo.delete(id);
     }
 }

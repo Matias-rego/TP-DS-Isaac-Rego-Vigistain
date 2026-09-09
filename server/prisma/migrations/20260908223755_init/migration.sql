@@ -65,7 +65,7 @@ CREATE TABLE `Failure` (
 -- CreateTable
 CREATE TABLE `Equipment` (
     `id_equipment` CHAR(36) NOT NULL,
-    `tipo_equipment` ENUM('celular', 'computadora', 'tablet', 'consola', 'otro') NOT NULL,
+    `tipo_equipment` ENUM('celular', 'computadora', 'tablet', 'consola', 'notebook', 'impresora', 'televisor', 'otro') NOT NULL,
     `brand` VARCHAR(191) NOT NULL,
     `model` VARCHAR(191) NOT NULL,
     `observations` VARCHAR(191) NULL,

@@ -1,21 +1,28 @@
 import { Router } from "express";
-import { createNewClient, getAllClients, getOneClient, modifyClient, getPartialClient } from "./client.controller.js";
+import { ClientController } from "./client.controller.js";
+import { ClientService } from "./client.service.js";
+import { ClientRepository } from "./client.repository.js";
+import prisma from "@/database/prisma.js";
 import { validate } from "@/middlewares/validation.middleware.js";
-import { createClientSchema, modifyClientSchema } from "./client.schema.js";
+import { createClientSchema, modifyClientSchema, clientQuerySchema } from "./client.schema.js";
 import { idSchema } from "@/shared/common.schema.js";
+
+const ctrl = new ClientController(
+    new ClientService(
+        new ClientRepository(
+            prisma
+        )
+    )
+);
 
 const router = Router();
 
-router.post('/', validate({ body: createClientSchema }), createNewClient);
+router.post('/', validate({ body: createClientSchema }), ctrl.createClient);
 
-router.get('/', getAllClients);
+router.get('/', validate({ query: clientQuerySchema }), ctrl.getAllClients);
 
-router.get('/search', getPartialClient);
+router.get('/:id', validate({ params: idSchema }), ctrl.getOneClient);
 
-router.get('/:id', validate({params: idSchema}), getOneClient);
-
-router.put('/:id', validate({ params: idSchema, body: modifyClientSchema }), modifyClient);
-
-
+router.put('/:id', validate({ params: idSchema, body: modifyClientSchema }), ctrl.modifyClient);
 
 export default router;
