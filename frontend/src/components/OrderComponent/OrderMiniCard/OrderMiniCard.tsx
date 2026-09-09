@@ -14,8 +14,13 @@ const STATUS_CONFIG: Record<EnumOrderStatus, { label: string; className: string 
 
 export interface OrderMiniCardProps {
   order: Order;
-  onClick?: (id_order: number) => void;
+  onClick?: (id_order: string) => void;
 }
+
+// El id de la orden ahora es un uuid largo. Para la tarjeta mostramos solo
+// los primeros 8 caracteres (alcanza para identificarla) y dejamos el id
+// completo en el title (tooltip al pasar el mouse).
+const shortId = (id: string) => `#${String(id).slice(0, 8)}`;
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(value);
@@ -64,7 +69,7 @@ const OrderMiniCard = ({ order, onClick }: OrderMiniCardProps) => {
     >
       <div className={styles.header}>
         <div className={styles.titleBlock}>
-          <span className={styles.orderId}>#{order.id_order}</span>
+          <span className={styles.orderId} title={String(order.id_order)}>{shortId(order.id_order)}</span>
           <span className={styles.equipment} title={equipmentLabel}>{equipmentLabel}</span>
         </div>
         <span className={`${styles.badge} ${styles[statusInfo.className]}`}>
