@@ -4,6 +4,7 @@ import { eventBus } from '@/lib/eventBus';
 import { BACKEND_URL } from '@/lib/config';
 import styles from './BajaForm.module.css';
 import { useAuth } from '@/lib/AuthContext';
+import type { PaginatedResponse } from "@/types/types";
 
 // ─── Field config para el detalle ────────────────────────────────────────────
 
@@ -75,25 +76,24 @@ export default function BajaForm<T extends object>({
     }
 
     const fetchResults = async () => {
+ 
       try {
-        const headers: Record<string, string> = {};
-        if (requiresAuth) {
-          const token = localStorage.getItem('token');
-          if (token) headers.Authorization = `Bearer ${token}`;
-        }
-
+        // La búsqueda va como query string (?search=...), no como segmento
+        // de ruta: el backend la valida con req.validated.query, no con
+        // req.validated.params.
+        const searchParams = new URLSearchParams({ search: debouncedQuery });
         const result = await fetch(
-          `${baseUrl}${searchEndpoint}/${encodeURIComponent(debouncedQuery)}`,
-          { method: 'GET', headers, credentials: 'include' }
-        );
-
+          `${baseUrl}${searchEndpoint}?${searchParams.toString()}`,
+          { method: 'GET', credentials: 'include' });
         if (result.status === 404) {
           setResults([]);
           return;
         }
-
-        const data = await result.json();
-        setResults(data);
+ 
+        const data: PaginatedResponse<T> | T[] = await result.json();
+        // findAll devuelve { data, metadata }; soportamos también un array
+        // plano por si algún endpoint todavía no está paginado.
+        setResults(Array.isArray(data) ? data : data.data);
       } catch (e) {
         console.error(e);
         setError('Error al buscar.');
@@ -179,20 +179,26 @@ export default function BajaForm<T extends object>({
 
       {/* Lista de resultados */}
       {results.length > 0 && !selected && (
-        <ul className={styles.resultsList}>
-          {results.map((r) => (
-            <li
-              key={String(r[idField])}
-              className={styles.resultItem}
-              onClick={() => handleSelect(r)}
-            >
-              <span className={styles.resultId}>#{String(r[idField])}</span>
-              <span className={styles.resultDesc}>
-                {previewFormat ? previewFormat(r) : String(r[previewField as keyof T])}
-              </span>
-            </li>
-          ))}
-        </ul>
+        <div className={styles.resultsContainer}>
+          {/* Contador de resultados */}
+          <span className={styles.resultsCount}>
+            {results.length} {results.length === 1 ? 'resultado encontrado' : 'resultados encontrados'}
+          </span>
+
+          <ul className={styles.resultsList}>
+            {results.map((r) => (
+              <li
+                key={String(r[idField])}
+                className={styles.resultItem}
+                onClick={() => handleSelect(r)}
+              >
+                <span className={styles.resultDesc}>
+                  {previewFormat ? previewFormat(r) : String(r[previewField as keyof T])}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
 
       {/* Detalle del seleccionado */}

@@ -121,13 +121,22 @@ const Nav = () => {
               Clientes
             </button>
           </li>
+          {user?.rol === 'admin' && (
+            <li>
+              <button type="button" className={styles.navButton} onClick={() => navigate('/userManagement')}>
+                Usuarios
+              </button>
+            </li>
+          )}
         </ul>
 
         {/* Acciones desktop */}
         <div className={styles.navActions}>
+        {/*
           {user?.rol === 'admin' && (
             <UserToggle />
           )}
+          */}
           <ThemeToggle />
           <button
             type="button"

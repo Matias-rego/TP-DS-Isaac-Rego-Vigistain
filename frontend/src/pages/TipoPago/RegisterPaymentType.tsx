@@ -39,7 +39,7 @@ const FIELDS: FieldConfig[] = [
         placeholder: 'Seleccioná un tipo de pago',
     },
     {
-        name: 'percentaje',
+        name: 'percentage',
         label: 'Porcentaje',
         type: 'number',
         placeholder: 'Ej: 0.1 para 10%',

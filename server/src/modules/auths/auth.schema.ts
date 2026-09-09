@@ -27,3 +27,14 @@ export const resetPasswordSchema = z.object({
 }).strict();
 
 export type ResetPasswordDto = z.infer<typeof resetPasswordSchema>;
+
+export const createAuthSchema = z.object({
+    userName: username,
+    email: email,
+    password_hash: z.string(),
+    rol: z.string().optional(),
+    status: z.boolean().optional(),
+    validationStatus: z.boolean().optional(),
+});
+
+export type CreateAuthDto = z.infer<typeof createAuthSchema>;

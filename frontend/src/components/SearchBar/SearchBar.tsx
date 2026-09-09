@@ -3,6 +3,7 @@ import useDebounce from '@/components/useDebounce';
 import { BACKEND_URL } from '@/lib/config';
 import styles from './SearchBar.module.css';
 import { X } from 'lucide-react';
+import type { PaginatedResponse } from '@/types/types';
 
 // ─── Filter config ────────────────────────────────────────────────────────────
 
@@ -25,28 +26,26 @@ export interface ActiveFilters {
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
-export interface SearchBarProps {
+export interface SearchBarProps<T> {
   searchPlaceholder?: string;
   searchEndpoint: string;
   filters?: FilterConfig[];
-  /** Nuevo atributo para controlar la visibilidad de los filtros */
-  showFilters?: boolean; 
-  onResults: (results: unknown[]) => void;
+  showFilters?: boolean;
+  onResults: (results: PaginatedResponse<T>) => void;
   onClear?: () => void;
   debounceMs?: number;
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
-
-export default function SearchBar({
+export default function SearchBar<T>({
   searchPlaceholder = 'Buscar...',
   searchEndpoint,
   filters = [],
-  showFilters = true, // Por defecto es true
+  showFilters = true,
   onResults,
   onClear,
   debounceMs = 600,
-}: SearchBarProps) {
+}: SearchBarProps<T>) {
   const [query, setQuery] = useState('');
   const [activeFilters, setActiveFilters] = useState<ActiveFilters>({});
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -55,6 +54,16 @@ export default function SearchBar({
 
   const debouncedQuery = useDebounce(query, debounceMs);
   const baseUrl = BACKEND_URL;
+
+  const emptyResponse = (): PaginatedResponse<T> => ({
+    data: [],
+    metadata: {
+      page: 1,
+      limit: 10,
+      total: 0,
+      totalPages: 0,
+    },
+  });
 
   // Cerrar dropdown al clickear afuera
   useEffect(() => {
@@ -68,12 +77,19 @@ export default function SearchBar({
   }, []);
 
   // Fetch cuando cambia el query o los filtros
-  useEffect(() => {
-    const hasQuery = debouncedQuery.trim().length > 0;
+useEffect(() => {
+    const trimmedQuery = debouncedQuery.trim();
+    const hasQuery = trimmedQuery.length > 0;
     const hasFilters = Object.values(activeFilters).some(v => v !== '');
 
     if (!hasQuery && !hasFilters) {
       onClear?.();
+      return;
+    }
+
+    // 1. Evita disparar la petición con 1 solo carácter si no hay filtros activos (previene el 400)
+    if (hasQuery && trimmedQuery.length < 2 && !hasFilters) {
+      onResults(emptyResponse());
       return;
     }
 
@@ -82,7 +98,12 @@ export default function SearchBar({
       try {
         const params = new URLSearchParams();
 
-        if (debouncedQuery.trim()) params.set('q', debouncedQuery.trim());
+        if (trimmedQuery) params.set('q', trimmedQuery);
+
+        // 2. Agregar la metadata de paginación por defecto que espera el backend
+        params.set('page', '1');
+        params.set('limit', '10');
+
         Object.entries(activeFilters).forEach(([key, value]) => {
           if (value) params.set(key, value);
         });
@@ -91,15 +112,18 @@ export default function SearchBar({
           credentials: 'include',
         });
 
-        if (res.status === 404) { onResults([]); return; }
+        if (res.status === 404) {
+          onResults(emptyResponse());
+          return;
+        }
         if (!res.ok) throw new Error(`Error ${res.status}`);
 
         const data = await res.json();
         onResults(data);
-      } catch (e) {
+      }catch (e) {
         console.error('SearchBar fetch error:', e);
-        onResults([]);
-      } finally {
+        onResults(emptyResponse());
+      }finally {
         setLoading(false);
       }
     };

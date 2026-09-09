@@ -19,7 +19,7 @@ interface DeviceTypeOption {
 }
 
 const DEVICE_TYPES: DeviceTypeOption[] = [
-  { value: "telefono", label: "Teléfono", icon: Smartphone },
+  { value: "celular", label: "Teléfono", icon: Smartphone },
   { value: "computadora", label: "Computadora", icon: Monitor },
   { value: "notebook", label: "Notebook", icon: Laptop },
   { value: "impresora", label: "Impresora", icon: Printer },

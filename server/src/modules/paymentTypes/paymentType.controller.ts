@@ -1,78 +1,71 @@
-import type { Request, Response } from "express";
-import prisma from "@/database/prisma.js";
+import type { NewPaymentTypeDto, ModifyPaymentTypeDto, PaymentTypeQueryDto } from "./paymentType.schema.js";
+import type { Request, Response, NextFunction } from "express";
+import type { PaymentTypeService } from "./paymentType.service.js";
+import type { IdDto } from "@/shared/common.schema.js";
 import { emitEvent } from "@/websocket.js";
 import { EVENTS } from "@/shared/events.js";
-import type { CreateTypePaymentDto, ModifyTypePaymentDto } from "./paymentType.schema.js";
+import { error } from "node:console";
+
+export class PaymentTypeController {
+    constructor(private service: PaymentTypeService) { }
+
+    public newTypePayment = async (req: Request, res: Response, next: NextFunction) => {
+        const data = req.validated.body as NewPaymentTypeDto;
+
+        try {
+            const newTypePayment = await this.service.create(data)
+            emitEvent(EVENTS.paymentTypeChanged, newTypePayment);
+            res.status(201).json(newTypePayment);
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    public getAllPaymentTypes = async (req: Request, res: Response, next: NextFunction) => {
+        const query = req.validated.query as PaymentTypeQueryDto;
+
+        try {
+            res.json(await this.service.findAll(query));
+        } catch (_error) {
+            next(error)
+        }
+    };
 
 
-export const createTypePayment = async (req: Request, res: Response) => {
-    try {
-        const { paymentTypeName, paymentMethod, type_of_payment, percentaje }: CreateTypePaymentDto = req.body;
-        const newTypePayment = await prisma.payment_Type.create({
-            data: {
-                paymentTypeName,
-                paymentMethod,
-                type_of_payment,
-                percentaje
-            }
-        });
-        emitEvent(EVENTS.paymentTypeChanged, newTypePayment);
-        res.status(201).json(newTypePayment);
-    } catch (error) {
-        console.error('Error en createTypePayment:', error);
-        res.status(500).json({ error: "Error al crear el tipo de pago" });
-    }
-};
-export const getAllPaymentTypes = async (req: Request, res: Response) => {
-    try {
-        const result = await prisma.payment_Type.findMany();
-        res.status(200).json(result);
-    } catch (_error) {
-        res.status(500).json({ error: "Error al obtener los tipos de pago" });
-    }
-};
-export const getPartialTypesPayment = async (req: Request, res: Response) => {
-    try {
-        const query = String(req.params.query);
-        const result = await prisma.payment_Type.findMany({
-            where: {
-                paymentTypeName: {
-                    contains: query,
-                }
-            }
-        });
-        res.status(200).json(result);
-    } catch (_error) {
-        res.status(500).json({ error: "Error al obtener los tipos de pago" });
-    }
-};
-export const deleteTypePayment = async (req: Request, res: Response) => {
-    try {
-        const id = Number(req.params.id);
-        const deletedTypePayment = await prisma.payment_Type.delete({
-            where: { id_payment_type: id }
-        });
-        emitEvent(EVENTS.paymentTypeDeleted, { id: id });
-        res.status(200).json(deletedTypePayment);
-    } catch (_error) {
-        res.status(500).json({ error: "Error al eliminar el tipo de pago" });
-    }
-};
-export const modifyTypePayment = async (req: Request, res: Response) => {
-    const data: ModifyTypePaymentDto = {};
-    if (req.body.paymentTypeName) data.paymentTypeName = req.body.paymentTypeName;
-    if (req.body.paymentMethod) data.paymentMethod = req.body.paymentMethod;
-    if (req.body.type_of_payment) data.type_of_payment = req.body.type_of_payment;
-    if (req.body.percentaje) data.percentaje = req.body.percentaje;
-    try {
-        const id = Number(req.params.id);
-        const updatedTypePayment = await prisma.payment_Type.update({
-            where: { id_payment_type: id },
-            data: data
-        });
-        emitEvent(EVENTS.paymentTypeChanged, updatedTypePayment);
-        res.status(200).json(updatedTypePayment);
-    } catch (_error) {
-        res.status(500).json({ error: "Error al modificar el tipo de pago" });
-    }
-};
+    public deleteTypePayment = async (req: Request, res: Response, next: NextFunction) => {
+
+        const params = req.validated.params as IdDto;
+
+        try {
+            await this.service.delete(params.id);
+            emitEvent(EVENTS.paymentTypeDeleted, { id: params.id });
+            return res.status(200).json({ message: 'Type tailure deleted successfully' });
+        } catch (error) {
+            next(error)
+        }
+    };
+
+    public modifyTypePayment = async (req: Request, res: Response, next: NextFunction) => {
+        const data = req.validated.body as ModifyPaymentTypeDto;
+        const params = req.validated.params as IdDto
+
+        try {
+            const updatedTypePayment = await this.service.update(params.id, data)
+            emitEvent(EVENTS.paymentTypeChanged, updatedTypePayment);
+            res.json(updatedTypePayment);
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    public getOneTypePayment = async (req: Request, res: Response, next: NextFunction) => {
+        const params = req.validated.params as IdDto;
+
+        try {
+            res.json(await this.service.findById(params.id));
+        } catch (error) {
+            next(error);
+        }
+    };
+
+}

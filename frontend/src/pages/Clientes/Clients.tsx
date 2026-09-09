@@ -10,29 +10,18 @@ import ClientRegister from './ClientRegister';
 import { eventBus, EVENTS } from '@/lib/eventBus';
 import ClientDetailModal from "@/components/ClientCard/ClientDetailModal/ClientDetailModal";
 import { BACKEND_URL } from '@/lib/config';
-
-interface Client {
-  id_client: number;
-  clientName: string;
-  clientEmail: string;
-  clientPhone: string;
-  cuit: string;
-  dateOfRegistration: string;
-  categoryClientName?: string;
-  lastRepair?: string;
-  tags?: string[];
-  onClick?: (id: number) => void;
-}
+import type { PaginatedResponse } from '@/types/types';
+import type { Client } from '@/types/types';
 
 interface categoryClient {
-  categoryClientName: string;
+  clientTypeName: string;
 }
 
 const Clientes = () => {
   const [results, setResults] = useState<Client[]>([]);
-  const [clients, setAllClients] = useState<Client[]>([]);
+  const [clients, setAllClients] = useState<PaginatedResponse<Client> | null>(null);
   const [registerClient, setRegisterClient] = useState(false);
-  const [categories, setCategories] = useState<categoryClient[]>([]);
+  const [categories, setCategories] = useState<PaginatedResponse<categoryClient> | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [client, setOneClient] = useState<Client | null>(null);
   const [open, setOpen] = useState(false);
@@ -41,11 +30,9 @@ const Clientes = () => {
 
   const getAllClients = useCallback(async () => {
     try {
-      const res = await fetch(
-        `${BACKEND_URL}/api/clients/`,
-        { credentials: 'include' }
-      );
-      setAllClients(await res.json());
+      const res = await fetch(`${BACKEND_URL}/api/clients/`, { credentials: 'include' });
+      const data: PaginatedResponse<Client> = await res.json();
+      setAllClients(data);
     } catch (e) {
       console.error('Error al obtener clientes:', e);
       setError('No se pudieron cargar los clientes. Intentá de nuevo.');
@@ -54,17 +41,16 @@ const Clientes = () => {
 
   const findCategoryClients = useCallback(async () => {
     try {
-      const res = await fetch(
-        `${BACKEND_URL}/api/client-types/`,
-        { credentials: 'include' }
-      );
-      setCategories(await res.json());
+      const res = await fetch(`${BACKEND_URL}/api/client-types/`, { credentials: 'include' });
+      const data: PaginatedResponse<categoryClient> = await res.json();
+      setCategories(data);
     } catch (e) {
       console.error('Error fetching category clients:', e);
     }
   }, []);
 
-  const fetchOneClient = useCallback(async (id: number): Promise<Client | null> => {
+  // 🔴 Cambiado: id de number a string
+  const fetchOneClient = useCallback(async (id: string): Promise<Client | null> => {
     try {
       const res = await fetch(
         `${BACKEND_URL}/api/clients/${id}`,
@@ -87,6 +73,7 @@ const Clientes = () => {
     const unsubscribe = eventBus.on(EVENTS.clientChanged, async () => {
       await getAllClients();
       if (open && client) {
+        // client.id_client ahora se procesa como string
         const updated = await fetchOneClient(client.id_client);
         if (updated) setOneClient(updated);
       }
@@ -96,7 +83,8 @@ const Clientes = () => {
 
   // ─── Acciones ──────────────────────────────────────────────────────────────
 
-  const openModal = async (id: number) => {
+  // 🔴 Cambiado: id de number a string
+  const openModal = async (id: string) => {
     const data = await fetchOneClient(id);
     if (data) {
       setOneClient(data);
@@ -123,9 +111,9 @@ const Clientes = () => {
       label: 'Tipo de cliente',
       type: 'select',
       placeholder: 'Todos los tipos',
-      options: categories.map((c) => ({
-        value: c.categoryClientName,
-        label: c.categoryClientName,
+      options: (categories?.data ?? []).map((c) => ({
+        value: c.clientTypeName,
+        label: c.clientTypeName,
       })),
     },
   ], [categories]);
@@ -168,7 +156,7 @@ const Clientes = () => {
         {client && open && (
           <ClientDetailModal
             client={client}
-            equipos={[]}
+            //equipos={[]}
             open={open}
             onClose={closeModal}
             entityEvent={EVENTS.clientChanged}
@@ -197,10 +185,10 @@ const Clientes = () => {
           )}
           <div className={styles.gridSection}>
             <ClientGrid
-              clients={results.length > 0 ? results : clients}
+              clients={results.length > 0 ? results : (clients?.data ?? [])}
               columns={registerClient ? 2 : 4}
               onAddClick={() => setRegisterClient(true)}
-              onCardClick={(id: number) => openModal(id)}
+              onCardClick={(id: string) => openModal(id)}
             />
           </div>
         </div>
@@ -212,3 +200,12 @@ const Clientes = () => {
 };
 
 export default Clientes;
+
+/*
+    CUIT	         Tipo
+30-12345678-1	Empresa (S.R.L.)
+30-23456789-2	Empresa (S.R.L.)
+33-55555555-0	Sociedad del Estado
+20-11111111-2	Persona física (M)
+27-99999999-4	Persona física (F)
+*/ 

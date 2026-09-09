@@ -1,33 +1,44 @@
 import { Router } from 'express';
-import { registerUser, loginUser, forgotPassword, resetPassword, getMe, logout, validateAccountController} from "./auth.controller.js";
 import authenticate from '@/middlewares/authenticate.middleware.js';
 import { upload } from '@/middlewares/upload.middleware.js';
 import { validate } from '@/middlewares/validation.middleware.js';
-import { forgotPasswordSchema, resetPasswordSchema, loginSchema, registerSchema } from './auth.schema.js';
 import type { Request, Response } from 'express';
+import { AuthController } from './auth.controller.js';
+import { UserService } from "@/modules/users/user.service.js";
+import { UserRepository } from "@/modules/users/user.repository.js"
+import prisma from '@/database/prisma.js';
+import { forgotPasswordSchema, loginSchema, registerSchema, resetPasswordSchema } from './auth.schema.js';
+
+const ctrl = new AuthController(
+    new UserService(
+        new UserRepository(
+            prisma
+        )
+    )
+)
 
 const router = Router();
 
-router.post('/register', 
-    upload.single('foto'), 
+router.post('/register',
+    upload.single('foto'),
     validate({ body: registerSchema }),
-    registerUser);
+    ctrl.registerUser);
 
-router.post('/login', validate({ body: loginSchema }), loginUser);
+router.post('/login', validate({ body: loginSchema }), ctrl.loginUser);
 
-router.post('/logout', authenticate([]), logout);
+router.post('/logout', authenticate([]), ctrl.logout);
 
 router.post('/refresh', (req: Request, res: Response) => {
     res.status(200).json({ message: 'Refresh token endpoint not implemented yet' });
 });
 
-router.post('/forgot-password', validate({ body: forgotPasswordSchema }), forgotPassword);
+router.post('/forgot-password', validate({ body: forgotPasswordSchema }), ctrl.forgotPassword);
 
-router.post('/reset-password/:token', validate({ body: resetPasswordSchema }), resetPassword);
+router.post('/reset-password/:token', validate({ body: resetPasswordSchema }), ctrl.resetPassword);
 
-router.put('/validate/:token', validateAccountController);
+router.put('/validate/:token', ctrl.validateAccountController);
 
-router.get('/me', authenticate([]), getMe);
+router.get('/me', authenticate([]), ctrl.getMe);
 
 export default router;
 

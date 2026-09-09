@@ -1,11 +1,11 @@
 import styles from './SmallClientCard.module.css'
 
 export interface ClientMiniCardProps {
-  id_client?: number;
+  id_client?: string;
   clientName: string;
   registrationYear: number | string;
   urlPicture?: string;
-  onClick?: (id?: number) => void;
+  onClick?: (id?: string) => void;
 }
 
 const AVATAR_COLORS = [

@@ -1,18 +1,28 @@
 import { Router } from 'express';
-import {upload} from '@/middlewares/upload.middleware.js';
-import { uploadPhotoCloud, registerEquipment, getPartialEquipment, getEquipmentOfClient } from './equipment.controller.js';
 import { validate } from '@/middlewares/validation.middleware.js';
-import { registerEquipmentSchema } from './equipment.schema.js';
-import { idSchema } from '@/shared/common.schema.js';
+import { equipmentQuerySchema, registerEquipmentSchema } from './equipment.schema.js';
+import { EquipmentController } from './equipment.controller.js';
+import { EquipmentService } from './equipment.service.js';
+import { idSchema } from "@/shared/common.schema.js";
+import { EquipmentRepository } from './equipment.repository.js';
+import prisma from "@/database/prisma.js";
 
-const router =Router();
+const ctrl = new EquipmentController(
+    new EquipmentService(
+        new EquipmentRepository(
+            prisma
+        )
+    )
+)
 
-router.get('/equipmentForClient/:id',validate({params: idSchema}), getEquipmentOfClient)
+const router = Router();
 
-router.get('/search', getPartialEquipment);
+router.get('/equipmentForClient/:id', validate({ params: idSchema }), ctrl.getEquipmentOfClient);
 
-router.post('/upload-photo', upload.single('foto'), uploadPhotoCloud);
+router.get('/', validate({ query: equipmentQuerySchema }), ctrl.getAllEquipment);
 
-router.post('/', validate({body: registerEquipmentSchema}), registerEquipment);
+router.post('/', validate({ body: registerEquipmentSchema }), ctrl.registerEquipment);
+
+router.get('/:id', validate({ params: idSchema }), ctrl.getOneEquipment);
 
 export default router;

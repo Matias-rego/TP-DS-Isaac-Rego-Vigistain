@@ -2,20 +2,16 @@ import styles from "./FailureDescription.module.css";
 import { useCallback, useEffect, useState } from "react";
 import { BACKEND_URL } from "@/lib/config";
 import { useAuth } from "@/lib/AuthContext";
+import type { Failure_Type, PaginatedResponse} from "@/types/types";
 
-interface Failure_Type {
-  id_failure_type: number;
-  failureDescription: string;
-  estimatedImport: number;
-}
 
-interface FailureDescriptionProps {
-  description: string;
-  onChangeDescription: (value: string) => void;
-  selectedFailureType: number | null;
-  onChangeSelectedFailureType: (id: number | null) => void;
-  placeholder?: string;
-}
+  interface FailureDescriptionProps {
+    description: string;
+    onChangeDescription: (value: string) => void;
+    selectedFailureType: number | null;
+    onChangeSelectedFailureType: (id: number | null) => void;
+    placeholder?: string;
+  }
 
 const FailureDescription = ({
   description,
@@ -33,15 +29,19 @@ const FailureDescription = ({
         method: "GET",
         credentials: "include",
       });
+
       if (result.status === 404) {
         setTiposFallas([]);
         return;
       }
+
       if (!result.ok) throw new Error(`Error ${result.status}`);
-      const data = await result.json();
-      setTiposFallas(data);
+
+      const response: PaginatedResponse<Failure_Type> = await result.json();
+      setTiposFallas(response.data); // <--- Extraés el arreglo desde .data
     } catch (error) {
       console.error("Error al buscar tipos de falla:", error);
+      setTiposFallas([]);
     }
   }, []);
 

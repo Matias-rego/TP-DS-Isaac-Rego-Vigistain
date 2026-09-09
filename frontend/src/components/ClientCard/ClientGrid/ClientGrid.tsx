@@ -4,7 +4,7 @@ import styles from './ClientGrid.module.css';
 
 interface ClientGridProps {
   clients: ClientCardProps[];
-  onCardClick?: (id: number) => void;
+  onCardClick?: (id: string) => void;
   onAddClick?: () => void;
   columns?: 2 | 3 | 4;
 }

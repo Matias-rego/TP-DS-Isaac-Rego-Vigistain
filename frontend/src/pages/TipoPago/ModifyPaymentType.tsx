@@ -1,14 +1,7 @@
 import ModForm from '../CRUDS/Modify/ModForm';
 import type { FieldConfig } from '../CRUDS/Alta/AltaForm';
 import { EVENTS } from '../../lib/eventBus';
-
-interface PaymentType {
-  id_payment_type: number;
-  paymentTypeName: string;
-  percentaje: number;
-  paymentMethod: 'EFECTIVO' | 'CREDITO' | 'DEBITO' | 'MP';
-  type_of_payment: 'Descuento' | 'Recargo';
-}
+import type {Payment_Type} from '@/types/types';
 const PAYMENT_OPTIONS = [
   { value: 'DEBITO',  label: 'Débito' },
   { value: 'MP',      label: 'Mercado Pago' },
@@ -46,7 +39,7 @@ const FIELDS: FieldConfig[] = [
         placeholder: 'Seleccioná un tipo de pago',
     },
     {
-        name: 'percentaje',
+        name: 'percentage',
         label: 'Porcentaje',
         type: 'number',
         placeholder: 'Ej: 0.1 para 10%',
@@ -69,7 +62,7 @@ interface ModifyPaymentTypeProps {
 
 export default function ModifyPaymentType({ onSuccess }: ModifyPaymentTypeProps) {
   return (
-    <ModForm<PaymentType>
+    <ModForm<Payment_Type>
         title="Modificar Tipo de Pago"
         subtitle="Buscá el tipo de pago que querés editar"
         searchPlaceholder="Buscar tipo de pago..."

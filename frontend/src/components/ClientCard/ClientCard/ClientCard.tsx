@@ -3,17 +3,17 @@ import styles from './ClientCard.module.css';
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface ClientCardProps {
-  id_client: number;
+  id_client: string;
   clientName: string;
   clientEmail: string;
   clientPhone: string;
   cuit: string;
-  dateOfRegistration: string;
+  dateOfRegistration: Date | string;
   status?: boolean;
   categoryClientName?: string;
   lastRepair?: string;
   tags?: string[];
-  onClick?: (id: number) => void;
+  onClick?: (id: string) => void;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
