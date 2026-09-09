@@ -17,27 +17,26 @@ export interface UserResponseDto {
 export class UserController {
     constructor(private service: UserService) { }
 
-    public async getAllUsers(req: Request, res: Response, next: NextFunction) {
+    public getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
         const query = req.validated.query as UserQueryDto;
 
         try {
-
-            const users = await this.service.findAll(query)
+            const users = await this.service.findAll(query);
 
             return res.json({
                 ...users,
                 data: users.data.map(this.toResponse),
             });
         } catch (error) {
-            next(error)
+            next(error);
         }
-    }
+        };
 
     public async createUser(_req: Request, _res: Response) { }
 
     public async deleteUser(_req: Request, _res: Response) { }
 
-    public async getOneUser(req: Request, res: Response, next: NextFunction) {
+    public getOneUser =  async(req: Request, res: Response, next: NextFunction) => {
         const params = req.validated.params as IdDto;
 
         try {
@@ -55,7 +54,7 @@ export class UserController {
         }
     };
 
-    public async modifyUser(req: Request, res: Response, next: NextFunction) {
+    public modifyUser =  async (req: Request, res: Response, next: NextFunction) => {
         const data = req.validated.body as ModifyUserDto;
         const params = req.validated.params as IdDto
 

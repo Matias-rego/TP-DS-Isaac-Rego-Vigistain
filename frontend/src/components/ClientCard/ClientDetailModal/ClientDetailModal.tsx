@@ -4,13 +4,17 @@ import type { DetailFieldConfig, DetailItemConfig } from "@/components/Modals/De
 import styles from './ClientDetailModal.module.css';
 import { eventBus } from "@/lib/eventBus";
 import { BACKEND_URL } from "@/lib/config";
-import type { Equipment } from "@/types/types";
+import type { Equipment as EquipmentBase } from "@/types/types";
 import EquipmentMiniDescriptiveCard from "@/components/EquipmentComponent/EquipmentMiniDescriptiveCard/EquipmentMiniDescriptiveCard";
 import type { Client as BaseClient } from "@/types/types";
+import EquipmentDetailModal from "@/components/EquipmentComponent/EquipmentDetailModal/EquipmentDetailModal
 
 // Extendemos la interfaz BaseClient para agregar la propiedad aplanada
 interface Client extends BaseClient {
   clientTypeName?: string;
+}
+interface Equipment extends EquipmentBase {
+  onClick?: (id: string) => void;
 }
 
 const clientFields: DetailFieldConfig<Client>[] = [
@@ -54,6 +58,7 @@ const ClientDetailModal = ({
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData]   = useState<Client>(client);
   const [equipments, setEquipments] = useState<Equipment[]>([]);
+  const [showDetailModalEquipment, setShowDetailModalEquipment] = useState(false);
 
   // Sincronizar formData cuando el padre actualiza client (post-guardado)
   useEffect(() => {

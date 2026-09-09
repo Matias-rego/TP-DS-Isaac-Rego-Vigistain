@@ -205,7 +205,6 @@ const EquipmentDetailModal = ({
       {showModalClient && dataClient && (
         <ClientDetailModal
           client={dataClient}
-          equipos={[]}
           open={showModalClient}
           onClose={() => setShowModalClient(false)}
         />

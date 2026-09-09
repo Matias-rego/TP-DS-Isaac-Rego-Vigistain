@@ -2,14 +2,14 @@ import styles from './UserCard.module.css';
 
 
 export interface UserCardProps {
-  id_user: number;
+  id_user: string;
   userName: string;
   email: string;
   rol: string;
   status?: boolean;
   validationStatus?: boolean;
   urlPicture?: string;
-  onClick?: (id: number) => void;
+  onClick?: (id: string) => void;
 }
 
 

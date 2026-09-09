@@ -5,7 +5,7 @@ import styles from './UserGrid.module.css';
 
 interface UserGridProps {
   users: UserCardProps[];
-  onCardClick?: (id: number) => void;
+  onCardClick?: (id: string) => void;
   onAddClick?: () => void;
   columns?: 2 | 3 | 4;
 }

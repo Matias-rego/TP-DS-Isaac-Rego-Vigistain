@@ -1,4 +1,4 @@
-import type { User as User_P } from "@/generated/prisma/client.js";
+import type { Prisma, User as User_P } from "@/generated/prisma/client.js";
 import type { PaginatedResult } from "@/shared/base.repository.js"
 import type { UserQueryDto } from "./user.schema.js"
 import { BaseRepository } from "@/shared/base.repository.js";
@@ -7,49 +7,38 @@ import { User } from "./user.entity.js";
 
 export class UserRepository extends BaseRepository<User, UserQueryDto> {
 
-    public async findAll(query?: UserQueryDto): Promise<PaginatedResult<User>> {
-
-        const { page, limit, skip } = this.getPagination(
+    public findAll = async (query?: UserQueryDto): Promise<PaginatedResult<User>> => {
+const { page, limit, skip } = this.getPagination(
             query?.page,
             query?.limit
         );
+        const where: Prisma.UserWhereInput = query?.search
+            ? {
+                OR: [
+                    {
+                        email: {
+                            contains: query.search,
+                        },
+                    },
+                    {
+                        userName: {
+                            contains: query.search,
+                        },
+                    },
+                ],
+            }
+            : {};
 
         const [data, total] = await Promise.all([
             this.prisma.user.findMany({
                 skip,
                 take: limit,
-                where: {
-                    OR: [
-                        {
-                            email: {
-                                contains: query?.search,
-                            },
-                        }, {
-                            userName: {
-                                contains: query?.search,
-                            },
-                        },
-                    ],
-                },
+                where,
                 orderBy: (query?.sortBy && query?.sortOrder) ? {
                     [query.sortBy]: query.sortOrder,
                 } : undefined,
             }),
-            this.prisma.user.count({
-                where: {
-                    OR: [
-                        {
-                            email: {
-                                contains: query?.search,
-                            },
-                        }, {
-                            userName: {
-                                contains: query?.search,
-                            },
-                        },
-                    ],
-                },
-            }),
+            this.prisma.user.count({ where }),
         ]);
 
         return {

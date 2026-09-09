@@ -4,6 +4,7 @@ import { z } from "zod";
 
 export const registerStatusSchema = z.object({
     id_order: id,
+    id_user: id,
     status: enumSchema([
         "recibido",
         "diagnostico",

@@ -5,16 +5,9 @@ import styles from './UserDetailModal.module.css';
 import { eventBus } from "@/lib/eventBus";
 import { BACKEND_URL } from "@/lib/config";
 import ActionButton from "../Common/Buttons/ActionButton";
+import type { User as UserBase, PaginatedResponse} from "@/types/types";
 
-interface User {
-  id_user: number;
-  userName: string;
-  email: string;
-  password_hash: string;
-  rol: string;
-  status?: boolean;
-  validationStatus?: boolean;
-  urlPicture?: string;
+interface User extends UserBase {
   onClick?: (id: number) => void;
 }
 
