@@ -58,8 +58,15 @@ export class UserController {
         const data = req.validated.body as ModifyUserDto;
         const params = req.validated.params as IdDto
 
+        // Si el usuario mandó una foto nueva, multer ya la subió a Cloudinary
+        // y dejó la URL en req.file.path. La agregamos a los campos a actualizar
+        // (mismo patrón que usa el registro en auth.controller). Si no mandó
+        // foto, req.file es undefined y actualizamos solo lo que vino en el body.
+        const fotoUrl = (req.file as Express.Multer.File | undefined)?.path;
+        const dataAActualizar = fotoUrl ? { ...data, urlPicture: fotoUrl } : data;
+
         try {
-            const user = await this.service.update(params.id, data)
+            const user = await this.service.update(params.id, dataAActualizar)
 
             if (!user) {
                 return res.status(404).json({

@@ -44,9 +44,12 @@ const EditorPerfil = () => {
     setError(null);
 
     const formData = new FormData();
-    formData.append('username', (document.getElementById('username') as HTMLInputElement).value);
+    // El backend (modifyUserSchema) espera la clave 'userName', no 'username'.
+    // Como el schema es .strict(), cualquier clave que no reconozca da 400.
+    formData.append('userName', (document.getElementById('username') as HTMLInputElement).value);
     formData.append('email', (document.getElementById('email') as HTMLInputElement).value);
     if (foto) {
+      // 'foto' es el campo que lee multer (upload.single('foto')) en la ruta.
       formData.append('foto', foto);
     }
 
