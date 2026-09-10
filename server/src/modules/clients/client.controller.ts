@@ -60,4 +60,21 @@ export class ClientController {
             next(error);
         }
     };
+
+    public deleteClient = async (req: Request, res: Response, next: NextFunction) => {
+        const { id } = req.validated.params as IdDto;
+
+        try {
+            const client = await this.service.update(id, { status: false });
+
+            if (!client) {
+                return res.status(404).json({ message: "Cliente no encontrado" });
+            }
+
+            emitEvent(EVENTS.clientChanged, client);
+            return res.json(client);
+        } catch (error) {
+            next(error);
+        }
+    };
 }

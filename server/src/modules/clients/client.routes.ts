@@ -25,4 +25,6 @@ router.get('/:id', validate({ params: idSchema }), ctrl.getOneClient);
 
 router.put('/:id', validate({ params: idSchema, body: modifyClientSchema }), ctrl.modifyClient);
 
+router.delete('/:id', validate({ params: idSchema }), ctrl.deleteClient);
+
 export default router;
