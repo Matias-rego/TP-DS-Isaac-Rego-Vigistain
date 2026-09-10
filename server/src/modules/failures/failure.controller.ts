@@ -1,7 +1,9 @@
 import type { NextFunction, Request, Response } from "express";
 import type { IdDto } from "@/shared/common.schema.js";
-import type { CreateFailuresDto } from "./failure.schema.js";
+import type { CreateFailuresDto, ModifyFailuresDto } from "./failure.schema.js";
 import type { FailureService } from "./failure.service.js";
+import { emitEvent } from "@/websocket.js";
+import { EVENTS } from "@/shared/events.js";
 
 export class FailureController {
   constructor(private service: FailureService) { }
@@ -11,7 +13,7 @@ export class FailureController {
 
     try {
       const created = await this.service.createMany(failures);
-
+      emitEvent(EVENTS.failureChanged, created);
       return res.status(201).json({
         message: "Fallas registradas con éxito",
         failures: created,
@@ -32,4 +34,32 @@ export class FailureController {
       next(error);
     }
   };
+
+  public modifyFailure = async (req:Request, res:Response, next:NextFunction) => {
+    const { id } = req.validated.params as IdDto;
+    const updateFail = req.validated.body as ModifyFailuresDto;
+    try{
+      const updatedFailure = await this.service.update(id , updateFail)
+      emitEvent(EVENTS.failureChanged, updatedFailure);
+      return res.status(200).json({
+        message: "Falla actualizada con exito",
+        failure: updatedFailure,
+      });
+    }catch(e){
+      next(e);
+    }
+  }
+  public deleteFailure = async (req:Request, res:Response, next: NextFunction) => {
+    const { id } = req.validated.params as IdDto;
+    try{
+      const deletedFailure = await this.service.delete(id);
+      emitEvent(EVENTS.failureDeleted, deletedFailure);
+      return res.status(200).json({
+        message: 'Falla eliminada correctamente',
+        res: deletedFailure
+      })
+    }catch(e){
+      next(e);
+    }
+  }
 }

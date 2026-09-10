@@ -12,7 +12,7 @@ import { Order } from "./order.entity.js";
 const orderInclude = {
     equipment: { include: { client: true } },
     statusHistory: true,
-    failures: true,
+    failures: { include: { failureType: true } },
 } satisfies Prisma.OrderInclude;
 
 type OrderWithRelations = Order_P & Prisma.OrderGetPayload<{ include: typeof orderInclude }>;
@@ -87,10 +87,7 @@ export class OrderRepository extends BaseRepository<Order, OrderQueryDto> {
             where: {
                 id_equipment: equipmentId,
             },
-            include : {
-                failures: true,
-                statusHistory: true,
-            }
+            include: orderInclude,
         });
 
         return orders.map((order) => this.toDomain(order));

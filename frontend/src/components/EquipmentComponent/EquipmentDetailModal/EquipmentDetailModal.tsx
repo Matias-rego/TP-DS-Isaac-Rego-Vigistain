@@ -3,12 +3,13 @@ import { X, Wrench, User, AlertTriangle, FileText } from 'lucide-react';
 import styles from './EquipmentDetailModal.module.css';
 import { type Equipment } from '@/types/types';
 import { type Client } from '@/types/types';
-import { type Order } from '@/types/types'
+import { type Order, type Failure, type Status_History } from '@/types/types'
 import SmallClientCard from '@/components/ClientCard/SmallClientCard/SmallClientCard';
 import ClientDetailModal from '@/components/ClientCard/ClientDetailModal/ClientDetailModal';
 import BACKEND_URL from '@/lib/config';
 import FailureMiniCard from '@/components/Failure/FailureMiniCard/FailureMiniCard';
 import OrderMiniCard from '@/components/OrderComponent/OrderMiniCard/OrderMiniCard';
+import { EVENTS, eventBus } from '@/lib/eventBus';
 
 export interface EquipmentDetailModalProps {
   open: boolean;
@@ -27,7 +28,6 @@ const EquipmentDetailModal = ({
   const [dataClient, setDataClient] = useState<Client | null>(null);
   const [dataOrders, setDataOrders] = useState<Order[]>([]);
 
-  // Mismo criterio para órdenes, usando la fecha de ingreso.
   const sortedOrders = useMemo(
     () =>
       [...dataOrders].sort(
@@ -36,10 +36,6 @@ const EquipmentDetailModal = ({
     [dataOrders]
   );
 
-  // Las fallas ya no se piden aparte: cada Order trae las suyas (gracias al
-  // include en OrderRepository.findByEquipmentId), así que simplemente
-  // aplanamos las fallas de todas las órdenes del equipo.
-  // Más reciente primero, igual que antes.
   const sortedFailures = useMemo(() => {
     const allFailures = dataOrders.flatMap((order) => order.failures ?? []);
     return [...allFailures].sort(
@@ -83,6 +79,82 @@ const EquipmentDetailModal = ({
     fetchClient();
     fetchOrders();
   }, [equipment])
+
+
+  useEffect(() => {
+    const handleFailureChanged = (payload: unknown) => {
+      const changedFailure = payload as Failure;
+
+      setDataOrders((prev) => {
+        const belongsHere = prev.some((o) => o.id_order === changedFailure.id_order);
+        if (!belongsHere) return prev; // no es de este equipo, ignorar
+
+        return prev.map((order) => {
+          if (order.id_order !== changedFailure.id_order) return order;
+
+          const currentFailures = order.failures ?? [];
+          const exists = currentFailures.some((f) => f.id_failure === changedFailure.id_failure);
+
+          return {
+            ...order,
+            failures: exists
+              ? currentFailures.map((f) =>
+                  f.id_failure === changedFailure.id_failure ? changedFailure : f
+                )
+              : [...currentFailures, changedFailure],
+          };
+        });
+      });
+    };
+
+    eventBus.on(EVENTS.failureChanged, handleFailureChanged);
+    return () => eventBus.off(EVENTS.failureChanged, handleFailureChanged);
+  }, []);
+
+  // Igual criterio para cambios de estado de orden: si en otro lado se
+  // confirma un nuevo Status_History, reflejamos el estado actualizado acá.
+  useEffect(() => {
+    const handleStatusChanged = (payload: unknown) => {
+      const newStatus = payload as Status_History;
+
+      setDataOrders((prev) => {
+        const belongsHere = prev.some((o) => o.id_order === newStatus.id_order);
+        if (!belongsHere) return prev;
+
+        return prev.map((order) =>
+          order.id_order === newStatus.id_order
+            ? {
+                ...order,
+                status: newStatus.status,
+                statusHistory: [...(order.statusHistory ?? []), newStatus],
+              }
+            : order
+        );
+      });
+    };
+
+    eventBus.on(EVENTS.statusChanged, handleStatusChanged);
+    return () => eventBus.off(EVENTS.statusChanged, handleStatusChanged);
+  }, []);
+  useEffect(() => {
+    const handleFailureDeleted = (payload: unknown) => {
+      const { id_failure, id_order } = payload as { id_failure: string; id_order: string };
+
+      setDataOrders((prev) => {
+        const belongsHere = prev.some((o) => o.id_order === id_order);
+        if (!belongsHere) return prev;
+
+        return prev.map((order) =>
+          order.id_order === id_order
+            ? { ...order, failures: (order.failures ?? []).filter((f) => f.id_failure !== id_failure) }
+            : order
+        );
+      });
+    };
+
+    eventBus.on(EVENTS.failureDeleted, handleFailureDeleted);
+    return () => eventBus.off(EVENTS.failureDeleted, handleFailureDeleted);
+  }, []);
 
   if (!open) return null;
 

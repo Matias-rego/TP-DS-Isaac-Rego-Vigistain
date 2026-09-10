@@ -6,6 +6,8 @@ import styles from './UpdateStatusModal.module.css';
 import BACKEND_URL from '@/lib/config';
 import { useAuth } from '@/lib/AuthContext';
 import { EVENTS, eventBus } from '@/lib/eventBus';
+import Diagnostic from './Diagnostic/Diagnostic';
+import Budget from './Budget/Budget';
 
 const STATUS_LABELS: Record<EnumOrderStatus, string> = {
   recibido:      'Recibido',
@@ -18,13 +20,21 @@ const STATUS_LABELS: Record<EnumOrderStatus, string> = {
   cancelado:     'Cancelado',
 };
 
+// Título del campo de comentario según el estado elegido. Los estados que
+// no están acá caen en el label genérico "Comentarios".
+const COMMENT_LABELS: Partial<Record<EnumOrderStatus, string>> = {
+  diagnostico:   'Comentarios del Diagnóstico',
+  presupuestado: 'Comentarios del Presupuesto',
+  reparacion:    'Comentarios de la Reparación',
+  listo:         'Comentarios de Entrega',
+};
+
 const ALL_STATUSES = Object.keys(STATUS_LABELS) as EnumOrderStatus[];
 
 export interface UpdateStatusModalProps {
   open: boolean;
   order: Order;
   onClose: () => void;
-  /** Se llama SOLO si el POST salió bien, con el Status_History real que devolvió el server */
   onConfirm: (createdStatusHistory: Status_History) => void | Promise<void>;
 }
 
@@ -49,6 +59,7 @@ const UpdateStatusModal = ({ open, order, onClose, onConfirm }: UpdateStatusModa
   if (!open) return null;
 
   const canSubmit = status !== undefined && !submitting;
+  const commentLabel = status ? (COMMENT_LABELS[status] ?? 'Comentarios') : 'Comentarios';
 
   const handleConfirm = async () => {
     if (!canSubmit || !status) return;
@@ -73,11 +84,10 @@ const UpdateStatusModal = ({ open, order, onClose, onConfirm }: UpdateStatusModa
       });
 
       if (!res.ok) {
-        // Intentamos leer un mensaje de error del server; si no viene, uno genérico
         const errorBody = await res.json().catch(() => null);
         throw new Error(errorBody?.message ?? `Error ${res.status} al actualizar el estado`);
       }
-      
+
       const createdStatusHistory: Status_History = await res.json();
 
       eventBus.emit(EVENTS.statusChanged, createdStatusHistory);
@@ -126,18 +136,32 @@ const UpdateStatusModal = ({ open, order, onClose, onConfirm }: UpdateStatusModa
             </div>
 
             <div className={styles.field}>
-              <label className={styles.label} htmlFor="status-comment">Notas Técnicas</label>
+              {status === 'diagnostico' && (
+                <div>
+                  <Diagnostic order={order} />
+                </div>
+              )}
+              {status === 'presupuestado' && (
+                <div>
+                  <Budget order={order} />
+                </div>
+              )}
+            </div>
+
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="status-comment">{commentLabel}</label>
               <textarea
                 id="status-comment"
                 className={styles.textarea}
-                placeholder="Describa el progreso o hallazgos..."
+                rows={3}
+                placeholder="Agregá una observación sobre este cambio de estado (opcional)..."
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
-                rows={3}
                 disabled={submitting}
               />
             </div>
 
+            {/*
             <label className={styles.checkboxRow}>
               <input
                 type="checkbox"
@@ -147,6 +171,7 @@ const UpdateStatusModal = ({ open, order, onClose, onConfirm }: UpdateStatusModa
               />
               Notificar al Cliente
             </label>
+               */}
 
             {errorMessage && (
               <p className={styles.errorText}>{errorMessage}</p>

@@ -12,7 +12,7 @@ import ClientRegister from '../../Clientes/ClientRegister';
 import DeviceForm, { type DeviceFormValues } from "@/components/DeviceForm/DeviceForm";
 import CautionIcon from "@/assets/caution.svg";
 import ClipboardCheck from "@/assets/clipboardCheck.svg";
-import FallaForm, { type NuevaFalla } from "@/components/Failure/FallaForm/FallaForm";
+import FallaForm, { type NuevaFalla } from "@/components/Failure/FailureForm/FailureForm";
 import VisualProof from "@/components/ImagesAdd/VisualProof";
 import { BACKEND_URL } from "@/lib/config";
 import { useNavigate } from "react-router-dom";
@@ -35,7 +35,7 @@ interface Client extends BaseClient {
 interface FailureEntry {
   id_failure_type: string;
   description: string;
-  failureName: string;
+  failureDescription: string;
 }
 
 const WorkOrder = () => {
@@ -548,7 +548,7 @@ const WorkOrder = () => {
                   {fallas.map((falla, index) => (
                     <span key={index} className={styles.fallaChip}>
                       <span className={styles.fallaChipNum}>{index + 1}</span>
-                      {falla.failureName}
+                      {falla.failureDescription}
                       <button
                         type="button"
                         className={styles.fallaChipRemove}

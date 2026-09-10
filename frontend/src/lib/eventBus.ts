@@ -45,6 +45,8 @@ export const EVENTS = {
   paymentTypeDeleted: 'paymentType:deleted',        
   failureTypeChanged: 'failureType:changed',
   failureTypeDeleted: 'failureType:deleted',
+  failureChanged: 'failure:changed',
+  failureDeleted: 'failure:deleted',
   userChanged: 'user:changed',
   statusChanged: 'status:changed',
 } as const;

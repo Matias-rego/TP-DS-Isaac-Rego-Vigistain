@@ -111,6 +111,14 @@ const OrderDirectory = () => {
     const unsubscribe = eventBus.on(EVENTS.statusChanged, () => fetchOrders());
     return unsubscribe;
   }, [fetchOrders]);
+  useEffect(() => {
+    const unsubscribe = eventBus.on(EVENTS.failureChanged, () => fetchOrders());
+    return unsubscribe;
+  }, [fetchOrders]);
+  useEffect(() => {
+    const unsubscribe = eventBus.on(EVENTS.failureDeleted, () => fetchOrders());
+    return unsubscribe;
+  }, [fetchOrders]);
 
   // 3. Carga inicial
   useEffect(() => {

@@ -6,7 +6,7 @@ import styles from './StatusHistoryTimeline.module.css';
 export interface StatusHistoryTimelineProps {
   order: Order;
   title?: string;
-  onClickStatus?: (id_status_history: number) => void;
+  onClickStatus?: (id_status_history: string) => void;
 }
 
 const StatusHistoryTimeline = ({

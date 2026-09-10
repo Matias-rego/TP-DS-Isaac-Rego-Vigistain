@@ -2,8 +2,10 @@ import { BaseRepository } from "@/shared/base.repository.js";
 import type { PaginatedResult } from "@/shared/base.repository.js";
 import type { FailureQueryDto } from "./failure.schema.js";
 import { Failure } from "./failure.entity.js";
-import type { Failure as Failure_P } from "@/generated/prisma/client.js";
+import type { Failure as Failure_P , Prisma } from "@/generated/prisma/client.js";
 import { v7 as uuidv7 } from "uuid";
+
+type FailureWithType = Failure_P & Prisma.FailureGetPayload<{ include: { failureType: true } }>;
 
 export class FailureRepository extends BaseRepository<Failure, FailureQueryDto> {
 
@@ -93,6 +95,7 @@ export class FailureRepository extends BaseRepository<Failure, FailureQueryDto> 
                         description: item.description,
                         status: item.status,
                     },
+                    include : { failureType: true},
                 }),
             ),
         );
@@ -108,6 +111,7 @@ export class FailureRepository extends BaseRepository<Failure, FailureQueryDto> 
             data: {
                 ...item,
             },
+            include: { failureType: true },
         });
 
         return this.toDomain(failure);
@@ -125,7 +129,7 @@ export class FailureRepository extends BaseRepository<Failure, FailureQueryDto> 
         };
     }
 
-    private toDomain(failure: Failure_P): Failure {
+    private toDomain(failure: Failure_P | FailureWithType): Failure {
         return new Failure(
             failure.id_failure_type,
             failure.id_order,
@@ -133,6 +137,7 @@ export class FailureRepository extends BaseRepository<Failure, FailureQueryDto> 
             failure.id_failure,
             failure.dateOfFailure,
             failure.status,
+            "failureType" in failure ? failure.failureType ?? undefined : undefined,
         );
     }
 }

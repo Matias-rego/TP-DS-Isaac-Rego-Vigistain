@@ -12,7 +12,7 @@ export interface OrderDescriptionProps {
   order: Order;
   onClose?: () => void;
   onUpdateStatus?: () => void;
-  onClickStatusEntry?: (id_status_history: number) => void;
+  onClickStatusEntry?: (id_status_history: string) => void;
   updatingStatus?: boolean;
 }
 

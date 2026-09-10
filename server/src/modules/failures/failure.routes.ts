@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { createFailuresSchema } from './failure.schema.js';
+import { createFailuresSchema, modifyFailureSchema } from './failure.schema.js';
 import { validate } from '@/middlewares/validation.middleware.js';
 import { idSchema } from '@/shared/common.schema.js';
 import { FailureController } from './failure.controller.js';
@@ -18,5 +18,9 @@ const router = Router();
 router.post("/", validate({ body: createFailuresSchema }), ctrl.createFailures);
 
 router.get('/ofOrder/:id', validate({ params: idSchema }), ctrl.getFailuresOfOrder);
+
+router.put('/:id', validate({params: idSchema,body: modifyFailureSchema}), ctrl.modifyFailure);
+
+router.delete('/:id', validate({params: idSchema}), ctrl.deleteFailure)
 
 export default router;
