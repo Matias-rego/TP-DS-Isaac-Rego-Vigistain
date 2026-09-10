@@ -6,6 +6,7 @@ import { BACKEND_URL } from '@/lib/config';
 import CustomButton1 from "../../components/Common/Buttons/Button1";
 import { PasswordInput } from "../../components/ui/PasswordInput";
 import { X, Camera } from "lucide-react";
+import { uploadFoto } from "@/lib/upload";
 
 type FieldErrors = {
     username?: string;
@@ -106,21 +107,30 @@ const Register = () => {
 
         if (!validate()) return;
 
-        const formData = new FormData();
-        formData.append('username', username.trim());
-        formData.append('email', email.trim());
-        formData.append('password', password);
-        if (foto) {
-            formData.append('foto', foto);
-        }
-
         setSubmitting(true);
+
         try {
+            let urlPicture: string | undefined;
+
+            if (foto) {
+                const uploadResult = await uploadFoto(foto);
+                urlPicture = uploadResult.url;
+            }
+
             const response = await fetch(`${BACKEND_URL}/api/auth/register`, {
                 method: 'POST',
-                body: formData,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
                 credentials: 'include',
+                body: JSON.stringify({
+                    username: username.trim(),
+                    email: email.trim(),
+                    password,
+                    urlPicture,
+                }),
             });
+
             const result = await response.json();
 
             if (response.ok && result.message === 'Usuario registrado exitosamente, valida tu cuenta a través del enlace enviado a tu correo electrónico') {
@@ -129,8 +139,13 @@ const Register = () => {
                 setError(result.message || 'Error en el registro');
             }
         } catch (error) {
-            console.error('Error:', error);
-            setError('No se pudo conectar con el servidor');
+            console.error("Error:", error);
+
+            setError(
+                error instanceof Error
+                    ? error.message
+                    : "No se pudo completar el registro"
+            );
         } finally {
             setSubmitting(false);
         }

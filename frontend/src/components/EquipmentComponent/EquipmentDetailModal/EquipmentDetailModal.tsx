@@ -4,7 +4,7 @@ import styles from './EquipmentDetailModal.module.css';
 import { type Equipment } from '@/types/types';
 import { type Client } from '@/types/types';
 import { type Failure } from '@/types/types';
-import { type Order } from '@/types/types'
+import { type Order } from '@/types/types';
 import SmallClientCard from '@/components/ClientCard/SmallClientCard/SmallClientCard';
 import ClientDetailModal from '@/components/ClientCard/ClientDetailModal/ClientDetailModal';
 import BACKEND_URL from '@/lib/config';

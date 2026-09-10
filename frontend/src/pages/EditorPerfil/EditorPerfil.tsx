@@ -9,6 +9,7 @@ import AlertSuccess from "@/components/Alert/AlertSuccess";
 import Alert from "@/components/Alert/Alert";
 import { useNavigate } from "react-router-dom";
 import { BACKEND_URL } from '@/lib/config';
+import { uploadFoto } from '@/lib/upload';
 import ActionButton from "@/components/Common/Buttons/ActionButton";
 
 const EditorPerfil = () => {
@@ -41,34 +42,58 @@ const EditorPerfil = () => {
 
   const handleSaveChanges = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(null);
 
-    const formData = new FormData();
-    // El backend (modifyUserSchema) espera la clave 'userName', no 'username'.
-    // Como el schema es .strict(), cualquier clave que no reconozca da 400.
-    formData.append('userName', (document.getElementById('username') as HTMLInputElement).value);
-    formData.append('email', (document.getElementById('email') as HTMLInputElement).value);
-    if (foto) {
-      // 'foto' es el campo que lee multer (upload.single('foto')) en la ruta.
-      formData.append('foto', foto);
-    }
+    setError(null);
+    setSuccess(null);
 
     try {
-      const response = await fetch(`${BACKEND_URL}/api/users/${usuario?.id_user}`, {
-        method: 'PUT',
-        body: formData,
-        credentials: 'include',
-      });
+      let urlPicture = usuario?.urlPicture;
 
-      const { user, success } = await response.json();
-      if (!response.ok) {
-        throw new Error('Error al guardar cambios');
+      // 1. Si hay una foto nueva, primero la subimos
+      if (foto) {
+        const uploadResult = await uploadFoto(foto);
+        urlPicture = uploadResult.url;
       }
-      setUsuario(user);
-      setSuccess(success);
+
+      // 2. Ahora actualizamos el usuario
+      const response = await fetch(
+        `${BACKEND_URL}/api/users/${usuario?.id_user}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            userName: (
+              document.getElementById("username") as HTMLInputElement
+            ).value,
+
+            email: (
+              document.getElementById("email") as HTMLInputElement
+            ).value,
+
+            urlPicture,
+          }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          result.message || "Error al guardar cambios"
+        );
+      }
+
+      setUsuario(result.user);
+      setSuccess(result.success);
+      setFoto(null);
+
     } catch (e) {
-      console.error('Error al guardar cambios:', e);
-      setError(e instanceof Error ? e.message : 'Error desconocido');
+      console.error("Error al guardar cambios:", e);
+
+      setError(e instanceof Error ? e.message : "Error desconocido");
     }
   };
 

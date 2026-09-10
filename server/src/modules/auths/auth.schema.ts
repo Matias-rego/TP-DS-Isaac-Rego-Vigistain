@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { username, password, email } from "@/utils/fields.js";
+import { username, password, email, url } from "@/utils/fields.js";
 
 export const loginSchema = z.object({
     username: username,
@@ -12,6 +12,7 @@ export const registerSchema = z.object({
     username: username,
     password: password,
     email: email,
+    urlPicture: url,
 }).strict();
 
 export type RegisterDto = z.infer<typeof registerSchema>;
