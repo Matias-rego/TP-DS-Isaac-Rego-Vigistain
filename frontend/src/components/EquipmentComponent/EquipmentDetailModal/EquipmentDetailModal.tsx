@@ -16,6 +16,10 @@ export interface EquipmentDetailModalProps {
   onClose: () => void;
   equipment: Equipment;
   closeOnOverlayClick?: boolean;
+  // Permite forzar el z-index del overlay. Sirve cuando este modal se abre
+  // por encima de otro modal (ej: desde el Detalle de Cliente, que está en
+  // 1100, hay que pasarle un valor mayor para que no quede tapado).
+  zIndex?: number;
 }
 
 const EquipmentDetailModal = ({
@@ -23,6 +27,7 @@ const EquipmentDetailModal = ({
   onClose,
   equipment,
   closeOnOverlayClick = true,
+  zIndex,
 }: EquipmentDetailModalProps) => {
   const [showModalClient, setShowModalClient] = useState(false);
   const [dataClient, setDataClient] = useState<Client | null>(null);
@@ -110,6 +115,7 @@ const EquipmentDetailModal = ({
     <>
       <div
         className={styles.overlay}
+        style={zIndex !== undefined ? { zIndex } : undefined}
         onClick={() => {
           if (closeOnOverlayClick) onClose();
         }}
