@@ -107,8 +107,8 @@ export interface Failure {
   id_failure: string;
   id_failure_type: string;
   failureType?: Failure_Type;
-  id_equipment: string;
-  equipment?: Equipment;
+  id_order: string;
+  order?: Order;
   description: string;
   dateOfFailure: Date;
   status: EnumFailureStatus;
@@ -140,6 +140,7 @@ export interface Order {
   deliveryDate?: Date | null;
   totalCharged?: number | null;
   statusHistory?: Status_History[];
+  failures?: Failure[];
   budget?: Budget | null;
 }
 

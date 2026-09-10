@@ -3,7 +3,6 @@ import { X, Wrench, User, AlertTriangle, FileText } from 'lucide-react';
 import styles from './EquipmentDetailModal.module.css';
 import { type Equipment } from '@/types/types';
 import { type Client } from '@/types/types';
-import { type Failure } from '@/types/types';
 import { type Order } from '@/types/types'
 import SmallClientCard from '@/components/ClientCard/SmallClientCard/SmallClientCard';
 import ClientDetailModal from '@/components/ClientCard/ClientDetailModal/ClientDetailModal';
@@ -26,17 +25,7 @@ const EquipmentDetailModal = ({
 }: EquipmentDetailModalProps) => {
   const [showModalClient, setShowModalClient] = useState(false);
   const [dataClient, setDataClient] = useState<Client | null>(null);
-  const [dataFailures, setDataFailures] = useState<Failure[]>([]);
   const [dataOrders, setDataOrders] = useState<Order[]>([]);
-
-  // Más reciente primero. Falla "más reciente" = mayor dateOfFailure.
-  const sortedFailures = useMemo(
-    () =>
-      [...dataFailures].sort(
-        (a, b) => new Date(b.dateOfFailure).getTime() - new Date(a.dateOfFailure).getTime()
-      ),
-    [dataFailures]
-  );
 
   // Mismo criterio para órdenes, usando la fecha de ingreso.
   const sortedOrders = useMemo(
@@ -46,6 +35,17 @@ const EquipmentDetailModal = ({
       ),
     [dataOrders]
   );
+
+  // Las fallas ya no se piden aparte: cada Order trae las suyas (gracias al
+  // include en OrderRepository.findByEquipmentId), así que simplemente
+  // aplanamos las fallas de todas las órdenes del equipo.
+  // Más reciente primero, igual que antes.
+  const sortedFailures = useMemo(() => {
+    const allFailures = dataOrders.flatMap((order) => order.failures ?? []);
+    return [...allFailures].sort(
+      (a, b) => new Date(b.dateOfFailure).getTime() - new Date(a.dateOfFailure).getTime()
+    );
+  }, [dataOrders]);
 
   useEffect(() => {
     const fetchClient = async () => {
@@ -61,25 +61,6 @@ const EquipmentDetailModal = ({
         setDataClient(null);
       }
     }
-    const fetchFailures = async () => {
-      try {
-        const id_equipment = equipment?.id_equipment;
-        if (!id_equipment) return;
-        const failures = await fetch(
-          `${BACKEND_URL}/api/failures/ofEquipment/${id_equipment}`, {
-          method: "GET",
-          credentials: 'include',
-        }
-        );
-        if (!failures.ok) {
-          throw new Error('Error al obtener las fallas');
-        }
-        const dataFailures = await failures.json();
-        setDataFailures(dataFailures);
-      } catch (e) {
-        setDataFailures([]);
-      }
-    };
     const fetchOrders = async () => {
       try {
         const id_equipment = equipment?.id_equipment;
@@ -91,7 +72,7 @@ const EquipmentDetailModal = ({
           }
         );
         if (!orders.ok) {
-          throw new Error('Error al obtener las fallas');
+          throw new Error('Error al obtener las órdenes');
         };
         const dataOrders = await orders.json();
         setDataOrders(dataOrders);
@@ -99,7 +80,6 @@ const EquipmentDetailModal = ({
         setDataOrders([]);
       }
     }
-    fetchFailures();
     fetchClient();
     fetchOrders();
   }, [equipment])

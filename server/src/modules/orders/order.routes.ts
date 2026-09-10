@@ -14,7 +14,7 @@ const statusRepo = new StatusHistoryRepository(prisma);
 const statusService = new StatusService(statusRepo, orderRepo);
 
 const ctrl = new OrderController(
-  new OrderService(orderRepo, statusService)
+  new OrderService(prisma, orderRepo, statusService)   // ✅
 );
 
 const router = Router();

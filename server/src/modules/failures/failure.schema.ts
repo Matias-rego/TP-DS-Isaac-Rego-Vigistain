@@ -6,7 +6,7 @@ export const createFailuresSchema = z.array(
     z.object({
         id_failure_type: id,
         failureDescription: description,
-        id_equipment: id,
+        id_order: id,
     }).strict(),
     {
         error: (issue) => {

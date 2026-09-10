@@ -115,8 +115,8 @@ model Failure {
   id_failure              String                @id @db.Char(36)
   failureType             Failure_Type          @relation(fields: [id_failure_type], references: [id_failure_type])
   id_failure_type         String                @db.Char(36)
-  equipment               Equipment             @relation(fields: [id_equipment], references: [id_equipment])
-  id_equipment            String                @db.Char(36)
+  order                   Order                @relation(fields: [id_order], references: [id_order])
+  id_order                String               @db.Char(36)
   description             String
   dateOfFailure           DateTime              @default(now())
   status                  EnumFailureStatus     @default(diagnosticada)
@@ -132,7 +132,6 @@ model Equipment {
   observations            String?
   client                  Client                @relation(fields: [id_client], references: [id_client])
   id_client               String                @db.Char(36)
-  failures                Failure[]
   orders                  Order[]
 
   @@map("Equipment")
@@ -153,6 +152,7 @@ model Order {
   totalCharged            Decimal?              @db.Decimal(12, 2)
   statusHistory           Status_History[]
   budget                  Budget?
+  failures                Failure[]
 
   @@map("Order")
 }

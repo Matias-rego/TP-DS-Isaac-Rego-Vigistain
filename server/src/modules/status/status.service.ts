@@ -4,6 +4,9 @@ import type { StatusQueryDto } from "./status.schema.js";
 import type { StatusHistoryRepository } from "./status.repository.js";
 import type { OrderRepository } from "@/modules/orders/order.repository.js";
 import type { StatusHistory } from "./status.entity.js";
+import type { PrismaClient, Prisma } from "@/generated/prisma/client.js";
+
+type Db = PrismaClient | Prisma.TransactionClient;
 
 interface CreateStatusInput {
     id_order: string;
@@ -53,13 +56,20 @@ export class StatusService {
         return entry;
     }
 
-    // Se llama una sola vez, al registrar la orden.
-    async createFirstStatus(id_order: string, id_user: string, status: $Enums.EnumOrderStatus): Promise<StatusHistory> {
-        return this.repo.create({
-            id_order,
-            id_user,
-            status,
-            comment: "Orden creada",
-        } as StatusHistory);
+    async createFirstStatus(
+        id_order: string,
+        id_user: string,
+        status: $Enums.EnumOrderStatus,
+        db?: Db,
+    ): Promise<StatusHistory> {
+        return this.repo.create(
+            {
+                id_order,
+                id_user,
+                status,
+                comment: "Orden creada",
+            } as StatusHistory,
+            db,
+        );
     }
 }

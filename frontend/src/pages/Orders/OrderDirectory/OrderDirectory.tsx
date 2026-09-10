@@ -71,7 +71,7 @@ const toRow = (order: Order): OrderRow => {
     device: order.equipment
       ? `${order.equipment.brand ?? ''} ${order.equipment.model ?? ''}`.trim()
       : `Equipo #${order.id_equipment}`,
-    status: (currentStatus?.newStatus ?? 'recibido') as EnumOrderStatus,
+    status: (currentStatus?.status ?? 'recibido') as EnumOrderStatus,
     elapsed: formatElapsed(order.dateOfEntry),
     raw: order,
   };

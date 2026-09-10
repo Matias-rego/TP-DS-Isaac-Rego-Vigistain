@@ -1,15 +1,22 @@
+import type { PrismaClient } from "@/generated/prisma/client.js";
 import type { PaginatedResult } from "@/shared/base.repository.js";
 import type { OrderQueryDto } from "./order.schema.js";
 import type { OrderRepository } from "./order.repository.js";
 import type { Order } from "./order.entity.js";
 import type { StatusService } from "@/modules/status/status.service.js";
+import type { RegisterOrderDto } from "./order.schema.js";
+import { v7 as uuidv7 } from "uuid";
 
+type CreateOrderInput = RegisterOrderDto & {
+    status: Order["status"];
+    dateOfEntry: Date;
+};
 export class OrderService {
     constructor(
+        private prisma: PrismaClient,
         private repo: OrderRepository,
         private statusService: StatusService,
     ) { }
-
     findAll(query?: OrderQueryDto): Promise<PaginatedResult<Order>> {
         return this.repo.findAll(query);
     }
@@ -22,22 +29,76 @@ export class OrderService {
         return this.repo.findByEquipmentId(equipmentId);
     }
 
-    async create(input: Omit<Order, "id_order">): Promise<Order | undefined> {
-        const order = await this.repo.create(input as Order);
+    async create(input: CreateOrderInput): Promise<Order | undefined> {
+        const { id_client, equipment, failures, id_user, ...orderFields } = input;
 
-        if (order?.id_order && order.status && input.id_user) {
-            const id_order = order.id_order;
-            const status = order.status;
-            const id_user = input.id_user;
+        const id_order = await this.prisma.$transaction(async (tx) => {
+            // 1. Resolver equipo
+            let id_equipment: string;
 
-            await this.statusService.createFirstStatus(
-                id_order,
-                id_user,
-                status,
+            if ("id_equipment" in equipment) {
+                const existing = await tx.equipment.findFirst({
+                    where: { id_equipment: equipment.id_equipment, id_client },
+                });
+                if (!existing) {
+                    throw new Error(
+                        "El equipo no existe o no pertenece al cliente seleccionado"
+                    );
+                }
+                id_equipment = equipment.id_equipment;
+            } else {
+                const newEquipment = await tx.equipment.create({
+                    data: {
+                        id_equipment: uuidv7(),
+                        tipo_equipment: equipment.tipo_equipment,
+                        brand: equipment.brand,
+                        model: equipment.model,
+                        observations: equipment.observations ?? undefined,
+                        id_client,
+                    },
+                });
+                id_equipment = newEquipment.id_equipment;
+            }
+
+            // 2. Crear orden (repo.create acepta el `tx`)
+            const order = await this.repo.create(
+                {
+                    id_equipment,
+                    id_user: id_user ?? undefined,
+                    status: orderFields.status,
+                    observations: orderFields.observations ?? undefined,
+                    equipmentPhotoUrl: orderFields.equipmentPhotoUrl ?? undefined,
+                    dateOfEntry: orderFields.dateOfEntry,
+                    estimatedDate: orderFields.estimatedDate ?? undefined,
+                } as Order,
+                tx,
             );
-        }
 
-        return order;
+            // 3. Crear fallas
+            await tx.failure.createMany({
+                data: failures.map((f) => ({
+                    id_failure: uuidv7(),
+                    id_order: order.id_order,
+                    id_failure_type: f.id_failure_type,
+                    description: f.description,
+                })),
+            });
+
+            // 4. Status history inicial (dentro de la misma transacción)
+            if (id_user) {
+                await this.statusService.createFirstStatus(
+                    order.id_order,
+                    id_user,
+                    order.status,
+                    tx, // <-- requiere que este método acepte un client transaccional
+                );
+            }
+
+            return order.id_order;
+        });
+
+        // fuera de la transacción: releemos con todas las relaciones
+        return this.repo.findById(id_order);
     }
 
     update(id: string, input: Partial<Order>): Promise<Order | undefined> {

@@ -17,6 +17,6 @@ const router = Router();
 
 router.post("/", validate({ body: createFailuresSchema }), ctrl.createFailures);
 
-router.get('/ofEquipment/:id', validate({ params: idSchema }), ctrl.getFailureOfEquipment);
+router.get('/ofOrder/:id', validate({ params: idSchema }), ctrl.getFailuresOfOrder);
 
 export default router;

@@ -21,11 +21,12 @@ export class FailureController {
     }
   };
 
-  public getFailureOfEquipment = async (req: Request, res: Response, next: NextFunction) => {
+  // Antes era getFailureOfEquipment; ahora la falla cuelga de la orden.
+  public getFailuresOfOrder = async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.validated.params as IdDto;
 
     try {
-      const failures = await this.service.findByEquipmentId(id);
+      const failures = await this.service.findByOrderId(id);
       return res.status(200).json(failures);
     } catch (error) {
       next(error);

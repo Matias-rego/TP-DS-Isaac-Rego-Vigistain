@@ -112,149 +112,121 @@ const WorkOrder = () => {
     setSubmitError(null);
     setSubmitSuccess(false);
 
-    const id_cliente = selectedClient?.id_client;
-
-    if (!id_cliente) {
+    // 1. Validar cliente
+    if (!selectedClient?.id_client) {
       setSubmitError("Seleccioná un cliente antes de registrar la orden.");
       return;
     }
-    let equipmentData;
 
-    if (selectedEquipment == null) {
+    // 2. Validar fallas
+    if (fallas.length === 0) {
+      setSubmitError("Agregá al menos una falla.");
+      return;
+    }
+
+    const fallaIncompleta = fallas.some(
+      (f) =>
+        !f.id_failure_type ||
+        f.description.trim() === ""
+    );
+
+    if (fallaIncompleta) {
+      setSubmitError(
+        "Completá el tipo y la descripción de cada falla."
+      );
+      return;
+    }
+
+    // 3. Preparar equipo
+    let equipmentPayload;
+
+    if (selectedEquipment) {
+      equipmentPayload = {
+        id_equipment: selectedEquipment.id_equipment,
+      };
+    } else {
       const tipoEquipoFinal =
         deviceValues.deviceType !== "otro"
           ? deviceValues.deviceType
           : deviceValues.deviceTypeOther;
 
-      if (!tipoEquipoFinal || !deviceValues.brand || !deviceValues.model) {
-        setSubmitError("Completá el tipo, marca y modelo del equipo.");
+      if (
+        !tipoEquipoFinal ||
+        !deviceValues.brand.trim() ||
+        !deviceValues.model.trim()
+      ) {
+        setSubmitError(
+          "Completá el tipo, marca y modelo del equipo."
+        );
         return;
       }
 
-      equipmentData = {
+      equipmentPayload = {
         tipo_equipment: tipoEquipoFinal,
         brand: deviceValues.brand,
         model: deviceValues.model,
-        observations: deviceValues.observations,
-        id_client: selectedClient.id_client,
-      };
-    } else {
-
-      equipmentData = {
-        tipo_equipment: selectedEquipment.tipo_equipment,
-        brand: selectedEquipment.brand,
-        model: selectedEquipment.model,
-        observations: selectedEquipment.observations,
-        id_client: selectedEquipment.id_client,
+        observations: deviceValues.observations || null,
       };
     }
-    const fallaIncompleta = fallas.some(
-      (f) => f.id_failure_type !== null && f.description.trim() === ""
-    );
 
-    if (fallaIncompleta) {
-      setSubmitError("Completá la descripción de cada falla que hayas seleccionado.");
-      return;
-    }
+    const orderPayload = {
+      id_client: selectedClient.id_client,
+
+      equipment: equipmentPayload,
+
+      observations: orderObservations || null,
+
+      equipmentPhotoUrl: equipmentPhotoUrl || null,
+
+      estimatedDate: estimatedDeliveryDate || null,
+
+      id_user: user?.id_user || null,
+
+      failures: fallas.map((falla) => ({
+        id_failure_type: falla.id_failure_type,
+        description: falla.description.trim(),
+      })),
+    };
+
     setSubmitting(true);
 
     try {
-      let id_equipment;
-      if(selectedEquipment==null){
-        const registE = await fetch(`${BACKEND_URL}/api/equipments`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(equipmentData),
-          credentials: 'include',
-        });
+      const response = await fetch(`${BACKEND_URL}/api/orders`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(orderPayload),
+        credentials: "include",
+      });
 
-        if (!registE.ok) {
-          throw new Error(`Error ${registE.status} al registrar el equipo`);
-        }
+      if (!response.ok) {
+        const errorBody = await response.json().catch(() => ({}));
 
-        const equipment = await registE.json();
-        setEquipmentRegistered(equipment);
-
-
-        id_equipment = equipment.id_equipment;
-        if (!id_equipment) {
-          throw new Error("El backend no devolvió id_equipment");
-        }
-    }else{
-      setEquipmentRegistered(selectedEquipment)
-      id_equipment = selectedEquipment.id_equipment;
-      if (!id_equipment) {
-        throw new Error("No se registro el equipo correctamente");
-      }
-    }
-      
-    const failuresPayload = fallas
-        .filter((f) => f.id_failure_type !== null)
-        .map(({ id_failure_type, description }) => ({
-          id_failure_type,
-          failureDescription: description,
-          id_equipment,
-        }));
-
-      const orderPayload = {
-        id_equipment,
-        observations: orderObservations || null,
-        equipmentPhotoUrl: equipmentPhotoUrl || null,
-        estimatedDate: estimatedDeliveryDate || null,
-        id_user: user?.id_user,
-      };
-
-      const requests: Promise<Response>[] = [];
-
-      if (failuresPayload.length > 0) {
-        requests.push(
-          fetch(`${BACKEND_URL}/api/failures`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(failuresPayload),
-            credentials: 'include',
-          })
-        );
-      }
-
-      requests.push(
-        fetch(`${BACKEND_URL}/api/orders`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(orderPayload),
-          credentials: 'include',
-        })
-      );
-
-      const responses = await Promise.all(requests);
-
-      const fallaResponse = responses.find((_, i) => failuresPayload.length > 0 && i === 0);
-      if (fallaResponse && !fallaResponse.ok) {
-        const errBody = await fallaResponse.json().catch(() => ({}));
-        const detalle = Array.isArray(errBody.details) ? errBody.details.join(" ") : "";
         throw new Error(
-          errBody.message
-            ? `${errBody.message} ${detalle}`.trim()
-            : `Error ${fallaResponse.status} al registrar las fallas`
+          errorBody.message ||
+            `Error ${response.status} al registrar la orden`
         );
       }
 
-      const orderResponse = responses[responses.length - 1];
-      if (!orderResponse.ok) {
-        const errBody = await orderResponse.json().catch(() => ({}));
-        throw new Error(errBody.message || `Error ${orderResponse.status} al registrar la orden`);
-      }
+      const order = await response.json();
+
+      console.log("Orden creada:", order);
 
       setSubmitSuccess(true);
+
     } catch (error) {
       console.error("Error al registrar la orden:", error);
+
       setSubmitError(
-        error instanceof Error ? error.message : "Ocurrió un error al registrar la orden."
+        error instanceof Error
+          ? error.message
+          : "Ocurrió un error al registrar la orden."
       );
     } finally {
       setSubmitting(false);
     }
-  };
+  }
   useEffect(() => {
     if (submitSuccess) {
       const timer = setTimeout(() => {

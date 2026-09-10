@@ -1,4 +1,4 @@
-import type { Order as Order_P, Prisma } from "@/generated/prisma/client.js";
+import type { Order as Order_P, Prisma, PrismaClient } from "@/generated/prisma/client.js";
 import type { PaginatedResult } from "@/shared/base.repository.js";
 import type { OrderQueryDto } from "./order.schema.js";
 import { BaseRepository } from "@/shared/base.repository.js";
@@ -7,13 +7,17 @@ import { Order } from "./order.entity.js";
 
 // Relaciones que el frontend necesita para armar la fila de la tabla y el
 // detalle de la orden (OrderDirectory usa order.equipment?.client y
-// order.statusHistory para mostrar cliente, equipo y estado actual).
+// order.statusHistory; ahora también order.failures, ya que Failure pasó
+// a colgar de Order en vez de Equipment).
 const orderInclude = {
     equipment: { include: { client: true } },
     statusHistory: true,
+    failures: true,
 } satisfies Prisma.OrderInclude;
 
 type OrderWithRelations = Order_P & Prisma.OrderGetPayload<{ include: typeof orderInclude }>;
+
+type Db = PrismaClient | Prisma.TransactionClient;
 
 export class OrderRepository extends BaseRepository<Order, OrderQueryDto> {
 
@@ -83,16 +87,28 @@ export class OrderRepository extends BaseRepository<Order, OrderQueryDto> {
             where: {
                 id_equipment: equipmentId,
             },
+            include : {
+                failures: true,
+                statusHistory: true,
+            }
         });
 
         return orders.map((order) => this.toDomain(order));
     }
 
-    public async create(item: Order): Promise<Order> {
-        const order = await this.prisma.order.create({
+    public async create(item: Order, db: Db = this.prisma): Promise<Order> {
+        const order = await db.order.create({
             data: {
                 id_order: uuidv7(),
-                ...item,
+                id_equipment: item.id_equipment,
+                id_user: item.id_user ?? undefined,
+                status: item.status,
+                observations: item.observations ?? undefined,
+                equipmentPhotoUrl: item.equipmentPhotoUrl ?? undefined,
+                dateOfEntry: item.dateOfEntry,
+                estimatedDate: item.estimatedDate ?? undefined,
+                deliveryDate: item.deliveryDate ?? undefined,
+                totalCharged: item.totalCharged ?? undefined,
             },
         });
 
@@ -125,7 +141,8 @@ export class OrderRepository extends BaseRepository<Order, OrderQueryDto> {
 
     // Acepta tanto el resultado con relaciones (findAll/findById, que
     // usan `include`) como el plano de create/update/delete (que no lo
-    // necesitan) — equipment/statusHistory quedan undefined en ese caso.
+    // necesitan) — equipment/statusHistory/failures quedan undefined en
+    // ese caso.
     private toDomain(order: Order_P | OrderWithRelations): Order {
         return new Order(
             order.id_equipment,
@@ -140,6 +157,7 @@ export class OrderRepository extends BaseRepository<Order, OrderQueryDto> {
             order.totalCharged?.toNumber(),
             "equipment" in order ? order.equipment ?? undefined : undefined,
             "statusHistory" in order ? order.statusHistory ?? undefined : undefined,
+            "failures" in order ? order.failures ?? undefined : undefined,
         );
     }
 }
