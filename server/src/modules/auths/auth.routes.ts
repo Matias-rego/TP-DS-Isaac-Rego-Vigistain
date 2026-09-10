@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import authenticate from '@/middlewares/authenticate.middleware.js';
-import { upload } from '@/middlewares/upload.middleware.js';
 import { validate } from '@/middlewares/validation.middleware.js';
 import type { Request, Response } from 'express';
 import { AuthController } from './auth.controller.js';
@@ -19,10 +18,7 @@ const ctrl = new AuthController(
 
 const router = Router();
 
-router.post('/register',
-    upload.single('foto'),
-    validate({ body: registerSchema }),
-    ctrl.registerUser);
+router.post('/register', validate({ body: registerSchema }), ctrl.registerUser);
 
 router.post('/login', validate({ body: loginSchema }), ctrl.loginUser);
 

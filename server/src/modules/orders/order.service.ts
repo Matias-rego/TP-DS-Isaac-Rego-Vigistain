@@ -22,6 +22,12 @@ export class OrderService {
         return this.repo.findByEquipmentId(equipmentId);
     }
 
+    // Métricas del Home: el service solo delega en el repository (que es
+    // el que sabe hablar con la base de datos).
+    getStats() {
+        return this.repo.getStats();
+    }
+
     async create(input: Omit<Order, "id_order">): Promise<Order | undefined> {
         const order = await this.repo.create(input as Order);
 

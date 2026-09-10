@@ -9,6 +9,7 @@ import clientTypeRoutes from '@/modules/clientTypes/clientType.routes.js';
 import equipmentRoutes from '@/modules/equipments/equipment.routes.js';
 import orderRouter from '@/modules/orders/order.routes.js';
 import statusRouter from '@/modules/status/status.routes.js';
+import uploadRoutes from '@/modules/uploads/upload.routes.js';
 import { authenticate } from '@/middlewares/authenticate.middleware.js';
 
 const router = express.Router();
@@ -25,5 +26,6 @@ router.use('/payment-types', authenticate([]), paymentTypeRoutes);
 router.use('/equipments', authenticate([]), equipmentRoutes);
 router.use('/orders', authenticate([]), orderRouter);
 router.use('/status', authenticate([]), statusRouter);
+router.use('/uploads', uploadRoutes);
 
 export default router;

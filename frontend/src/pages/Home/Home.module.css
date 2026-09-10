@@ -305,6 +305,47 @@
   margin-top: 1.25rem;
 }
 
+/* ---------- Sección "Últimas órdenes" (tarjetas informativas) ---------- */
+.ordenesSection {
+  margin-top: 2rem;
+}
+
+.ordenesHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.ordenesTitle {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--tf-text);
+  margin: 0;
+}
+
+.ordenesVerTodas {
+  background: none;
+  border: none;
+  color: var(--tf-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 8px;
+  transition: background-color 0.18s ease;
+}
+
+.ordenesVerTodas:hover {
+  background-color: var(--tf-primary-soft);
+}
+
+.ordenesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
 .quickCard {
   background: var(--tf-card);
   border: 1px solid var(--tf-border);

@@ -61,4 +61,15 @@ export class OrderController {
       next(error);
     }
   };
+
+  // Métricas para las tarjetas del Home: cuenta órdenes por estado.
+  // Delega en el service -> repository (misma arquitectura de capas que
+  // el resto del módulo), en vez de pegarle a prisma desde el controller.
+  public getStats = async (_req: Request, res: Response, next: NextFunction) => {
+    try {
+      res.status(200).json(await this.service.getStats());
+    } catch (error) {
+      next(error);
+    }
+  };
 }

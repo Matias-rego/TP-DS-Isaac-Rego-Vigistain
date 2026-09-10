@@ -4,6 +4,7 @@ import type { OrderQueryDto } from "./order.schema.js";
 import { BaseRepository } from "@/shared/base.repository.js";
 import { v7 as uuidv7 } from "uuid";
 import { Order } from "./order.entity.js";
+import { $Enums } from "@/database/prisma.js";
 
 // Relaciones que el frontend necesita para armar la fila de la tabla y el
 // detalle de la orden (OrderDirectory usa order.equipment?.client y
@@ -121,6 +122,53 @@ export class OrderRepository extends BaseRepository<Order, OrderQueryDto> {
         return {
             id: order.id_order,
         };
+    }
+
+    // Métricas para las tarjetas del Home. Cuenta órdenes por estado y las
+    // entregadas dentro del mes actual (según deliveryDate).
+    public async getStats() {
+        const ahora = new Date();
+        const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+        const inicioMesSiguiente = new Date(ahora.getFullYear(), ahora.getMonth() + 1, 1);
+
+        const [activas, pendientesPresupuesto, enReparacion, entregadasMes] =
+            await Promise.all([
+                // Activas: todo lo que NO está entregado ni cancelado.
+                this.prisma.order.count({
+                    where: {
+                        status: {
+                            notIn: [
+                                $Enums.EnumOrderStatus.entregado,
+                                $Enums.EnumOrderStatus.cancelado,
+                            ],
+                        },
+                    },
+                }),
+                // Pendientes de presupuesto: recién recibidas o en diagnóstico.
+                this.prisma.order.count({
+                    where: {
+                        status: {
+                            in: [
+                                $Enums.EnumOrderStatus.recibido,
+                                $Enums.EnumOrderStatus.diagnostico,
+                            ],
+                        },
+                    },
+                }),
+                // En reparación.
+                this.prisma.order.count({
+                    where: { status: $Enums.EnumOrderStatus.reparacion },
+                }),
+                // Entregadas este mes.
+                this.prisma.order.count({
+                    where: {
+                        status: $Enums.EnumOrderStatus.entregado,
+                        deliveryDate: { gte: inicioMes, lt: inicioMesSiguiente },
+                    },
+                }),
+            ]);
+
+        return { activas, pendientesPresupuesto, enReparacion, entregadasMes };
     }
 
     // Acepta tanto el resultado con relaciones (findAll/findById, que

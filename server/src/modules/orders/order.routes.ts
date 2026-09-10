@@ -23,6 +23,10 @@ router.get('/', validate({ query: orderQuerySchema }), ctrl.getAllOrders);
 
 router.get('/ofEquipment/:id', validate({ params: idSchema }), ctrl.getOrderOfEquipment);
 
+// Ojo: /stats tiene que ir ANTES de /:id, si no Express toma "stats"
+// como si fuera un id de orden y nunca llega a este handler.
+router.get('/stats', ctrl.getStats);
+
 router.get('/:id', validate({ params: idSchema }), ctrl.getOneOrder);
 
 router.post('/', validate({ body: registerOrderSchema }), ctrl.registerOrder);

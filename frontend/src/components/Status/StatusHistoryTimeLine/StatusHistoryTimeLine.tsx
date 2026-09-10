@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { type Order } from '@/types/types';
 import StatusMiniDescriptiveCard from '@/components/Status/StatusMiniDescriptiveCard/StatusMiniDescriptiveCard';
-import styles from './StatusHistoryTimeline.module.css';
+import styles from './StatusHistoryTimeLine.module.css';
 
 export interface StatusHistoryTimelineProps {
   order: Order;
