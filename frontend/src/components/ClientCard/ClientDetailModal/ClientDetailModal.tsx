@@ -8,6 +8,7 @@ import type { Equipment as EquipmentBase } from "@/types/types";
 import EquipmentMiniDescriptiveCard from "@/components/EquipmentComponent/EquipmentMiniDescriptiveCard/EquipmentMiniDescriptiveCard";
 import type { Client as BaseClient } from "@/types/types";
 import EquipmentDetailModal from "@/components/EquipmentComponent/EquipmentDetailModal/EquipmentDetailModal";
+import ConfirmDialog from "@/components/Common/ConfirmDialog/ConfirmDialog";
 
 // Extendemos la interfaz BaseClient para agregar la propiedad aplanada
 interface Client extends BaseClient {
@@ -53,10 +54,9 @@ const ClientDetailModal = ({
   const [equipments, setEquipments] = useState<Equipment[]>([]);
   const [showDetailModalEquipment, setShowDetailModalEquipment] = useState(false);
   const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null);
+  const [refreshEquip, setRefreshEquip] = useState(0);
+  const [confirmBaja, setConfirmBaja] = useState(false);
 
-  // Config de cada equipo de la lista. Al hacer click en un equipo, guardamos
-  // cuál fue y abrimos el modal de detalle de equipo (esto es lo que Tomi
-  // había dejado sin conectar: antes el onClick solo hacía un console.log).
   const equipmentItemConfig: DetailItemConfig<Equipment> = {
     getKey: (item) => item.id_equipment,
     primary: (item) => item.tipo_equipment,
@@ -96,7 +96,7 @@ const ClientDetailModal = ({
     };
 
     searchEquipments();
-  }, [client.id_client, open]);
+  }, [client.id_client, open, refreshEquip]);
 
   // Resetear modo edición al cerrar
   useEffect(() => {
@@ -158,6 +158,48 @@ const ClientDetailModal = ({
     }
   };
 
+  const doBaja = async () => {
+    setConfirmBaja(false);
+    try {
+      const response = await fetch(
+        `${BACKEND_URL}/api/clients/${client.id_client}`,
+        { method: 'DELETE', credentials: 'include' }
+      );
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.message || 'No se pudo dar de baja el cliente');
+      }
+      const result = await response.json();
+      if (entityEvent) eventBus.emit(entityEvent, result);
+      onClose();
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Ocurrió un error inesperado');
+    }
+  };
+
+  const doReactivar = async () => {
+    try {
+      const response = await fetch(
+        `${BACKEND_URL}/api/clients/${client.id_client}`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: true }),
+          credentials: 'include',
+        }
+      );
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.message || 'No se pudo reactivar el cliente');
+      }
+      const result = await response.json();
+      if (entityEvent) eventBus.emit(entityEvent, result);
+      onClose();
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Ocurrió un error inesperado');
+    }
+  };
+
   return (
     <>
     <DetailModal
@@ -175,7 +217,12 @@ const ClientDetailModal = ({
       actions={
         isEditing
           ? [{ label: 'Guardar', variant: 'primary', onClick: () => handleSave() }]
-          : [{ label: 'Editar Cliente', variant: 'secondary', onClick: () => setIsEditing(true) }]
+          : [
+              { label: 'Editar Cliente', variant: 'secondary', onClick: () => setIsEditing(true) },
+              client.status === true
+                ? { label: 'Dar de baja', variant: 'danger', onClick: () => setConfirmBaja(true) }
+                : { label: 'Reactivar', variant: 'primary', onClick: () => doReactivar() },
+            ]
       }
       cancelLabel={isEditing ? "Cancelar" : "Cerrar"}
       zIndex={1100}
@@ -208,9 +255,20 @@ const ClientDetailModal = ({
         equipment={selectedEquipment}
         open={showDetailModalEquipment}
         onClose={() => setShowDetailModalEquipment(false)}
+        onEquipmentChanged={() => setRefreshEquip((k) => k + 1)}
         zIndex={1200}
       />
     )}
+
+    <ConfirmDialog
+      open={confirmBaja}
+      danger
+      title="Dar de baja cliente"
+      message="El cliente quedará inactivo. ¿Querés continuar?"
+      confirmLabel="Dar de baja"
+      onConfirm={doBaja}
+      onCancel={() => setConfirmBaja(false)}
+    />
     </>
   );
 };

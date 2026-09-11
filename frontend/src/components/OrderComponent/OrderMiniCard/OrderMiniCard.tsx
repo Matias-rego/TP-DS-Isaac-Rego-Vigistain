@@ -17,9 +17,6 @@ export interface OrderMiniCardProps {
   onClick?: (id_order: string) => void;
 }
 
-// El id de la orden ahora es un uuid largo. Para la tarjeta mostramos solo
-// los primeros 8 caracteres (alcanza para identificarla) y dejamos el id
-// completo en el title (tooltip al pasar el mouse).
 const shortId = (id: string) => `#${String(id).slice(0, 8)}`;
 
 const formatCurrency = (value: number) =>
