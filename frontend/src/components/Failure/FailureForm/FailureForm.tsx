@@ -3,6 +3,9 @@ import styles from "./FailureForm.module.css";
 import { BACKEND_URL } from "@/lib/config";
 import { useAuth } from "@/lib/AuthContext";
 import type { Failure_Type } from "@/types/types";
+import ActionButton from "@/components/Common/Buttons/ActionButton";
+import AltaTipoFalla from "@/pages/TipoFalla/AltaTipoFalla";
+import { eventBus, EVENTS } from "@/lib/eventBus";
 
 export interface NuevaFalla {
   id_failure?: string; // presente solo en edición, para identificar qué falla actualizar
@@ -28,6 +31,7 @@ const FailureForm = ({ onGuardar, onCancelar, falla }: FailureFormProps) => {
   const [error, setError] = useState<string | null>(null);
   const { isAuth, loading: authLoading } = useAuth();
   const boxRef = useRef<HTMLDivElement>(null);
+  const [registerFailureType, setRegisterFailureType] = useState(false);
 
   const fetchTipos = useCallback(async () => {
     try {
@@ -43,6 +47,14 @@ const FailureForm = ({ onGuardar, onCancelar, falla }: FailureFormProps) => {
   useEffect(() => {
     if (!authLoading && isAuth) fetchTipos();
   }, [authLoading, isAuth, fetchTipos]);
+
+  // Cuando AltaTipoFalla (u otro componente) crea/edita un tipo de falla,
+  // refrescamos el combo automáticamente sin depender de cerrar el modal.
+  useEffect(() => {
+    return eventBus.on(EVENTS.failureTypeChanged, () => {
+      fetchTipos();
+    });
+  }, [fetchTipos]);
 
 
   useEffect(() => {
@@ -67,6 +79,27 @@ const FailureForm = ({ onGuardar, onCancelar, falla }: FailureFormProps) => {
     return () => document.removeEventListener("mousedown", onClickOutside);
   }, []);
 
+  // Bloquea el scroll del body mientras el modal de alta está abierto
+  useEffect(() => {
+    if (registerFailureType) {
+      const prevOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = prevOverflow;
+      };
+    }
+  }, [registerFailureType]);
+
+  // Cierra el modal con la tecla Escape
+  useEffect(() => {
+    if (!registerFailureType) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") cerrarModalTipoFalla();
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [registerFailureType]);
+
   const filtrados = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return tipos;
@@ -78,6 +111,13 @@ const FailureForm = ({ onGuardar, onCancelar, falla }: FailureFormProps) => {
     setQuery(t.failureDescription);
     setOpen(false);
     setError(null);
+  };
+
+  const cerrarModalTipoFalla = () => {
+    setRegisterFailureType(false);
+    // AltaTipoFalla no expone un callback de éxito, así que al cerrar
+    // simplemente refrescamos la lista por si se creó un tipo nuevo.
+    fetchTipos();
   };
 
   const guardar = () => {
@@ -119,6 +159,12 @@ const FailureForm = ({ onGuardar, onCancelar, falla }: FailureFormProps) => {
             onChange={(e) => { setQuery(e.target.value); setOpen(true); setSelected(null); }}
             onFocus={() => setOpen(true)}
           />
+          <ActionButton
+            label="Agregar Tipo Falla"
+            variant="ghost"
+            onClick={() => setRegisterFailureType(true)}
+            icon={null}
+          />
           {open && (
             <ul className={styles.dropdown}>
               {filtrados.length === 0 ? (
@@ -158,6 +204,27 @@ const FailureForm = ({ onGuardar, onCancelar, falla }: FailureFormProps) => {
           {isEditing ? "Guardar cambios" : "Guardar falla"}
         </button>
       </div>
+
+      {registerFailureType && (
+        <div
+          className={styles.modalOverlay}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) cerrarModalTipoFalla();
+          }}
+        >
+          <div className={styles.modalContent}>
+            <button
+              type="button"
+              className={styles.modalClose}
+              onClick={cerrarModalTipoFalla}
+              aria-label="Cerrar"
+            >
+              ×
+            </button>
+            <AltaTipoFalla />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

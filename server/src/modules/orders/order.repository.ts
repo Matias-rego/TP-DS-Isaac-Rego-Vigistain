@@ -29,24 +29,44 @@ export class OrderRepository extends BaseRepository<Order, OrderQueryDto> {
             query?.limit,
         );
 
+
+        const where = query?.search ? {
+            OR: [
+                {
+                    observations: {
+                        contains: query.search,
+                    },
+                }, {
+                    equipment: {
+                        brand: {
+                            contains: query.search,
+                        },
+                    },
+                }, {
+                    equipment: {
+                        model: {
+                            contains: query.search,
+                        },
+                    },
+                },
+                {
+                    equipment: {
+                        client: {
+                            clientName: {
+                                contains: query.search
+                            }
+                        }
+                    }
+                },
+            ],
+        } : {};
+
         const [data, total] = await Promise.all([
             this.prisma.order.findMany({
                 skip,
                 take: limit,
-                where: {
-                //     query?.search ? {
-                //     OR: [
-                //         { clientName: { contains: query.search } },
-                //         { clientEmail: { contains: query.search } },
-                //         { cuit: { contains: query.search } },
-                //     ],
-                // } : {},
-                    observations: {
-                        contains: query?.search,
-                    },
-
-                },
-                orderBy: (query?.sortBy && query?.sortOrder)
+                where,
+                orderBy: query?.sortBy && query?.sortOrder
                     ? {
                         [query.sortBy]: query.sortOrder,
                     }
@@ -55,11 +75,7 @@ export class OrderRepository extends BaseRepository<Order, OrderQueryDto> {
             }),
 
             this.prisma.order.count({
-                where: {
-                    observations: {
-                        contains: query?.search,
-                    },
-                },
+                where,
             }),
         ]);
 
