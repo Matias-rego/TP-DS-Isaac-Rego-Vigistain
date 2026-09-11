@@ -124,8 +124,6 @@ export class OrderRepository extends BaseRepository<Order, OrderQueryDto> {
         };
     }
 
-    // Métricas para las tarjetas del Home. Cuenta órdenes por estado y las
-    // entregadas dentro del mes actual (según deliveryDate).
     public async getStats() {
         const ahora = new Date();
         const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
@@ -133,7 +131,6 @@ export class OrderRepository extends BaseRepository<Order, OrderQueryDto> {
 
         const [activas, pendientesPresupuesto, enReparacion, entregadasMes] =
             await Promise.all([
-                // Activas: todo lo que NO está entregado ni cancelado.
                 this.prisma.order.count({
                     where: {
                         status: {
@@ -144,7 +141,6 @@ export class OrderRepository extends BaseRepository<Order, OrderQueryDto> {
                         },
                     },
                 }),
-                // Pendientes de presupuesto: recién recibidas o en diagnóstico.
                 this.prisma.order.count({
                     where: {
                         status: {
@@ -155,11 +151,9 @@ export class OrderRepository extends BaseRepository<Order, OrderQueryDto> {
                         },
                     },
                 }),
-                // En reparación.
                 this.prisma.order.count({
                     where: { status: $Enums.EnumOrderStatus.reparacion },
                 }),
-                // Entregadas este mes.
                 this.prisma.order.count({
                     where: {
                         status: $Enums.EnumOrderStatus.entregado,

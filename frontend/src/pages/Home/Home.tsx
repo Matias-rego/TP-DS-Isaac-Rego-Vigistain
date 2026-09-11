@@ -59,9 +59,6 @@ const Home = () => {
         const response = await fetch(`${BACKEND_URL}/api/orders`, { credentials: 'include' });
         if (!response.ok) return;
         const data = await response.json();
-        // El backend ahora devuelve el listado paginado: { data: [...], metadata: {...} }.
-        // Nos quedamos con el array de adentro (data.data). El Array.isArray es por
-        // si en algún endpoint todavía viniera como array pelado.
         const lista: Order[] = Array.isArray(data) ? data : data.data ?? [];
         setOrdenes(lista);
       } catch (error) {
@@ -92,9 +89,6 @@ const Home = () => {
   }, [mostrarToast]);
 
   const esTecnico = usuario?.rol === "tecnico" || usuario?.rol === "admin";
-  // id_order es un uuid (string). Como se generan con uuid v7, ordenar el
-  // string de mayor a menor equivale a ordenar de la orden más nueva a la
-  // más vieja. Nos quedamos con las 6 últimas.
   const ultimasOrdenes = [...ordenes]
     .sort((a, b) => String(b.id_order).localeCompare(String(a.id_order)))
     .slice(0, 6);

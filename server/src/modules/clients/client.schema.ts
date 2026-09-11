@@ -17,6 +17,7 @@ export const modifyClientSchema = z.object({
     clientEmail: email.optional(),
     clientPhone: phone.optional(),
     cuit: cuit.optional(),
+    status: z.boolean().optional(),
 }).strict();
 
 export type ModifyClientDto = z.infer<typeof modifyClientSchema>;

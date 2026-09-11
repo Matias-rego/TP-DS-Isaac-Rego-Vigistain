@@ -177,6 +177,29 @@ const ClientDetailModal = ({
     }
   };
 
+  const doReactivar = async () => {
+    try {
+      const response = await fetch(
+        `${BACKEND_URL}/api/clients/${client.id_client}`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: true }),
+          credentials: 'include',
+        }
+      );
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.message || 'No se pudo reactivar el cliente');
+      }
+      const result = await response.json();
+      if (entityEvent) eventBus.emit(entityEvent, result);
+      onClose();
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Ocurrió un error inesperado');
+    }
+  };
+
   return (
     <>
     <DetailModal
@@ -196,7 +219,9 @@ const ClientDetailModal = ({
           ? [{ label: 'Guardar', variant: 'primary', onClick: () => handleSave() }]
           : [
               { label: 'Editar Cliente', variant: 'secondary', onClick: () => setIsEditing(true) },
-              { label: 'Dar de baja', variant: 'danger', onClick: () => setConfirmBaja(true) },
+              client.status === true
+                ? { label: 'Dar de baja', variant: 'danger', onClick: () => setConfirmBaja(true) }
+                : { label: 'Reactivar', variant: 'primary', onClick: () => doReactivar() },
             ]
       }
       cancelLabel={isEditing ? "Cancelar" : "Cerrar"}
