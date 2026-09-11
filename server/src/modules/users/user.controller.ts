@@ -34,7 +34,21 @@ export class UserController {
 
     public async createUser(_req: Request, _res: Response) { }
 
-    public async deleteUser(_req: Request, _res: Response) { }
+    public deleteUser = async (req: Request, res: Response, next: NextFunction) => {
+        const { id } = req.validated.params as IdDto;
+
+        try {
+            const user = await this.service.update(id, { status: false });
+
+            if (!user) {
+                return res.status(404).json({ message: "User not found" });
+            }
+
+            return res.json(this.toResponse(user));
+        } catch (error) {
+            next(error);
+        }
+    };
 
     public getOneUser =  async(req: Request, res: Response, next: NextFunction) => {
         const params = req.validated.params as IdDto;
