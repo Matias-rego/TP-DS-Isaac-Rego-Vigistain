@@ -437,7 +437,7 @@ const WorkOrder = () => {
                     <div className={styles.searchContainer}>
                       <SearchBar<Equipment>
                         showFilters={false}
-                        searchEndpoint="/api/equipments/search"
+                        searchEndpoint="/api/equipments/"
                         searchPlaceholder="Busca Equipos por tipo, marca o modelo"
                         onResults={(data) => {
                           setResultsEquipment(data);

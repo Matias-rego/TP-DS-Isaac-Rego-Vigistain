@@ -33,9 +33,17 @@ export class OrderRepository extends BaseRepository<Order, OrderQueryDto> {
                 skip,
                 take: limit,
                 where: {
+                //     query?.search ? {
+                //     OR: [
+                //         { clientName: { contains: query.search } },
+                //         { clientEmail: { contains: query.search } },
+                //         { cuit: { contains: query.search } },
+                //     ],
+                // } : {},
                     observations: {
                         contains: query?.search,
                     },
+
                 },
                 orderBy: (query?.sortBy && query?.sortOrder)
                     ? {

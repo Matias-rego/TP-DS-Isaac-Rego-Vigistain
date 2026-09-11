@@ -103,15 +103,6 @@ const Nav = () => {
             </button>
           </li>
           <li>
-            <button
-              type="button"
-              className={styles.navButton}
-              onClick={() => alert('La sección Servicios todavía está en desarrollo.')}
-            >
-              Servicios
-            </button>
-          </li>
-          <li>
             <button type="button" className={styles.navButton} onClick={() => navigate('/gestion')}>
               Gestión
             </button>
@@ -224,14 +215,6 @@ const Nav = () => {
           >
             <span className={styles.drawerLinkIcon}><Home size={20} /></span>
             Inicio
-          </button>
-          <button
-            type="button"
-            className={styles.drawerLink}
-            onClick={() => { setMenuOpen(false); alert('La sección Servicios todavía está en desarrollo.'); }}
-          >
-            <span className={styles.drawerLinkIcon}><Wrench size={20} /></span>
-            Servicios
           </button>
           <button
             type="button"
