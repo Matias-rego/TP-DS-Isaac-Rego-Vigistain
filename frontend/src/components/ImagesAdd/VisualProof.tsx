@@ -1,29 +1,17 @@
 import { useRef, useState } from "react";
 import { Camera, X, Loader2 } from "lucide-react";
 import styles from "./VisualProof.module.css";
-import BACKEND_URL from "@/lib/config";
-
-// ─── Props ──────────────────────────────────────────────────────────────
+import { uploadFoto } from "@/lib/upload";
 
 interface VisualProofProps {
-  /** URL de la foto ya subida (si estás editando un equipo existente) */
+  /** URL de la foto ya subida */
   value: string | null;
-  /** Se llama con la URL que devuelve el backend tras subir a Cloudinary, o null si se quita la foto */
+
+  /** Se llama con la URL devuelta por /api/uploads, o null si se quita */
   onChange: (url: string | null) => void;
-  /** Endpoint del backend que recibe el FormData y sube a Cloudinary. Ajustá según tu ruta real. */
-  uploadEndpoint?: string;
-  /** Nombre del campo dentro del FormData que espera el backend */
-  fieldName?: string;
 }
 
-// ─── Componente ─────────────────────────────────────────────────────────
-
-const VisualProof = ({
-  value,
-  onChange,
-  uploadEndpoint = `${BACKEND_URL}/api/equipments/upload-photo`,
-  fieldName = "foto",
-}: VisualProofProps) => {
+const VisualProof = ({ value, onChange }: VisualProofProps) => {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [localPreview, setLocalPreview] = useState<string | null>(null);
@@ -36,32 +24,25 @@ const VisualProof = ({
   const uploadFile = async (file: File) => {
     setError(null);
 
-    // Preview local inmediato mientras se sube
+    // Preview local inmediato
     const objectUrl = URL.createObjectURL(file);
     setLocalPreview(objectUrl);
     setUploading(true);
 
     try {
-      const formData = new FormData();
-      formData.append(fieldName, file);
+      const result = await uploadFoto(file);
 
-      const response = await fetch(uploadEndpoint, {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.message || "No se pudo subir la foto");
-      }
-
-      // Asumimos que el backend devuelve { url: string } — ajustá si tu endpoint responde distinto
+      // El backend devuelve { id, url }
       onChange(result.url);
     } catch (err) {
       console.error("Error al subir foto:", err);
-      setError("No se pudo subir la foto. Probá de nuevo.");
+
+      setError(
+        err instanceof Error
+          ? err.message
+          : "No se pudo subir la foto. Probá de nuevo."
+      );
+
       setLocalPreview(null);
       onChange(null);
     } finally {
@@ -74,7 +55,7 @@ const VisualProof = ({
     const file = e.target.files?.[0];
     if (!file) return;
     uploadFile(file);
-    e.target.value = ""; // permite volver a elegir el mismo archivo si se saca y se vuelve a poner
+    e.target.value = ""; // Permite seleccionar nuevamente el mismo archivo
   };
 
   const handleRemove = () => {
@@ -98,7 +79,12 @@ const VisualProof = ({
       <div className={styles.dropzone}>
         {displayedImage ? (
           <div className={styles.previewWrap}>
-            <img src={displayedImage} alt="Foto del equipo" className={styles.previewImg} />
+            <img
+              src={displayedImage}
+              alt="Foto del equipo"
+              className={styles.previewImg}
+            />
+
             {uploading && (
               <div className={styles.uploadingOverlay}>
                 <Loader2 size={22} className={styles.spinner} />
@@ -144,20 +130,18 @@ const VisualProof = ({
         </button>
       </div>
 
-      {/* Input normal: abre selector de archivos / galería */}
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/webp"
         className={styles.hiddenInput}
         onChange={handleFileChange}
       />
 
-      {/* Input con capture: en mobile abre la cámara directamente */}
       <input
         ref={cameraInputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/webp"
         capture="environment"
         className={styles.hiddenInput}
         onChange={handleFileChange}

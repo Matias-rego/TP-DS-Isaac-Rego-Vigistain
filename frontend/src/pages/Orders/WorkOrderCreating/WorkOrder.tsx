@@ -76,8 +76,7 @@ const WorkOrder = () => {
   const [step, setStep] = useState(0);
   const [equipoTab, setEquipoTab] = useState<'nuevo' | 'buscar'>('nuevo');
   const [agregando, setAgregando] = useState(true);
-  const tipoEquipoElegido =
-    deviceValues.deviceType === "otro" ? deviceValues.deviceTypeOther : deviceValues.deviceType;
+  const tipoEquipoElegido = deviceValues.deviceType;
   const equipoValido =
     selectedEquipment != null ||
     Boolean(tipoEquipoElegido && deviceValues.brand && deviceValues.model);

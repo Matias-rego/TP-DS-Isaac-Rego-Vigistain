@@ -185,7 +185,7 @@ export class AuthController {
 
     public registerUser = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { username, email, password }: RegisterDto = req.body;
+            const { username, email, password, urlPicture }: RegisterDto = req.body;
 
             // El primer usuario registrado en el sistema queda como admin
             // y auto-validado; el resto entra como "tecnico" pendiente de
@@ -193,11 +193,6 @@ export class AuthController {
             const userCount = await prisma.user.count();
             const role = userCount === 0 ? EnumRol.admin : EnumRol.tecnico;
             const adminValidation = role === EnumRol.admin;
-
-            // Si el usuario subió foto, multer ya la mandó a Cloudinary y
-            // dejó la URL en req.file.path. Si no subió nada, req.file es
-            // undefined y no seteamos urlPicture.
-            const fotoUrl = (req.file as Express.Multer.File | undefined)?.path;
 
             const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -211,7 +206,7 @@ export class AuthController {
                 role,
                 false,           // status: inactivo hasta validar el email
                 adminValidation, // validationStatus
-                fotoUrl
+                urlPicture
             );
 
             await this.service.create(user);

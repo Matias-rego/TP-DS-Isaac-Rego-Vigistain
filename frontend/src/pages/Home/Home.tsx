@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 import Nav from "@/pages/Nav/Nav";
 import styles from "./Home.module.css";
-import type { User } from "@/types/types";
+import type { User, Order } from "@/types/types";
 import Footer from "@/components/Footer/Footer";
+import OrderMiniCard from "@/components/OrderComponent/OrderMiniCard/OrderMiniCard";
 import { BACKEND_URL } from '@/lib/config';
 import { ClipboardList, Plus, Wallet, Zap, Search, Check, FileText, Clock, Wrench, CircleCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const [usuario, setUsuario] = useState<User | null>(null);
+  const [stats, setStats] = useState({ activas: 0, pendientesPresupuesto: 0, enReparacion: 0, entregadasMes: 0 });
+  const [ordenes, setOrdenes] = useState<Order[]>([]);
   //const [mostrarToast, setMostrarToast] = useState<boolean>(true);
   const navigate = useNavigate();
   const [mostrarToast, setMostrarToast] = useState<boolean>(() => {
@@ -37,6 +40,38 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
+    const cargarStats = async () => {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/orders/stats`, { credentials: 'include' });
+        if (!response.ok) return;
+        const data = await response.json();
+        setStats(data);
+      } catch (error) {
+        console.error("Error al cargar estadísticas:", error);
+      }
+    };
+    cargarStats();
+  }, []);
+
+  useEffect(() => {
+    const cargarOrdenes = async () => {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/orders`, { credentials: 'include' });
+        if (!response.ok) return;
+        const data = await response.json();
+        // El backend ahora devuelve el listado paginado: { data: [...], metadata: {...} }.
+        // Nos quedamos con el array de adentro (data.data). El Array.isArray es por
+        // si en algún endpoint todavía viniera como array pelado.
+        const lista: Order[] = Array.isArray(data) ? data : data.data ?? [];
+        setOrdenes(lista);
+      } catch (error) {
+        console.error("Error al cargar órdenes:", error);
+      }
+    };
+    cargarOrdenes();
+  }, []);
+
+  useEffect(() => {
     if (!mostrarToast) return;
 
     sessionStorage.removeItem('showLoginToast');
@@ -57,6 +92,12 @@ const Home = () => {
   }, [mostrarToast]);
 
   const esTecnico = usuario?.rol === "tecnico" || usuario?.rol === "admin";
+  // id_order es un uuid (string). Como se generan con uuid v7, ordenar el
+  // string de mayor a menor equivale a ordenar de la orden más nueva a la
+  // más vieja. Nos quedamos con las 6 últimas.
+  const ultimasOrdenes = [...ordenes]
+    .sort((a, b) => String(b.id_order).localeCompare(String(a.id_order)))
+    .slice(0, 6);
 
   /*
     TODO CLIENTE:
@@ -194,26 +235,42 @@ const Home = () => {
           <section className={styles.quickGrid}>
             <div className={styles.quickCard}>
               <FileText className={styles.quickIcon} size={20} />
-              <span className={styles.quickNumber}>24</span>
+              <span className={styles.quickNumber}>{stats.activas}</span>
               <span className={styles.quickLabel}>Órdenes activas</span>
             </div>
 
             <div className={styles.quickCard}>
               <Clock className={styles.quickIcon} size={20} />
-              <span className={styles.quickNumber}>7</span>
+              <span className={styles.quickNumber}>{stats.pendientesPresupuesto}</span>
               <span className={styles.quickLabel}>Pendientes de presupuesto</span>
             </div>
 
             <div className={styles.quickCard}>
               <Wrench className={styles.quickIcon} size={20} />
-              <span className={styles.quickNumber}>15</span>
+              <span className={styles.quickNumber}>{stats.enReparacion}</span>
               <span className={styles.quickLabel}>En reparación</span>
             </div>
 
             <div className={styles.quickCard}>
               <CircleCheck className={styles.quickIcon} size={20} />
-              <span className={styles.quickNumber}>32</span>
+              <span className={styles.quickNumber}>{stats.entregadasMes}</span>
               <span className={styles.quickLabel}>Entregadas este mes</span>
+            </div>
+          </section>
+        )}
+
+        {esTecnico && ultimasOrdenes.length > 0 && (
+          <section className={styles.ordenesSection}>
+            <div className={styles.ordenesHeader}>
+              <h2 className={styles.ordenesTitle}>Últimas órdenes</h2>
+              <button type="button" className={styles.ordenesVerTodas} onClick={() => navigate('/manageOrder')}>
+                Ver todas
+              </button>
+            </div>
+            <div className={styles.ordenesGrid}>
+              {ultimasOrdenes.map((orden) => (
+                <OrderMiniCard key={orden.id_order} order={orden} onClick={() => navigate('/manageOrder')} />
+              ))}
             </div>
           </section>
         )}

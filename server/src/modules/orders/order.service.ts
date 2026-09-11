@@ -28,7 +28,9 @@ export class OrderService {
     findByEquipmentId(equipmentId: string): Promise<Order[]> {
         return this.repo.findByEquipmentId(equipmentId);
     }
-
+    getStats() {
+        return this.repo.getStats();
+    }
     async create(input: CreateOrderInput): Promise<Order | undefined> {
         const { id_client, equipment, failures, id_user, ...orderFields } = input;
 
