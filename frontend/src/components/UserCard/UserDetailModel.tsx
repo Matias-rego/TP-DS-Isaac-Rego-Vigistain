@@ -5,6 +5,7 @@ import styles from './UserDetailModal.module.css';
 import { eventBus } from "@/lib/eventBus";
 import { BACKEND_URL } from "@/lib/config";
 import ActionButton from "../Common/Buttons/ActionButton";
+import ConfirmDialog from "../Common/ConfirmDialog/ConfirmDialog";
 import type { User as UserBase, PaginatedResponse} from "@/types/types";
 
 interface User extends UserBase {
@@ -52,6 +53,7 @@ const UserDetailModal = ({
 }: UserDetailModalProps) => {
   const [isUpgrading, setIsUpgrading] = useState(false);
   const [formValidate, setFormValidate] = useState<User>(user);
+  const [confirmBaja, setConfirmBaja] = useState(false);
 
   useEffect(() => {
     setFormValidate(user);
@@ -107,7 +109,27 @@ const UserDetailModal = ({
     }
   };
 
+  const doBaja = async () => {
+    setConfirmBaja(false);
+    try {
+      const response = await fetch(
+        `${BACKEND_URL}/api/users/${user.id_user}`,
+        { method: 'DELETE', credentials: 'include' }
+      );
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.message || 'No se pudo dar de baja el usuario');
+      }
+      const result = await response.json();
+      if (entityEvent) eventBus.emit(entityEvent, result);
+      onClose();
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Ocurrió un error inesperado');
+    }
+  };
+
   return (
+    <>
     <DetailModal
       open={open}
       onClose={() => {
@@ -140,7 +162,15 @@ const UserDetailModal = ({
                 onClick: handleConfirmUpgrade,
               },
             ]
-          : []
+          : (user.status === true
+              ? [
+                  {
+                    label: "Dar de baja",
+                    variant: "danger",
+                    onClick: () => setConfirmBaja(true),
+                  },
+                ]
+              : [])
       }
     >
       {user.validationStatus === false && !isUpgrading && (
@@ -163,6 +193,17 @@ const UserDetailModal = ({
         <h1 className={styles.editingHeader}>Presione en confirmar ascenso para otorgarle todas las facultades correspondientes de un administrador al usuario {user.userName}.</h1>
       )}
     </DetailModal>
+
+    <ConfirmDialog
+      open={confirmBaja}
+      danger
+      title="Dar de baja usuario"
+      message="El usuario quedará inactivo y no podrá iniciar sesión. ¿Continuar?"
+      confirmLabel="Dar de baja"
+      onConfirm={doBaja}
+      onCancel={() => setConfirmBaja(false)}
+    />
+    </>
   );
 };
 
