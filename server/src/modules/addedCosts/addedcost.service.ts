@@ -1,7 +1,7 @@
 import type { PaginatedResult } from "@/shared/base.repository.js";
 import type { AddedCostQueryDto } from "./addedcost.schema.js";
 import type { AddedCostRepository } from "./addedcost.repository.js";
-import type { BudgetService } from "@/modules/budget/budget.service.js";
+import type { BudgetService } from "@/modules/budgets/budget.service.js";
 import { AddedCost } from "./addedcost.entity.js";
 
 export class AddedCostService {
@@ -47,5 +47,13 @@ export class AddedCostService {
         }
 
         return deleted;
+    }
+    async sumByBudgetId(id_budget:string): Promise<number>{
+        const existing = await this.budgetService.findById(id_budget);
+        let result = 0.00
+        if (existing){
+            result = await this.repo.sumByBudgetId(id_budget);
+        };
+        return result;
     }
 }

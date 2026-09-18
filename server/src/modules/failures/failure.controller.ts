@@ -62,4 +62,13 @@ export class FailureController {
       next(e);
     }
   }
+  public getTotalByOrder = async (req: Request, res: Response) => {
+      try {
+          const { id_order } = req.params;
+          const total = await this.service.sumFailureCosts(String(id_order));
+          res.status(200).json({ total });
+      } catch (error) {
+          res.status(500).json({ message: "Error al calcular el total de fallas estimadas." });
+      }
+  };
 }

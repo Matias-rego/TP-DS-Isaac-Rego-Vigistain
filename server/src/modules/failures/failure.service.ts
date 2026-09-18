@@ -2,9 +2,10 @@ import type { PaginatedResult } from "@/shared/base.repository.js";
 import type { CreateFailuresDto, FailureQueryDto } from "./failure.schema.js";
 import type { FailureRepository } from "./failure.repository.js";
 import { Failure } from "./failure.entity.js";
+import { BudgetService } from "../budgets/budget.service.js";
 
 export class FailureService {
-    constructor(private repo: FailureRepository) { }
+    constructor(private repo: FailureRepository, private budgetService: BudgetService) { }
 
     findAll(query?: FailureQueryDto): Promise<PaginatedResult<Failure>> {
         return this.repo.findAll(query);
@@ -37,5 +38,8 @@ export class FailureService {
 
     delete(id: string): Promise<{ id: string } | undefined> {
         return this.repo.delete(id);
+    }
+    async sumFailureCosts(id_order: string): Promise<number>{
+        return this.budgetService.sumFailureCost(id_order);
     }
 }

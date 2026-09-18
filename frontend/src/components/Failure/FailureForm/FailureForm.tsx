@@ -48,8 +48,6 @@ const FailureForm = ({ onGuardar, onCancelar, falla }: FailureFormProps) => {
     if (!authLoading && isAuth) fetchTipos();
   }, [authLoading, isAuth, fetchTipos]);
 
-  // Cuando AltaTipoFalla (u otro componente) crea/edita un tipo de falla,
-  // refrescamos el combo automáticamente sin depender de cerrar el modal.
   useEffect(() => {
     return eventBus.on(EVENTS.failureTypeChanged, () => {
       fetchTipos();
@@ -79,7 +77,6 @@ const FailureForm = ({ onGuardar, onCancelar, falla }: FailureFormProps) => {
     return () => document.removeEventListener("mousedown", onClickOutside);
   }, []);
 
-  // Bloquea el scroll del body mientras el modal de alta está abierto
   useEffect(() => {
     if (registerFailureType) {
       const prevOverflow = document.body.style.overflow;
@@ -90,7 +87,6 @@ const FailureForm = ({ onGuardar, onCancelar, falla }: FailureFormProps) => {
     }
   }, [registerFailureType]);
 
-  // Cierra el modal con la tecla Escape
   useEffect(() => {
     if (!registerFailureType) return;
     const onKeyDown = (e: KeyboardEvent) => {
@@ -115,8 +111,6 @@ const FailureForm = ({ onGuardar, onCancelar, falla }: FailureFormProps) => {
 
   const cerrarModalTipoFalla = () => {
     setRegisterFailureType(false);
-    // AltaTipoFalla no expone un callback de éxito, así que al cerrar
-    // simplemente refrescamos la lista por si se creó un tipo nuevo.
     fetchTipos();
   };
 
@@ -136,8 +130,6 @@ const FailureForm = ({ onGuardar, onCancelar, falla }: FailureFormProps) => {
       failureDescription: selected.failureDescription,
     });
 
-    // En creación limpiamos el form para cargar otra falla seguida.
-    // En edición no tiene sentido vaciarlo (el form probablemente se cierra).
     if (!isEditing) {
       setSelected(null);
       setQuery("");

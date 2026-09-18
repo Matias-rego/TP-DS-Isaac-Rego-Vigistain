@@ -1,0 +1,102 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.select,
+.input {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #334155;
+  background: #fff;
+  outline: none;
+}
+
+.select:focus,
+.input:focus,
+.amountInput:focus {
+  border-color: #94A3B8;
+}
+
+.select:disabled,
+.input:disabled,
+.amountInput:disabled {
+  background: #F8FAFC;
+  color: #94A3B8;
+  cursor: not-allowed;
+}
+
+.amountWrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  padding: 0 10px;
+  max-width: 140px;
+  margin-left: auto;
+}
+
+.currencyPrefix {
+  color: #64748B;
+  font-size: 14px;
+}
+
+.amountInput {
+  border: none;
+  padding: 6px 0;
+  text-align: right;
+  font-size: 14px;
+  font-family: inherit;
+  color: #334155;
+  outline: none;
+  width: 100%;
+  -moz-appearance: textfield;
+}
+
+.amountInput::-webkit-outer-spin-button,
+.amountInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.deleteButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: #2563EB;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+}
+
+.deleteButton:hover:not(:disabled) {
+  background: #EFF6FF;
+}
+
+.deleteButton:disabled {
+  color: #CBD5E1;
+  cursor: not-allowed;
+}
+
+.addButton {
+  align-self: flex-start;
+  background: none;
+  border: 1px dashed #94A3B8;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 14px;
+  color: #334155;
+  cursor: pointer;
+}
+
+.addButton:hover {
+  background: #F8FAFC;
+}

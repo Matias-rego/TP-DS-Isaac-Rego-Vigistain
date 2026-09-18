@@ -7,6 +7,7 @@ import styles from './OrderDescription.module.css';
 import EquipmentDetailModal from '@/components/EquipmentComponent/EquipmentDetailModal/EquipmentDetailModal';
 import { useState, useEffect } from 'react';
 import { eventBus, EVENTS } from '@/lib/eventBus';
+import { formatDocumentNumber } from '@/lib/utils';
 
 export interface OrderDescriptionProps {
   order: Order;
@@ -71,7 +72,7 @@ const OrderDescription = ({
     <div className={styles.panel}>
       <div className={styles.header}>
         <div className={styles.headerText}>
-          <span className={styles.orderId}>#ORD-{order.id_order}</span>
+          <span className={styles.orderId}>{formatDocumentNumber("#ORD",order.nroOrder, {padLength:4})}</span>
           <span className={styles.clientName}>{clientName}</span>
         </div>
 

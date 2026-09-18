@@ -5,13 +5,11 @@ import styles from './ActionButton.module.css';
 export interface ActionButtonProps {
   label: string;
   onClick?: () => void;
-  /** Ícono SVG a la izquierda del texto */
   icon?: React.ReactNode;
   variant?: 'primary' | 'danger' | 'success' | 'neutral' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
   disabled?: boolean;
   loading?: boolean;
-  /** Si se usa como link (ej: react-router) */
   href?: string;
   fullWidth?: boolean;
   type?: 'button' | 'submit' | 'reset';

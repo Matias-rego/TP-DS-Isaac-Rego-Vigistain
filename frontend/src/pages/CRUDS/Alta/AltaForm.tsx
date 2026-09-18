@@ -6,7 +6,7 @@ import styles from './AltaForm.module.css';
 
 // ─── Field config ────────────────────────────────────────────────────────────
 
-export type FieldType = 'text' | 'email' | 'number' | 'tel' | 'password' | 'select';
+export type FieldType = 'text' | 'email' | 'number' | 'tel' | 'password' | 'select' | 'hidden';
 
 export interface SelectOption {
   value: string;
@@ -26,6 +26,7 @@ export interface FieldConfig {
   maxLength?: number;
   options?: SelectOption[];
   validate?: (value: string) => string | undefined;
+  defaultValue?: string; 
 }
 
 
@@ -49,7 +50,7 @@ export interface AltaFormProps {
 
 
 function buildInitialState(fields: FieldConfig[]): Record<string, string> {
-  return Object.fromEntries(fields.map(f => [f.name, '']));
+  return Object.fromEntries(fields.map(f => [f.name, f.defaultValue ?? '']));
 }
 
 function runValidations(
@@ -62,7 +63,7 @@ function runValidations(
     const value = formData[field.name] ?? '';
     const trimmed = value.trim();
 
-    if (field.required && !trimmed) {
+    if (field.required && !trimmed && field.type !== 'hidden') {
       errors[field.name] = `${field.label} es obligatorio.`;
       continue;
     }
@@ -254,11 +255,14 @@ export default function AltaForm({
 
         {/* Form */}
         <form onSubmit={handleSubmit} noValidate className={styles.form}>
-          {fields.map(field => (
-            <div
-              key={field.name}
-              className={`${styles.field} ${errors[field.name] ? styles.fieldError : ''}`}
-            >
+          {fields.map(field => {
+            if (field.type === 'hidden') return null; // 👈 no se renderiza
+
+            return (
+              <div
+                key={field.name}
+                className={`${styles.field} ${errors[field.name] ? styles.fieldError : ''}`}
+              >
               <label className={styles.label} htmlFor={field.name}>
                 {field.label}
                 {field.required && <span className={styles.required}>*</span>}
@@ -317,8 +321,8 @@ export default function AltaForm({
                 <span className={styles.errorMsg}>{errors[field.name]}</span>
               )}
             </div>
-          ))}
-
+           );
+          })}
           <button type="submit" className={styles.btn} disabled={loading}>
             {loading ? (
               <>

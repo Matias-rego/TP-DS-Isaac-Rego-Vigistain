@@ -16,7 +16,7 @@ const addedCostRepo = new AddedCostRepository(prisma);
 const budgetRepo = new BudgetRepository(prisma);
 const orderRepo = new OrderRepository(prisma);
 const statusRepo = new StatusHistoryRepository(prisma);
-const statusService = new StatusService(statusRepo, orderRepo);
+const statusService = new StatusService(statusRepo, orderRepo, budgetRepo);
 const budgetService = new BudgetService(budgetRepo, addedCostRepo, statusService);
 
 const ctrl = new AddedCostController(
@@ -27,6 +27,8 @@ const router = Router();
 
 router.get('/', validate({ query: addedCostQuerySchema }), ctrl.getAllAddedCosts);
 
+router.get('/ofBudget/:id_budget/total', ctrl.getTotalByBudget);
+
 router.get('/ofBudget/:id', validate({ params: idSchema }), ctrl.getAddedCostsOfBudget);
 
 router.get('/:id', validate({ params: idSchema }), ctrl.getOneAddedCost);
@@ -36,5 +38,7 @@ router.post('/', validate({ body: registerAddedCostSchema }), ctrl.registerAdded
 router.put('/:id', validate({ params: idSchema, body: modifyAddedCostSchema }), ctrl.modifyAddedCost);
 
 router.delete('/:id', validate({ params: idSchema }), ctrl.deleteAddedCost);
+
+
 
 export default router;

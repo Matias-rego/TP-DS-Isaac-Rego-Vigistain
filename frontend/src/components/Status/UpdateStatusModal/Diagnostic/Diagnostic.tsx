@@ -20,22 +20,16 @@ const Diagnostic = ({ order, onFailureUpdated }: DiagnosticProps) => {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // Sincroniza si las props cambian al abrir/cerrar
   useEffect(() => {
     setFailures(order.failures ?? []);
   }, [order.failures]);
 
-  // Limpia el mensaje de éxito solo, después de un rato.
   useEffect(() => {
     if (!successMessage) return;
     const t = setTimeout(() => setSuccessMessage(null), 3000);
     return () => clearTimeout(t);
   }, [successMessage]);
 
-  // Única fuente de verdad para altas y actualizaciones: el WebSocket.
-  // "Upsert": si la falla ya está en la lista, se reemplaza; si es nueva,
-  // se agrega. Esto cubre tanto ediciones como altas sin duplicar nada,
-  // sin importar si el cliente que originó el cambio fue este mismo.
   useEffect(() => {
     const handleFailureChanged = (payload: unknown) => {
       const changedFailure = payload as Failure;
@@ -69,9 +63,6 @@ eventBus.on(EVENTS.failureDeleted, handleFailureDeleted);
     setSaving(true);
     setSaveError(null);
     try {
-      // NOTA: el nombre "createFailuresSchema" (plural) sugiere que el
-      // endpoint espera un array. Ajustar el body si el backend responde
-      // con error de validación.
       const response = await fetch(`${BACKEND_URL}/api/failures`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -91,13 +82,8 @@ eventBus.on(EVENTS.failureDeleted, handleFailureDeleted);
       }
 
       const body = await response.json();
-      // El backend puede devolver { failure } o { failures: [...] } — cubrimos ambos.
       const created: Failure | undefined = body.failure ?? body.failures?.[0];
 
-      // Fallback optimista: si el backend no emite el evento de WebSocket
-      // al crear (solo lo confirmamos para update), la agregamos a mano.
-      // El "upsert" del useEffect de arriba evita que se duplique si el
-      // WebSocket también la trae.
       if (created) {
         setFailures((prev) =>
           prev.some((f) => f.id_failure === created.id_failure) ? prev : [...prev, created]

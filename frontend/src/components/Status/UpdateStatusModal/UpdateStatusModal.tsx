@@ -31,6 +31,14 @@ const COMMENT_LABELS: Partial<Record<EnumOrderStatus, string>> = {
 
 const ALL_STATUSES = Object.keys(STATUS_LABELS) as EnumOrderStatus[];
 
+function getCurrentStatus(history?: Status_History[]): EnumOrderStatus | null {
+  if (!history || history.length === 0) return null;
+  const latest = [...history].sort(
+    (a, b) => new Date(b.dateOfChange).getTime() - new Date(a.dateOfChange).getTime()
+  )[0];
+  return latest.status;
+}
+
 export interface UpdateStatusModalProps {
   open: boolean;
   order: Order;
@@ -39,17 +47,19 @@ export interface UpdateStatusModalProps {
 }
 
 const UpdateStatusModal = ({ open, order, onClose, onConfirm }: UpdateStatusModalProps) => {
-  const usedStatuses = useMemo(
-    () => new Set((order.statusHistory ?? []).map((h) => h.status)),
+  const currentStatus = useMemo(
+    () => getCurrentStatus(order.statusHistory),
     [order.statusHistory]
   );
 
-  const availableStatuses = useMemo(
-    () => ALL_STATUSES.filter((s) => !usedStatuses.has(s)),
-    [usedStatuses]
-  );
+  // Antes se filtraban los estados ya usados en el historial, lo que
+  // impedía volver a un estado anterior (ej. de "presupuestado" de nuevo
+  // a "diagnostico"). Ahora se puede elegir cualquiera — todavía no hay
+  // una máquina de estados que valide qué transiciones son válidas, eso
+  // queda para más adelante.
+  const availableStatuses = ALL_STATUSES;
 
-  const [status, setStatus] = useState<EnumOrderStatus | undefined>(availableStatuses[0]);
+  const [status, setStatus] = useState<EnumOrderStatus | undefined>(undefined);
   const [comment, setComment] = useState('');
   const [notifyClient, setNotifyClient] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -114,69 +124,65 @@ const UpdateStatusModal = ({ open, order, onClose, onConfirm }: UpdateStatusModa
           </button>
         </div>
 
-        {availableStatuses.length === 0 ? (
-          <p className={styles.emptyText}>
-            Esta orden ya pasó por todos los estados disponibles.
-          </p>
-        ) : (
-          <>
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="new-status">Nuevo Estado</label>
-              <select
-                id="new-status"
-                className={styles.select}
-                value={status ?? ''}
-                onChange={(e) => setStatus(e.target.value as EnumOrderStatus)}
-                disabled={submitting}
-              >
-                {availableStatuses.map((s) => (
-                  <option key={s} value={s}>{STATUS_LABELS[s]}</option>
-                ))}
-              </select>
+        <div className={styles.field}>
+          <label className={styles.label} htmlFor="new-status">Nuevo Estado</label>
+          <select
+            id="new-status"
+            className={styles.select}
+            value={status ?? ''}
+            onChange={(e) => setStatus(e.target.value as EnumOrderStatus)}
+            disabled={submitting}
+          >
+            <option value="" disabled>Seleccioná un estado...</option>
+            {availableStatuses.map((s) => (
+              <option key={s} value={s}>
+                {STATUS_LABELS[s]}
+                {s === currentStatus ? ' (actual)' : ''}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className={styles.field}>
+          {status === 'diagnostico' && (
+            <div>
+              <Diagnostic order={order} />
             </div>
-
-            <div className={styles.field}>
-              {status === 'diagnostico' && (
-                <div>
-                  <Diagnostic order={order} />
-                </div>
-              )}
-              {status === 'presupuestado' && (
-                <div>
-                  <Budget order={order} />
-                </div>
-              )}
+          )}
+          {status === 'presupuestado' && (
+            <div>
+              <Budget order={order} />
             </div>
+          )}
+        </div>
 
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="status-comment">{commentLabel}</label>
-              <textarea
-                id="status-comment"
-                className={styles.textarea}
-                rows={3}
-                placeholder="Agregá una observación sobre este cambio de estado (opcional)..."
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                disabled={submitting}
-              />
-            </div>
+        <div className={styles.field}>
+          <label className={styles.label} htmlFor="status-comment">{commentLabel}</label>
+          <textarea
+            id="status-comment"
+            className={styles.textarea}
+            rows={3}
+            placeholder="Agregá una observación sobre este cambio de estado (opcional)..."
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            disabled={submitting}
+          />
+        </div>
 
-            {/*
-            <label className={styles.checkboxRow}>
-              <input
-                type="checkbox"
-                checked={notifyClient}
-                onChange={(e) => setNotifyClient(e.target.checked)}
-                disabled={submitting}
-              />
-              Notificar al Cliente
-            </label>
-               */}
+        {/*
+        <label className={styles.checkboxRow}>
+          <input
+            type="checkbox"
+            checked={notifyClient}
+            onChange={(e) => setNotifyClient(e.target.checked)}
+            disabled={submitting}
+          />
+          Notificar al Cliente
+        </label>
+           */}
 
-            {errorMessage && (
-              <p className={styles.errorText}>{errorMessage}</p>
-            )}
-          </>
+        {errorMessage && (
+          <p className={styles.errorText}>{errorMessage}</p>
         )}
 
         <div className={styles.actions}>
@@ -185,7 +191,7 @@ const UpdateStatusModal = ({ open, order, onClose, onConfirm }: UpdateStatusModa
             icon={null}
             variant="primary"
             fullWidth
-            disabled={availableStatuses.length === 0 || !canSubmit}
+            disabled={!canSubmit}
             loading={submitting}
             onClick={handleConfirm}
           />

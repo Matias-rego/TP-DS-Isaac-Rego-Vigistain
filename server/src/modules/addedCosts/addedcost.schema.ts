@@ -3,7 +3,7 @@ import { id, description, enumSchema } from "@/utils/fields.js";
 import { QuerySchema } from "@/shared/common.schema.js";
 
 const ADDED_COST_TYPES = [
-    "respuesto",
+    "repuesto",
     "procedimientoEspecial",
     "garantia",
     "reparacionExpress",

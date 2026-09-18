@@ -8,10 +8,12 @@ import { OrderService } from './order.service.js';
 import { OrderRepository } from './order.repository.js';
 import { StatusService } from '@/modules/status/status.service.js';
 import { StatusHistoryRepository } from '@/modules/status/status.repository.js';
+import { BudgetRepository } from '../budgets/budget.repository.js';
 
 const orderRepo = new OrderRepository(prisma);
 const statusRepo = new StatusHistoryRepository(prisma);
-const statusService = new StatusService(statusRepo, orderRepo);
+const budgetRepo = new BudgetRepository(prisma);
+const statusService = new StatusService(statusRepo, orderRepo, budgetRepo);
 
 const ctrl = new OrderController(
   new OrderService(prisma, orderRepo, statusService)   // ✅
@@ -23,8 +25,6 @@ router.get('/', validate({ query: orderQuerySchema }), ctrl.getAllOrders);
 
 router.get('/ofEquipment/:id', validate({ params: idSchema }), ctrl.getOrderOfEquipment);
 
-// Ojo: /stats tiene que ir ANTES de /:id, si no Express toma "stats"
-// como si fuera un id de orden y nunca llega a este handler.
 router.get('/stats', ctrl.getStats);
 
 router.get('/:id', validate({ params: idSchema }), ctrl.getOneOrder);

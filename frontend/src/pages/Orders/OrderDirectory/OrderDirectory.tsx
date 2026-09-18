@@ -2,7 +2,7 @@ import Nav from "@/pages/Nav/Nav";
 import Footer from "@/components/Footer/Footer";
 import styles from "./OrderDirectory.module.css";
 import '../../../index.css';
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback, type ReactElement } from "react";
 import type { Order, EnumOrderStatus, Status_History } from "@/types/types";
 import { Wrench, FileText, AlertTriangle, Banknote } from "lucide-react";
 import DescriptiveMiniCard from "@/components/Common/Cards/DescriptiveMiniCard/DescriptiveMiniCard";
@@ -13,6 +13,9 @@ import { BACKEND_URL } from "@/lib/config";
 import UpdateStatusModal from "@/components/Status/UpdateStatusModal/UpdateStatusModal";
 import { eventBus, EVENTS } from '@/lib/eventBus';
 import type { PaginatedResponse } from "@/types/types";
+import { formatDocumentNumber } from "@/lib/utils";
+import ActionButton from "@/components/Common/Buttons/ActionButton";
+import { useNavigate } from "react-router-dom";
 
 
 // Mismo tono que venimos usando en OrderCard / StatusMiniDescriptiveCard
@@ -34,6 +37,7 @@ const STATUS_FILTER_OPTIONS = Object.entries(STATUS_META).map(([value, meta]) =>
 
 interface OrderRow {
   id_order: string;
+  nroOrder: string;
   orderLabel: string;
   customer: string;
   device: string;
@@ -64,9 +68,11 @@ const formatElapsed = (value: Date | string) => {
 
 const toRow = (order: Order): OrderRow => {
   const currentStatus = getCurrentStatus(order.statusHistory);
+
   return {
     id_order: order.id_order,
-    orderLabel: `#ORD-${order.id_order}`,
+    nroOrder: formatDocumentNumber("#ORD",order.nroOrder,{padLength:4}),
+    orderLabel: `${formatDocumentNumber("#ORD",order.nroOrder)}`,
     customer: order.equipment?.client?.clientName ?? 'Sin cliente',
     device: order.equipment
       ? `${order.equipment.brand ?? ''} ${order.equipment.model ?? ''}`.trim()
@@ -82,7 +88,7 @@ const OrderDirectory = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [showModalActStatus, setShowModalActStatus] = useState(false);
-
+  const navigate = useNavigate();
   // 1. Envolver fetchOrders en useCallback y asegurar que la respuesta sea un Array
   const fetchOrders = useCallback(async () => {
     setLoading(true);
@@ -161,7 +167,7 @@ const OrderDirectory = () => {
   ];
 
   const columns: ColumnConfig<OrderRow>[] = [
-    { key: 'orderLabel', label: 'ID' },
+    { key: 'nroOrder', label: 'Numero' },
     { key: 'customer', label: 'Cliente' },
     { key: 'device', label: 'Equipo' },
     {
@@ -173,6 +179,13 @@ const OrderDirectory = () => {
       },
     },
     { key: 'elapsed', label: 'Tiempo' },
+    {
+      key: 'actions',
+      label: 'Acciones',
+      render: (row) => (
+        <ActionButton label="Gestion" icon={null} variant="neutral" onClick={()=>{navigate(`/manageOrder/${row.id_order}`)}}/>
+      ),
+    }
   ];
 
   return (
@@ -209,6 +222,7 @@ const OrderDirectory = () => {
               columns={columns}
               onRowClick={(row) => setSelectedOrder(row.raw)}
               selectedId={selectedOrder?.id_order}
+              
             />
           </div>
 

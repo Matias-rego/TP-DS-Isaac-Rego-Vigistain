@@ -94,15 +94,6 @@ const EquipmentDetailModal = ({
     }
   };
 
-  // Más reciente primero. Falla "más reciente" = mayor dateOfFailure.
-  const sortedFailures = useMemo(
-    () =>
-      [...dataFailures].sort(
-        (a, b) => new Date(b.dateOfFailure).getTime() - new Date(a.dateOfFailure).getTime()
-      ),
-    [dataFailures]
-  );
-
   // Mismo criterio para órdenes, usando la fecha de ingreso.
   const sortedOrders = useMemo(
     () =>
@@ -187,8 +178,6 @@ const EquipmentDetailModal = ({
     return () => eventBus.off(EVENTS.failureChanged, handleFailureChanged);
   }, []);
 
-  // Igual criterio para cambios de estado de orden: si en otro lado se
-  // confirma un nuevo Status_History, reflejamos el estado actualizado acá.
   useEffect(() => {
     const handleStatusChanged = (payload: unknown) => {
       const newStatus = payload as Status_History;

@@ -2,6 +2,9 @@ import type { NextFunction, Request, Response } from "express";
 import type { IdDto } from "@/shared/common.schema.js";
 import type { RegisterBudgetDto, ModifyBudgetDto, BudgetQueryDto } from "./budget.schema.js";
 import type { BudgetService } from "./budget.service.js";
+import { enviarPdfPorMail } from '@/service/mail.service.js'; 
+import {assertBudgetWithRelations} from "@/pdf/renderBudgetPdf.js"
+
 
 export class BudgetController {
     constructor(private service: BudgetService) { }
@@ -87,6 +90,25 @@ export class BudgetController {
         try {
             const result = await this.service.delete(id);
             return res.json(result);
+        } catch (error) {
+            next(error);
+        }
+    };
+    public sendBudgetEmail = async (req: Request, res: Response, next: NextFunction) => {
+        const { id } = req.validated.params as IdDto;
+
+        try {
+            const budget = await this.service.findById(id);
+
+            if (!budget) {
+                return res.status(404).json({ message: "Presupuesto no encontrado." });
+            }
+
+            assertBudgetWithRelations(budget); 
+
+            await enviarPdfPorMail(budget);
+
+            return res.status(200).json({ message: "Presupuesto enviado por mail correctamente." });
         } catch (error) {
             next(error);
         }

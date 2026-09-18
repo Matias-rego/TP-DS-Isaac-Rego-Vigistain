@@ -2,7 +2,7 @@ import { $Enums } from "@/database/prisma.js";
 import type { PaginatedResult } from "@/shared/base.repository.js";
 import type { BudgetQueryDto } from "./budget.schema.js";
 import type { BudgetRepository } from "./budget.repository.js";
-import type { AddedCostRepository } from "@/modules/addedcost/addedcost.repository.js";
+import type { AddedCostRepository } from "@/modules/addedCosts/addedcost.repository.js";
 import type { StatusService } from "@/modules/status/status.service.js";
 import { Budget } from "./budget.entity.js";
 
@@ -99,4 +99,8 @@ export class BudgetService {
     delete(id: string): Promise<{ id: string } | undefined> {
         return this.repo.delete(id);
     }
+    async sumFailureCost(id_order:string): Promise<number>{
+        const result = this.repo.sumFailureCosts(id_order);
+        return result;
+    } 
 }

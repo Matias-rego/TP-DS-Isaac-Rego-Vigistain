@@ -20,7 +20,6 @@ export default function ClientGrid({ clients, onCardClick, onAddClick, columns }
         />
       ))}
 
-      {/* ── Add Another Contact ── */}
       <div className={styles.addCard} onClick={onAddClick}>
         <span className={styles.addIcon}>+</span>
         <span className={styles.addLabel}>Add Another Contact</span>

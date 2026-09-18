@@ -76,4 +76,14 @@ export class AddedCostController {
             next(error);
         }
     };
+    public getTotalByBudget = async (req: Request, res: Response) => {
+        try {
+            const { id_budget } = req.params;
+            const total = await this.service.sumByBudgetId(String(id_budget));
+            res.status(200).json({ total });
+        } catch (error) {
+            console.error("Error en getTotalByBudget:", error); // 👈 agregá esto
+            res.status(500).json({ message: "Error al calcular el total de costos adicionales." });
+        }
+    };
 }
