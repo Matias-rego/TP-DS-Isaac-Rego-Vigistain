@@ -18,26 +18,27 @@ export interface StatusMiniDescriptiveCardProps {
   onClick?: (id_status_history: string) => void;
 }
 
-const formatRelativeTime = (value: string) => {
-  const date = new Date(value);
-  if (isNaN(date.getTime())) return value;
+  const formatRelativeTime = (value: Date | string): string => {
+    const date = typeof value === 'string' ? new Date(value) : value;
+    if (isNaN(date.getTime())) return typeof value === 'string' ? value : '';
 
-  const diffMs = Date.now() - date.getTime();
-  const diffMin = Math.round(diffMs / 60000);
+    const diffMs = Date.now() - date.getTime();
+    const diffMin = Math.round(diffMs / 60000);
 
-  if (diffMin < 1) return 'justo ahora';
-  if (diffMin < 60) return `hace ${diffMin}m`;
+    if (diffMin < 1) return 'justo ahora';
 
-  const diffHrs = Math.round(diffMin / 60);
-  if (diffHrs < 24) return `hace ${diffHrs}h`;
+    const rtf = new Intl.RelativeTimeFormat('es-AR', { numeric: 'auto' });
 
-  const diffDays = Math.round(diffHrs / 24);
-  if (diffDays === 1) return 'ayer';
-  if (diffDays < 7) return `hace ${diffDays}d`;
+    if (diffMin < 60) return rtf.format(-diffMin, 'minute');
+    
+    const diffHrs = Math.round(diffMin / 60);
+    if (diffHrs < 24) return rtf.format(-diffHrs, 'hour');
 
-  return date.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-};
+    const diffDays = Math.round(diffHrs / 24);
+    if (diffDays < 7) return rtf.format(-diffDays, 'day');
 
+    return date.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  };
 const getInitial = (name?: string) => (name?.trim()?.[0] ?? '?').toUpperCase();
 
 const StatusMiniDescriptiveCard = ({ statusHistory, active = true, onClick }: StatusMiniDescriptiveCardProps) => {

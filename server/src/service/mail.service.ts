@@ -1,40 +1,99 @@
 import nodemailer from 'nodemailer';
 import parseJwt from '../utils/toke.utils.js';
 import { config } from '@/utils/config.js';
-import { Resend } from 'resend';
-
-
-const resend = new Resend(config.RESEND_API_KEY); 
+import { renderBudgetPdf } from '@/pdf/renderBudgetPdf.js'
+import type { BudgetWithRelations } from '@/pdf/BudgetPdfDocument.js';
 
 const transporter = nodemailer.createTransport({
-    host: config.EMAIL_HOST, 
-    port: 587,               
-    secure: false,           
+    host: config.EMAIL_HOST,
+    port: 587,
+    secure: false,
     auth: {
         user: config.EMAIL_USER,
-        pass: config.EMAIL_PASSWORD 
+        pass: config.EMAIL_PASSWORD,
     },
     tls: {
-        rejectUnauthorized: false // <-- Evita bloqueos de seguridad en localhost
-    }
+        rejectUnauthorized: false,
+    },
 });
-/* --> Alternativa del resend para poder enviar mails
-async function enviarMailVerificador(direccionEmail: string, tokenVerificacion: string) {
+
+async function enviarPdfPorMail(budget: BudgetWithRelations): Promise<void> {
+    const pdfBuffer = await renderBudgetPdf(budget);
+    const client = budget.order.equipment.client;
+
     try {
-        await resend.emails.send({
-            from: 'Gestión Taller <onboarding@resend.dev>', // o tu dominio verificado
-            to: direccionEmail,
-            subject: 'Verificación de cuenta',
-            html: crearMailVerificacion(tokenVerificacion),
+        await transporter.sendMail({
+            from: `"TechFix" <${config.EMAIL_USER}>`,
+            to: client.clientEmail,
+            subject: `Presupuesto N° ${budget.nroBudget} - TechFix`,
+            html: crearMailPresupuesto(client.clientName, budget.nroBudget),
+            attachments: [
+                {
+                    filename: `presupuesto-${budget.nroBudget}.pdf`,
+                    content: pdfBuffer,
+                    contentType: 'application/pdf',
+                },
+            ],
         });
-        console.log("Mail enviado con éxito");
-        return true;
+        console.log('Presupuesto enviado por mail con éxito');
     } catch (error) {
-        console.error("Error enviando mail:", error);
-        return false;
+        console.error('Error enviando el presupuesto por mail:', error);
+        throw error;
     }
 }
-*/
+
+
+function crearMailPresupuesto(clientName: string, nroBudget: number) {
+    return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f9;">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" style="border-collapse: collapse; background-color: #ffffff; margin-top: 30px; margin-bottom: 30px; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+            <tr>
+                <td bgcolor="#2563eb" style="padding: 40px 0 40px 0; text-align: center;">
+                    <h1 style="color: #ffffff; margin: 0; font-size: 24px; letter-spacing: 1px;">TechFix</h1>
+                </td>
+            </tr>
+
+            <tr>
+                <td style="padding: 40px 30px 40px 30px;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                        <tr>
+                            <td style="color: #1e293b; font-size: 20px; font-weight: bold;">
+                                Presupuesto N° ${nroBudget}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 20px 0 10px 0; color: #475569; font-size: 16px; line-height: 24px;">
+                                Hola, <strong>${clientName}</strong>.<br><br>
+                                Te adjuntamos el presupuesto correspondiente a tu equipo. Cualquier consulta, quedamos a disposición.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 30px 0 0 0; color: #64748b; font-size: 14px; line-height: 20px; border-top: 1px solid #e2e8f0;">
+                                Este presupuesto es estimado y puede sufrir variaciones una vez iniciada la reparación.
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <tr>
+                <td bgcolor="#f8fafc" style="padding: 20px 30px 20px 30px; text-align: center; color: #94a3b8; font-size: 12px;">
+                    &copy; 2026 TechFix - Sistema de Gestión Técnica.<br>
+                    Rosario, Santa Fe, Argentina.
+                </td>
+            </tr>
+        </table>
+    </body>
+    </html>
+    `;
+}
+
 async function enviarMailVerificador(direccionEmail: string, tokenVerificacion: string) {
     try {
         await transporter.sendMail({
@@ -114,7 +173,5 @@ function crearMailVerificacion(tokenVerificacion: string) {
     `
 }
 
-
-
-
+export { enviarPdfPorMail };
 export default enviarMailVerificador;

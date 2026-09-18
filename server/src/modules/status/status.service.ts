@@ -4,6 +4,11 @@ import type { StatusQueryDto } from "./status.schema.js";
 import type { StatusHistoryRepository } from "./status.repository.js";
 import type { OrderRepository } from "@/modules/orders/order.repository.js";
 import type { StatusHistory } from "./status.entity.js";
+import type { PrismaClient, Prisma } from "@/generated/prisma/client.js";
+import { BudgetRepository } from "../budgets/budget.repository.js";
+import { Order } from "../orders/order.entity.js";
+
+type Db = PrismaClient | Prisma.TransactionClient;
 
 interface CreateStatusInput {
     id_order: string;
@@ -16,6 +21,7 @@ export class StatusService {
     constructor(
         private repo: StatusHistoryRepository,
         private orderRepo: OrderRepository,
+        private budgetRepo: BudgetRepository
     ) { }
 
     findAll(query?: StatusQueryDto): Promise<PaginatedResult<StatusHistory>> {
@@ -48,18 +54,33 @@ export class StatusService {
             comment: input.comment,
         } as StatusHistory);
 
+
         await this.orderRepo.update(input.id_order, { status: input.status });
+
+        if (order.budget?.id_budget && input.status==='aprobado') {
+        await this.budgetRepo.update(
+            order.budget.id_budget,
+            { status: 'aprobado' }
+        );
+        }
 
         return entry;
     }
 
-    // Se llama una sola vez, al registrar la orden.
-    async createFirstStatus(id_order: string, id_user: string, status: $Enums.EnumOrderStatus): Promise<StatusHistory> {
-        return this.repo.create({
-            id_order,
-            id_user,
-            status,
-            comment: "Orden creada",
-        } as StatusHistory);
+    async createFirstStatus(
+        id_order: string,
+        id_user: string,
+        status: $Enums.EnumOrderStatus,
+        db?: Db,
+    ): Promise<StatusHistory> {
+        return this.repo.create(
+            {
+                id_order,
+                id_user,
+                status,
+                comment: "Orden creada",
+            } as StatusHistory,
+            db,
+        );
     }
 }

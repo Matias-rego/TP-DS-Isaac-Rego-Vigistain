@@ -1,5 +1,6 @@
 import { type Order, type Status_History, type EnumOrderStatus } from "@/types/types";
 import styles from './OrderMiniCard.module.css';
+import { formatDocumentNumber, formatDate} from "@/lib/utils";
 
 const STATUS_CONFIG: Record<EnumOrderStatus, { label: string; className: string }> = {
   recibido:      { label: 'Recibido',      className: 'pending' },
@@ -17,17 +18,9 @@ export interface OrderMiniCardProps {
   onClick?: (id_order: string) => void;
 }
 
-const shortId = (id: string) => `#${String(id).slice(0, 8)}`;
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(value);
-
-const formatDate = (value?: string | null) => {
-  if (!value) return '—';
-  const date = new Date(value);
-  if (isNaN(date.getTime())) return value;
-  return date.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-};
 
 // Busca el status_history cuya fecha esté más cerca de "ahora" (no necesariamente el último por orden de array)
 const getCurrentStatus = (history?: Status_History[]): Status_History | null => {
@@ -66,7 +59,7 @@ const OrderMiniCard = ({ order, onClick }: OrderMiniCardProps) => {
     >
       <div className={styles.header}>
         <div className={styles.titleBlock}>
-          <span className={styles.orderId} title={String(order.id_order)}>{shortId(order.id_order)}</span>
+          <span className={styles.orderId} title={String(order.nroOrder)}>{formatDocumentNumber("ORD",order.nroOrder)}</span>
           <span className={styles.equipment} title={equipmentLabel}>{equipmentLabel}</span>
         </div>
         <span className={`${styles.badge} ${styles[statusInfo.className]}`}>

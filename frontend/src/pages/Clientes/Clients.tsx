@@ -18,7 +18,8 @@ interface categoryClient {
 }
 
 const Clientes = () => {
-  const [results, setResults] = useState<Client[]>([]);
+  // null = no hay búsqueda activa (mostrar el listado completo)
+  const [results, setResults] = useState<PaginatedResponse<Client> | null>(null);
   const [clients, setAllClients] = useState<PaginatedResponse<Client> | null>(null);
   const [registerClient, setRegisterClient] = useState(false);
   const [categories, setCategories] = useState<PaginatedResponse<categoryClient> | null>(null);
@@ -49,7 +50,6 @@ const Clientes = () => {
     }
   }, []);
 
-  // 🔴 Cambiado: id de number a string
   const fetchOneClient = useCallback(async (id: string): Promise<Client | null> => {
     try {
       const res = await fetch(
@@ -73,7 +73,6 @@ const Clientes = () => {
     const unsubscribe = eventBus.on(EVENTS.clientChanged, async () => {
       await getAllClients();
       if (open && client) {
-        // client.id_client ahora se procesa como string
         const updated = await fetchOneClient(client.id_client);
         if (updated) setOneClient(updated);
       }
@@ -83,7 +82,6 @@ const Clientes = () => {
 
   // ─── Acciones ──────────────────────────────────────────────────────────────
 
-  // 🔴 Cambiado: id de number a string
   const openModal = async (id: string) => {
     const data = await fetchOneClient(id);
     if (data) {
@@ -118,6 +116,11 @@ const Clientes = () => {
     },
   ], [categories]);
 
+  // Lista efectiva a mostrar: si hay una búsqueda activa (results !== null),
+  // se muestra su resultado (aunque sea vacío); si no, el listado completo.
+  const displayedClients = results !== null ? results.data : (clients?.data ?? []);
+  const isSearchActive = results !== null;
+
   return (
     <div className={styles.page}>
       <Nav />
@@ -140,13 +143,13 @@ const Clientes = () => {
 
         {/* SearchBar */}
         <div className={styles.searchRow}>
-          <SearchBar
+          <SearchBar<Client>
             showFilters={true}
             filters={CLIENT_FILTERS}
-            searchEndpoint="/api/clients/search/"
+            searchEndpoint="/api/clients"
             searchPlaceholder="Buscar clientes por nombre, apellido o correo electrónico"
-            onResults={(data) => setResults(data as Client[])}
-            onClear={() => setResults([])}
+            onResults={(data) => setResults(data)}
+            onClear={() => setResults(null)}
           />
         </div>
 
@@ -156,7 +159,6 @@ const Clientes = () => {
         {client && open && (
           <ClientDetailModal
             client={client}
-            //equipos={[]}
             open={open}
             onClose={closeModal}
             entityEvent={EVENTS.clientChanged}
@@ -184,12 +186,18 @@ const Clientes = () => {
             </div>
           )}
           <div className={styles.gridSection}>
-            <ClientGrid
-              clients={results.length > 0 ? results : (clients?.data ?? [])}
-              columns={registerClient ? 2 : 4}
-              onAddClick={() => setRegisterClient(true)}
-              onCardClick={(id: string) => openModal(id)}
-            />
+            {isSearchActive && displayedClients.length === 0 ? (
+              <p className={styles.emptyText}>
+                No se encontraron clientes que coincidan con tu búsqueda.
+              </p>
+            ) : (
+              <ClientGrid
+                clients={displayedClients}
+                columns={registerClient ? 2 : 4}
+                onAddClick={() => setRegisterClient(true)}
+                onCardClick={(id: string) => openModal(id)}
+              />
+            )}
           </div>
         </div>
 
@@ -200,12 +208,3 @@ const Clientes = () => {
 };
 
 export default Clientes;
-
-/*
-    CUIT	         Tipo
-30-12345678-1	Empresa (S.R.L.)
-30-23456789-2	Empresa (S.R.L.)
-33-55555555-0	Sociedad del Estado
-20-11111111-2	Persona física (M)
-27-99999999-4	Persona física (F)
-*/ 

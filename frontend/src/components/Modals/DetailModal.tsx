@@ -6,12 +6,13 @@ export type DetailFieldType = 'text' | 'email' | 'phone' | 'date' | 'currency' |
 export type BadgeTone = 'active' | 'inactive' | 'pending' | 'danger' | 'info';
 
 export interface DetailFieldConfig<T = any> {
-  name: keyof T & string;
+  name:Extract<keyof T, string> | (string & {});
   label: string;
   type?: DetailFieldType;
   badgeTone?: (value: any, data: T) => BadgeTone;
   format?: (value: any, data: T) => React.ReactNode;
   hidden?: (data: T) => boolean;
+  getValue?: (item: T)=> React.ReactNode;
   column?: 1 | 2;
 }
 
@@ -51,6 +52,7 @@ export interface DetailModalProps<T = any, I = any> {
   compact?: boolean;
   zIndex?: number;
   children?: React.ReactNode;
+  hideFooter?: boolean;
 }
 
 const TONE_STYLES: Record<BadgeTone, { bg: string; text: string }> = {
@@ -83,9 +85,13 @@ function Badge({ label, tone = 'active' }: { label: string; tone?: BadgeTone }) 
     </span>
   );
 }
-
+function getNestedValue(obj: any, path: string): any {
+  return path.split('.').reduce((acc, key) => acc?.[key], obj);
+}
 function FieldValue<T>({ field, data }: { field: DetailFieldConfig<T>; data: T }) {
-  const raw = (data as any)[field.name];
+  const raw = field.getValue
+    ? field.getValue(data)
+    : getNestedValue(data, field.name);
 
   if (field.format) return <>{field.format(raw, data)}</>;
 
@@ -162,6 +168,7 @@ export function DetailModal<T = any, I = any>({
   onCancel,
   compact = false,
   zIndex = 1000,
+  hideFooter = false,
   children,
 }: DetailModalProps<T, I>) {
   if (!open) return null;
@@ -181,7 +188,8 @@ export function DetailModal<T = any, I = any>({
 
   return (
     <div className={styles.overlay}
-      style={{zIndex}}>
+      style={{zIndex}}
+      onClick={(e) => e.stopPropagation()}>
       <div className={`${styles.modal} ${modalSizeClass}`}>
         
         {/* Header */}
@@ -214,6 +222,7 @@ export function DetailModal<T = any, I = any>({
         </div>
         )}
 
+        {visibleFields.length > 0 && (
           <div className={`${styles.grid} ${styles.bodySection}`}>
             <div className={styles.column}>
               {leftCol.map((f) => (
@@ -236,6 +245,7 @@ export function DetailModal<T = any, I = any>({
               ))}
             </div>
           </div>
+        )}
 
           {itemConfig && (
             <div className={styles.bodySection}>
@@ -264,6 +274,7 @@ export function DetailModal<T = any, I = any>({
         </div>
 
         {/* Footer */}
+        {!hideFooter && (
         <div className={styles.footer}>
           <button
             onClick={onCancel ?? onClose}
@@ -284,7 +295,8 @@ export function DetailModal<T = any, I = any>({
               </button>
             );
           })}
-        </div>    
+        </div>
+        )}    
       </div>
       
     </div>
@@ -293,3 +305,4 @@ export function DetailModal<T = any, I = any>({
 }
 
 export default DetailModal;
+

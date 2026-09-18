@@ -59,6 +59,17 @@ export const EnumFailureStatus = {
 } as const;
 export type EnumFailureStatus = (typeof EnumFailureStatus)[keyof typeof EnumFailureStatus];
 
+export const EnumTypeAddedCost = {
+  Repuesto: 'respuesto',
+  ProcedimientoEspecial :'procedimientoEspecial',
+  Garantia:'garantia',
+  ReparacionExpress:'reparacionExpress',
+  LimpiezaPuestaAPunto: 'limpiezaPuestaAPunto',
+  ServiciosSoftware: 'serviciosSoftware',
+} as const
+export type EnumTypeAddedCost = (typeof EnumTypeAddedCost)[keyof typeof EnumTypeAddedCost]
+
+
 // ==========================================
 // MODELS (DOMINIO/ENTIDADES)
 // ==========================================
@@ -107,8 +118,8 @@ export interface Failure {
   id_failure: string;
   id_failure_type: string;
   failureType?: Failure_Type;
-  id_equipment: string;
-  equipment?: Equipment;
+  id_order: string;
+  order?: Order;
   description: string;
   dateOfFailure: Date;
   status: EnumFailureStatus;
@@ -128,6 +139,7 @@ export interface Equipment {
 
 export interface Order {
   id_order: string;
+  nroOrder: number;
   id_equipment: string;
   equipment?: Equipment;
   id_user?: string | null;
@@ -136,10 +148,11 @@ export interface Order {
   observations?: string | null;
   equipmentPhotoUrl?: string | null;
   dateOfEntry: Date;
-  estimatedDate?: Date | null;
-  deliveryDate?: Date | null;
+  estimatedDate?: Date | null | string;
+  deliveryDate?: Date | null | string;
   totalCharged?: number | null;
   statusHistory?: Status_History[];
+  failures?: Failure[];
   budget?: Budget | null;
 }
 
@@ -156,13 +169,15 @@ export interface Status_History {
 
 export interface Budget {
   id_budget: string;
+  nroBudget: number;
   id_order: string;
   order?: Order;
   laborCost: number;
   discount: number;
-  estimatedTotal: number;
   status: EnumBudgetStatus;
+  budgetDate: Date;
   payments?: Payment[];
+  addedCosts: AddedCost[];
 }
 
 export interface Payment_Type {
@@ -182,6 +197,15 @@ export interface Payment {
   budget?: Budget;
   dateOfPayment: Date;
   amount: number;
+}
+
+export interface AddedCost{
+  id_addedCost: string;
+  id_budget: string;
+  budget: Budget;
+  type_addedCost: EnumTypeAddedCost;
+  addedCostDescription: string;
+  addedCostAmount: number;
 }
 
 export interface PaginatedResponse<T> {

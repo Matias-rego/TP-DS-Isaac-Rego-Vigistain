@@ -1,6 +1,6 @@
 import AltaForm from "./../CRUDS/Alta/AltaForm";
 import type { FieldConfig } from "./../CRUDS/Alta/AltaForm";
-import { EVENTS } from '../../lib/eventBus';
+import { EVENTS } from '@/lib/eventBus';
 
 const FIELDS: FieldConfig[] = [
   {

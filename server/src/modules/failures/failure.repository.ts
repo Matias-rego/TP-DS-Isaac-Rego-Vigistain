@@ -2,8 +2,10 @@ import { BaseRepository } from "@/shared/base.repository.js";
 import type { PaginatedResult } from "@/shared/base.repository.js";
 import type { FailureQueryDto } from "./failure.schema.js";
 import { Failure } from "./failure.entity.js";
-import type { Failure as Failure_P } from "@/generated/prisma/client.js";
+import type { Failure as Failure_P , Prisma } from "@/generated/prisma/client.js";
 import { v7 as uuidv7 } from "uuid";
+
+type FailureWithType = Failure_P & Prisma.FailureGetPayload<{ include: { failureType: true } }>;
 
 export class FailureRepository extends BaseRepository<Failure, FailureQueryDto> {
 
@@ -57,9 +59,11 @@ export class FailureRepository extends BaseRepository<Failure, FailureQueryDto> 
             : undefined;
     }
 
-    public async findByEquipmentId(id_equipment: string): Promise<Failure[]> {
+    // Antes era findByEquipmentId: la falla ahora cuelga de la orden, no
+    // del equipo (ver nota en el schema de Prisma).
+    public async findByOrderId(id_order: string): Promise<Failure[]> {
         const failures = await this.prisma.failure.findMany({
-            where: { id_equipment },
+            where: { id_order },
         });
 
         return failures.map((failure) => this.toDomain(failure));
@@ -70,7 +74,7 @@ export class FailureRepository extends BaseRepository<Failure, FailureQueryDto> 
             data: {
                 id_failure: uuidv7(),
                 id_failure_type: item.id_failure_type,
-                id_equipment: item.id_equipment,
+                id_order: item.id_order,
                 description: item.description,
                 status: item.status,
             },
@@ -87,10 +91,11 @@ export class FailureRepository extends BaseRepository<Failure, FailureQueryDto> 
                     data: {
                         id_failure: uuidv7(),
                         id_failure_type: item.id_failure_type,
-                        id_equipment: item.id_equipment,
+                        id_order: item.id_order,
                         description: item.description,
                         status: item.status,
                     },
+                    include : { failureType: true},
                 }),
             ),
         );
@@ -106,6 +111,7 @@ export class FailureRepository extends BaseRepository<Failure, FailureQueryDto> 
             data: {
                 ...item,
             },
+            include: { failureType: true },
         });
 
         return this.toDomain(failure);
@@ -123,14 +129,15 @@ export class FailureRepository extends BaseRepository<Failure, FailureQueryDto> 
         };
     }
 
-    private toDomain(failure: Failure_P): Failure {
+    private toDomain(failure: Failure_P | FailureWithType): Failure {
         return new Failure(
             failure.id_failure_type,
-            failure.id_equipment,
+            failure.id_order,
             failure.description,
             failure.id_failure,
             failure.dateOfFailure,
             failure.status,
+            "failureType" in failure ? failure.failureType ?? undefined : undefined,
         );
     }
 }

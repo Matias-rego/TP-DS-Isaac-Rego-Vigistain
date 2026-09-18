@@ -3,13 +3,13 @@ import { X, Wrench, User, AlertTriangle, FileText } from 'lucide-react';
 import styles from './EquipmentDetailModal.module.css';
 import { type Equipment } from '@/types/types';
 import { type Client } from '@/types/types';
-import { type Failure } from '@/types/types';
-import { type Order } from '@/types/types';
+import { type Order, type Failure, type Status_History } from '@/types/types'
 import SmallClientCard from '@/components/ClientCard/SmallClientCard/SmallClientCard';
 import ClientDetailModal from '@/components/ClientCard/ClientDetailModal/ClientDetailModal';
 import BACKEND_URL from '@/lib/config';
 import FailureMiniCard from '@/components/Failure/FailureMiniCard/FailureMiniCard';
 import OrderMiniCard from '@/components/OrderComponent/OrderMiniCard/OrderMiniCard';
+import { EVENTS, eventBus } from '@/lib/eventBus';
 import ConfirmDialog from '@/components/Common/ConfirmDialog/ConfirmDialog';
 
 export interface EquipmentDetailModalProps {
@@ -31,9 +31,7 @@ const EquipmentDetailModal = ({
 }: EquipmentDetailModalProps) => {
   const [showModalClient, setShowModalClient] = useState(false);
   const [dataClient, setDataClient] = useState<Client | null>(null);
-  const [dataFailures, setDataFailures] = useState<Failure[]>([]);
   const [dataOrders, setDataOrders] = useState<Order[]>([]);
-
   const [isEditing, setIsEditing] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [saved, setSaved] = useState<Equipment>(equipment);
@@ -96,15 +94,6 @@ const EquipmentDetailModal = ({
     }
   };
 
-  // Más reciente primero. Falla "más reciente" = mayor dateOfFailure.
-  const sortedFailures = useMemo(
-    () =>
-      [...dataFailures].sort(
-        (a, b) => new Date(b.dateOfFailure).getTime() - new Date(a.dateOfFailure).getTime()
-      ),
-    [dataFailures]
-  );
-
   // Mismo criterio para órdenes, usando la fecha de ingreso.
   const sortedOrders = useMemo(
     () =>
@@ -113,6 +102,13 @@ const EquipmentDetailModal = ({
       ),
     [dataOrders]
   );
+
+  const sortedFailures = useMemo(() => {
+    const allFailures = dataOrders.flatMap((order) => order.failures ?? []);
+    return [...allFailures].sort(
+      (a, b) => new Date(b.dateOfFailure).getTime() - new Date(a.dateOfFailure).getTime()
+    );
+  }, [dataOrders]);
 
   useEffect(() => {
     const fetchClient = async () => {
@@ -128,25 +124,6 @@ const EquipmentDetailModal = ({
         setDataClient(null);
       }
     }
-    const fetchFailures = async () => {
-      try {
-        const id_equipment = equipment?.id_equipment;
-        if (!id_equipment) return;
-        const failures = await fetch(
-          `${BACKEND_URL}/api/failures/ofEquipment/${id_equipment}`, {
-          method: "GET",
-          credentials: 'include',
-        }
-        );
-        if (!failures.ok) {
-          throw new Error('Error al obtener las fallas');
-        }
-        const dataFailures = await failures.json();
-        setDataFailures(dataFailures);
-      } catch (e) {
-        setDataFailures([]);
-      }
-    };
     const fetchOrders = async () => {
       try {
         const id_equipment = equipment?.id_equipment;
@@ -158,7 +135,7 @@ const EquipmentDetailModal = ({
           }
         );
         if (!orders.ok) {
-          throw new Error('Error al obtener las fallas');
+          throw new Error('Error al obtener las órdenes');
         };
         const dataOrders = await orders.json();
         setDataOrders(dataOrders);
@@ -166,10 +143,83 @@ const EquipmentDetailModal = ({
         setDataOrders([]);
       }
     }
-    fetchFailures();
     fetchClient();
     fetchOrders();
   }, [equipment])
+
+
+  useEffect(() => {
+    const handleFailureChanged = (payload: unknown) => {
+      const changedFailure = payload as Failure;
+
+      setDataOrders((prev) => {
+        const belongsHere = prev.some((o) => o.id_order === changedFailure.id_order);
+        if (!belongsHere) return prev; // no es de este equipo, ignorar
+
+        return prev.map((order) => {
+          if (order.id_order !== changedFailure.id_order) return order;
+
+          const currentFailures = order.failures ?? [];
+          const exists = currentFailures.some((f) => f.id_failure === changedFailure.id_failure);
+
+          return {
+            ...order,
+            failures: exists
+              ? currentFailures.map((f) =>
+                  f.id_failure === changedFailure.id_failure ? changedFailure : f
+                )
+              : [...currentFailures, changedFailure],
+          };
+        });
+      });
+    };
+
+    eventBus.on(EVENTS.failureChanged, handleFailureChanged);
+    return () => eventBus.off(EVENTS.failureChanged, handleFailureChanged);
+  }, []);
+
+  useEffect(() => {
+    const handleStatusChanged = (payload: unknown) => {
+      const newStatus = payload as Status_History;
+
+      setDataOrders((prev) => {
+        const belongsHere = prev.some((o) => o.id_order === newStatus.id_order);
+        if (!belongsHere) return prev;
+
+        return prev.map((order) =>
+          order.id_order === newStatus.id_order
+            ? {
+                ...order,
+                status: newStatus.status,
+                statusHistory: [...(order.statusHistory ?? []), newStatus],
+              }
+            : order
+        );
+      });
+    };
+
+    eventBus.on(EVENTS.statusChanged, handleStatusChanged);
+    return () => eventBus.off(EVENTS.statusChanged, handleStatusChanged);
+  }, []);
+  useEffect(() => {
+    const handleFailureDeleted = (payload: unknown) => {
+      const { id_failure, id_order } = payload as { id_failure: string; id_order: string };
+
+      setDataOrders((prev) => {
+        const belongsHere = prev.some((o) => o.id_order === id_order);
+        if (!belongsHere) return prev;
+
+        return prev.map((order) =>
+          order.id_order === id_order
+            ? { ...order, failures: (order.failures ?? []).filter((f) => f.id_failure !== id_failure) }
+            : order
+        );
+      });
+    };
+
+    eventBus.on(EVENTS.failureDeleted, handleFailureDeleted);
+    return () => eventBus.off(EVENTS.failureDeleted, handleFailureDeleted);
+  }, []);
 
   if (!open) return null;
 

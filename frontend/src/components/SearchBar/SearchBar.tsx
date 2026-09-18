@@ -98,7 +98,7 @@ useEffect(() => {
       try {
         const params = new URLSearchParams();
 
-        if (trimmedQuery) params.set('q', trimmedQuery);
+        if (trimmedQuery) params.set('search', trimmedQuery);
 
         // 2. Agregar la metadata de paginación por defecto que espera el backend
         params.set('page', '1');

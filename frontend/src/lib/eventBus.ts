@@ -38,13 +38,19 @@ export const eventBus = new EventBus();
 
 export const EVENTS = {
   clientChanged: 'client:changed',
-  clientDeleted: 'client:deleted',                    
+  clientDeleted: 'client:deleted',
   clientCategoryChanged: 'clientCategory:changed',
   clientCategoryDeleted: 'clientCategory:deleted',
   paymentTypeChanged: 'paymentType:changed',
-  paymentTypeDeleted: 'paymentType:deleted',        
+  paymentTypeDeleted: 'paymentType:deleted',
   failureTypeChanged: 'failureType:changed',
   failureTypeDeleted: 'failureType:deleted',
+  failureChanged: 'failure:changed',
+  failureDeleted: 'failure:deleted',
   userChanged: 'user:changed',
   statusChanged: 'status:changed',
+  addedCostChanged: 'addedCost:changed',
+  addedCostDeleted: 'addedCost:deleted',
+  budgetChanged: 'budgetChanged:changed',
+  budgetDeleted: 'budgetDeleted:deleted',
 } as const;
