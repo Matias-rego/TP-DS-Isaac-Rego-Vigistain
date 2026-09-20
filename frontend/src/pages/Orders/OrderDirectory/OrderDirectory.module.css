@@ -2,7 +2,9 @@
 .page {
   display: grid;
   grid-template-rows: auto 1fr auto; /* Nav | contenido (crece) | Footer */
+  grid-template-columns: minmax(0, 1fr); /* la columna nunca crece más que la pantalla (si no, la tabla ancha arrastra toda la página) */
   min-height: 100dvh; /* dvh > vh en mobile: ignora la barra de direcciones del navegador */
+  overflow-x: hidden; /* la página nunca scrollea horizontal; el scroll va en la caja de la tabla */
 }
 
 .main {
@@ -44,6 +46,7 @@
   flex-direction: column;
   gap: 16px;
   margin: 0.75rem;
+  min-width: 0;
 }
 
 .searchOrderSection {
@@ -54,16 +57,13 @@
   display: flex;
   align-items: flex-start;
   gap: 16px;
+  min-width: 0;
 }
 
 .tableOrderSection {
   flex: 1;
   min-width: 0;
-  background: var(--tf-card);
-  border: 1px solid var(--tf-border);
-  border-radius: var(--radius-md, 14px);
-  box-shadow: var(--shadow-soft);
-  overflow-x: auto;
+  overflow-x: auto; /* solo caja de scroll; el marco/card lo pone la propia tabla (si no, quedaba doble borde) */
 }
 
 .loadingText {
