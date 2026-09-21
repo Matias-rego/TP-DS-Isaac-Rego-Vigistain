@@ -24,7 +24,7 @@ jobs:
         id: meta-frontend
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.DOCKERHUB_USERNAME }}/techfix-frontend
+          images: ${{ vars.DOCKERHUB_USERNAME }}/techfix-frontend
           tags: |
             type=sha,format=short
             type=raw,value=latest
@@ -33,7 +33,7 @@ jobs:
         id: meta-server
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.DOCKERHUB_USERNAME }}/techfix-server
+          images: ${{ vars.DOCKERHUB_USERNAME }}/techfix-server
           tags: |
             type=sha,format=short
             type=raw,value=latest
