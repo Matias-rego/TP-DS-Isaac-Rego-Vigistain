@@ -140,12 +140,12 @@ const Clientes = () => {
 
         {/* SearchBar */}
         <div className={styles.searchRow}>
-          <SearchBar
+          <SearchBar<Client>
             showFilters={true}
             filters={CLIENT_FILTERS}
             searchEndpoint="/api/clients/search/"
             searchPlaceholder="Buscar clientes por nombre, apellido o correo electrónico"
-            onResults={(data) => setResults(data as Client[])}
+            onResults={(data) => setResults(data.data)}
             onClear={() => setResults([])}
           />
         </div>

@@ -8,8 +8,8 @@ import type { Failure_Type, PaginatedResponse} from "@/types/types";
   interface FailureDescriptionProps {
     description: string;
     onChangeDescription: (value: string) => void;
-    selectedFailureType: number | null;
-    onChangeSelectedFailureType: (id: number | null) => void;
+    selectedFailureType: string | null;
+    onChangeSelectedFailureType: (id: string | null) => void;
     placeholder?: string;
   }
 
@@ -52,7 +52,7 @@ const FailureDescription = ({
   }, [authLoading, isAuth, findCategories]);
 
   // Click en un tag: lo selecciona. Si ya estaba seleccionado, lo deselecciona (toggle off).
-  const handleTagClick = (id: number) => {
+  const handleTagClick = (id: string) => {
     if (selectedFailureType === id) {
       onChangeSelectedFailureType(null);
     } else {

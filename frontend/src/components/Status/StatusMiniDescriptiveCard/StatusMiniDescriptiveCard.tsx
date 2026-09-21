@@ -18,9 +18,9 @@ export interface StatusMiniDescriptiveCardProps {
   onClick?: (id_status_history: string) => void;
 }
 
-const formatRelativeTime = (value: string) => {
+const formatRelativeTime = (value: string | Date) => {
   const date = new Date(value);
-  if (isNaN(date.getTime())) return value;
+  if (isNaN(date.getTime())) return String(value);
 
   const diffMs = Date.now() - date.getTime();
   const diffMin = Math.round(diffMs / 60000);

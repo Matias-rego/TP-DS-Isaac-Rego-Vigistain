@@ -22,10 +22,10 @@ const shortId = (id: string) => `#${String(id).slice(0, 8)}`;
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(value);
 
-const formatDate = (value?: string | null) => {
+const formatDate = (value?: string | Date | null) => {
   if (!value) return '—';
   const date = new Date(value);
-  if (isNaN(date.getTime())) return value;
+  if (isNaN(date.getTime())) return String(value);
   return date.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 };
 

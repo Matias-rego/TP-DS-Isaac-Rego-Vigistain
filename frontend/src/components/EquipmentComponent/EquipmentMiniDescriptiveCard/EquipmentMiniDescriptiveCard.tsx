@@ -6,7 +6,7 @@ import styles from './EquipmentMiniDescriptiveCard.module.css';
 export interface EquipmentMiniDescriptiveCardProps {
   equipment: Equipment;
   reason?: string; 
-  onClick?: (id_equipment: number) => void;
+  onClick?: (id_equipment: string) => void;
 }
 
 

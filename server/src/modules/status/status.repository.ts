@@ -101,7 +101,11 @@ export class StatusHistoryRepository extends BaseRepository<StatusHistory, Statu
                 id_status_history: id,
             },
             data: {
-                ...item,
+                id_order: item.id_order,
+                id_user: item.id_user,
+                status: item.status,
+                dateOfChange: item.dateOfChange,
+                comment: item.comment,
             },
         });
 

@@ -93,7 +93,15 @@ export class OrderRepository extends BaseRepository<Order, OrderQueryDto> {
         const order = await this.prisma.order.create({
             data: {
                 id_order: uuidv7(),
-                ...item,
+                id_equipment: item.id_equipment,
+                id_user: item.id_user,
+                status: item.status,
+                observations: item.observations,
+                equipmentPhotoUrl: item.equipmentPhotoUrl,
+                dateOfEntry: item.dateOfEntry,
+                estimatedDate: item.estimatedDate,
+                deliveryDate: item.deliveryDate,
+                totalCharged: item.totalCharged,
             },
         });
 
@@ -106,7 +114,15 @@ export class OrderRepository extends BaseRepository<Order, OrderQueryDto> {
                 id_order: id,
             },
             data: {
-                ...item,
+                id_equipment: item.id_equipment,
+                id_user: item.id_user,
+                status: item.status,
+                observations: item.observations,
+                equipmentPhotoUrl: item.equipmentPhotoUrl,
+                dateOfEntry: item.dateOfEntry,
+                estimatedDate: item.estimatedDate,
+                deliveryDate: item.deliveryDate,
+                totalCharged: item.totalCharged,
             },
         });
 
