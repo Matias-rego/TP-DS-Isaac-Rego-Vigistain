@@ -66,7 +66,6 @@ const ClientDetailModal = ({
     },
   };
 
-  // Sincronizar formData cuando el padre actualiza client (post-guardado)
   useEffect(() => {
     setFormData(client);
   }, [client]);
@@ -97,14 +96,12 @@ const ClientDetailModal = ({
     searchEquipments();
   }, [client.id_client, open, refreshEquip]);
 
-  // Resetear modo edición al cerrar
   useEffect(() => {
     if (!open) setIsEditing(false);
   }, [open]);
 
   const handleEdit = async (data: Client): Promise<boolean> => {
     try {
-      // 1. Extraemos solo los campos permitidos por el schema de actualización del backend
       const payload = {
         clientName: data.clientName,
         clientEmail: data.clientEmail,
@@ -119,7 +116,7 @@ const ClientDetailModal = ({
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(payload), // Enviamos únicamente el payload limpio
+          body: JSON.stringify(payload), 
           credentials: 'include',
         }
       );
@@ -132,7 +129,6 @@ const ClientDetailModal = ({
       const result = await response.json();
       console.log('Cliente editado con éxito:', result);
 
-      // Emitir evento para refrescar la vista
       if (entityEvent) eventBus.emit(entityEvent, result);
 
       return true;
@@ -152,8 +148,6 @@ const ClientDetailModal = ({
     const exito = await handleEdit(formData);
     if (exito) {
       setIsEditing(false);
-      // El useEffect [client] se encargará de actualizar formData
-      // cuando Clientes.tsx refresque y pase el client actualizado
     }
   };
 

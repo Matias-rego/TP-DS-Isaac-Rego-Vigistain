@@ -1,6 +1,6 @@
 import type { Order, Status_History, EnumOrderStatus } from "@/types/types";
 import styles from './OrderCard.module.css'
-
+import {  formatDate, formatDocumentNumber } from "@/lib/utils"
 export interface OrderCardProps {
   order: Order;
   onClick?: (id_order: string) => void;
@@ -50,7 +50,7 @@ const OrderCard = ({ order, onClick }: OrderCardProps) => {
   const isOverdue =
     !isDelivered &&
     Boolean(order.estimatedDate) &&
-    new Date(order.estimatedDate ?? '').getTime() < Date.now();
+    new Date(order.estimatedDate!).getTime() < Date.now();
 
   const entryDate = formatDate(order.dateOfEntry);
   const estimatedDate = formatDate(order.estimatedDate);
@@ -65,7 +65,7 @@ const OrderCard = ({ order, onClick }: OrderCardProps) => {
     >
       <div className={styles.stub}>
         <span className={styles.stubLabel}>ORDEN</span>
-        <span className={styles.stubNumber}>#{order.id_order}</span>
+        <span className={styles.stubNumber}>#{formatDocumentNumber("ORD",order.nroOrder,{includeYear:true, date: order.dateOfEntry, padLength:3})}</span>
       </div>
 
       <div className={styles.divider} />

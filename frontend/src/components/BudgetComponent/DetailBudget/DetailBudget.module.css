@@ -1,0 +1,331 @@
+.card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border: 1px solid #eef1f5;
+  border-radius: 22px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  font-family: inherit;
+  color: #0f172a;
+}
+
+/* ─── Header ─────────────────────────────────────────────── */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.headerTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.headerIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: #eef2ff;
+  color: #4338ca;
+  flex-shrink: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e2333;
+}
+
+.badge {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.badge_live {
+  background: #e7f9ee;
+  color: #16a34a;
+}
+
+.badge_approved {
+  background: #e7f0fe;
+  color: #2563eb;
+}
+
+.badge_rejected {
+  background: #fde8e8;
+  color: #dc2626;
+}
+
+.badge_neutral {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+/* ─── Dividers ───────────────────────────────────────────── */
+
+.divider {
+  height: 1px;
+  background: #eef1f5;
+  margin: 16px 0;
+}
+
+.errorText {
+  margin: 0 0 12px;
+  font-size: 12.5px;
+  color: #dc2626;
+}
+
+/* ─── Line-item rows ─────────────────────────────────────── */
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.rowLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13.5px;
+  color: #475569;
+}
+
+.rowIcon {
+  display: flex;
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.rowValue {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  white-space: nowrap;
+}
+
+.rowValueDiscount {
+  font-size: 14px;
+  font-weight: 700;
+  color: #dc2626;
+  white-space: nowrap;
+}
+
+.promoTag {
+  font-size: 10px;
+  font-weight: 700;
+  color: #dc2626;
+  background: #fde8e8;
+  border-radius: 999px;
+  padding: 2px 8px;
+  margin-left: 4px;
+}
+
+/* ─── Total ──────────────────────────────────────────────── */
+
+.totalBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.totalCaption {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.totalRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.totalLabel {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e2333;
+}
+
+.totalValue {
+  font-size: 26px;
+  font-weight: 800;
+  color: #2563eb;
+  letter-spacing: -0.01em;
+}
+
+.formula {
+  margin: 0;
+  font-size: 11px;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+
+/* ─── Anticipo / Saldo box ───────────────────────────────── */
+
+.balanceBox {
+  margin-top: 16px;
+  background: #eef6ff;
+  border: 1px solid #dbeafe;
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.balanceRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.balanceLabel {
+  font-size: 13px;
+  color: #475569;
+}
+
+.balanceLabelStrong {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #1e2333;
+}
+
+.balancePaid {
+  font-size: 14px;
+  font-weight: 700;
+  color: #16a34a;
+}
+
+.balancePending {
+  font-size: 16px;
+  font-weight: 800;
+  color: #1e3a8a;
+}
+
+/* ─── Comunicación ───────────────────────────────────────── */
+
+.commSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.commTitle {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  margin-bottom: 2px;
+}
+
+.commRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: none;
+  padding: 4px 0;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+}
+
+.commRow:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  border: 1.5px solid #cbd5e1;
+  color: #ffffff;
+  flex-shrink: 0;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.checkboxGreen {
+  background: #16a34a;
+  border-color: #16a34a;
+}
+
+.checkboxBlue {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+
+.commIcon {
+  display: flex;
+  color: #2563eb;
+  flex-shrink: 0;
+}
+
+.commText {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #2563eb;
+}
+
+.commMuted {
+  font-weight: 500;
+  color: #64748b;
+}
+
+/* ─── Actions ────────────────────────────────────────────── */
+
+.actions {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.actionsRow {
+  display: flex;
+  gap: 10px;
+}
+
+.actionsRow > * {
+  flex: 1;
+}
+
+/* ─── Responsive ─────────────────────────────────────────── */
+
+@media (max-width: 420px) {
+  .card {
+    max-width: 100%;
+    padding: 18px;
+  }
+
+  .totalValue {
+    font-size: 22px;
+  }
+}

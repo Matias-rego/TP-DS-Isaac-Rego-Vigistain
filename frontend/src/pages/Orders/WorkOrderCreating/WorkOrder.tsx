@@ -12,7 +12,7 @@ import ClientRegister from '../../Clientes/ClientRegister';
 import DeviceForm, { type DeviceFormValues } from "@/components/DeviceForm/DeviceForm";
 import CautionIcon from "@/assets/caution.svg";
 import ClipboardCheck from "@/assets/clipboardCheck.svg";
-import FallaForm, { type NuevaFalla } from "@/components/Failure/FallaForm/FallaForm";
+import FallaForm, { type NuevaFalla } from "@/components/Failure/FailureForm/FailureForm";
 import VisualProof from "@/components/ImagesAdd/VisualProof";
 import { BACKEND_URL } from "@/lib/config";
 import { useNavigate } from "react-router-dom";
@@ -21,7 +21,7 @@ import EquimentDetailModal from "@/components/EquipmentComponent/EquipmentDetail
 import MonitorIcon from '@/assets/MonitorIcono.svg'
 import { type Equipment } from "@/types/types";
 import { useAuth } from "@/lib/AuthContext";
-import type { Client as BaseClient, PaginatedResponse} from "@/types/types";
+import type { Client as BaseClient, PaginatedResponse } from "@/types/types";
 
 interface Client extends BaseClient {
   categoryClientName?: string;
@@ -35,7 +35,7 @@ interface Client extends BaseClient {
 interface FailureEntry {
   id_failure_type: string;
   description: string;
-  failureName: string;
+  failureDescription: string;
 }
 
 const WorkOrder = () => {
@@ -66,8 +66,8 @@ const WorkOrder = () => {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
-  
-  const [showEquipmentModal,setShowEquipmentModal] = useState(false)
+
+  const [showEquipmentModal, setShowEquipmentModal] = useState(false)
   const navigate = useNavigate();
 
   // ── Wizard por pasos: mostramos una seccion a la vez y bloqueamos el avance
@@ -111,152 +111,121 @@ const WorkOrder = () => {
     setSubmitError(null);
     setSubmitSuccess(false);
 
-    const id_cliente = selectedClient?.id_client;
-
-    if (!id_cliente) {
+    // 1. Validar cliente
+    if (!selectedClient?.id_client) {
       setSubmitError("Seleccioná un cliente antes de registrar la orden.");
       return;
     }
-    let equipmentData;
 
-    if (selectedEquipment == null) {
-      const tipoEquipoFinal = deviceValues.deviceType;
-
-      if (!tipoEquipoFinal || !deviceValues.brand || !deviceValues.model) {
-        setSubmitError("Completá el tipo, marca y modelo del equipo.");
-        return;
-      }
-
-      // Si eligió "otro", guardamos el tipo escrito a mano dentro de las observaciones
-      const observacionesEquipo =
-        deviceValues.deviceType === "otro" && deviceValues.deviceTypeOther.trim()
-          ? `Tipo: ${deviceValues.deviceTypeOther.trim()}. ${deviceValues.observations}`.trim()
-          : deviceValues.observations;
-
-      equipmentData = {
-        tipo_equipment: tipoEquipoFinal,
-        brand: deviceValues.brand,
-        model: deviceValues.model,
-        observations: observacionesEquipo,
-        id_client: selectedClient.id_client,
-      };
-    } else {
-
-      equipmentData = {
-        tipo_equipment: selectedEquipment.tipo_equipment,
-        brand: selectedEquipment.brand,
-        model: selectedEquipment.model,
-        observations: selectedEquipment.observations,
-        id_client: selectedEquipment.id_client,
-      };
+    // 2. Validar fallas
+    if (fallas.length === 0) {
+      setSubmitError("Agregá al menos una falla.");
+      return;
     }
+
     const fallaIncompleta = fallas.some(
-      (f) => f.id_failure_type !== null && f.description.trim() === ""
+      (f) =>
+        !f.id_failure_type ||
+        f.description.trim() === ""
     );
 
     if (fallaIncompleta) {
-      setSubmitError("Completá la descripción de cada falla que hayas seleccionado.");
+      setSubmitError(
+        "Completá el tipo y la descripción de cada falla."
+      );
       return;
     }
+
+    // 3. Preparar equipo
+    let equipmentPayload;
+
+    if (selectedEquipment) {
+      equipmentPayload = {
+        id_equipment: selectedEquipment.id_equipment,
+      };
+    } else {
+      const tipoEquipoFinal =
+        deviceValues.deviceType !== "otro"
+          ? deviceValues.deviceType
+          : deviceValues.deviceTypeOther;
+
+      if (
+        !tipoEquipoFinal ||
+        !deviceValues.brand.trim() ||
+        !deviceValues.model.trim()
+      ) {
+        setSubmitError(
+          "Completá el tipo, marca y modelo del equipo."
+        );
+        return;
+      }
+
+      equipmentPayload = {
+        tipo_equipment: tipoEquipoFinal,
+        brand: deviceValues.brand,
+        model: deviceValues.model,
+        observations: deviceValues.observations || null,
+      };
+    }
+
+    const orderPayload = {
+      id_client: selectedClient.id_client,
+
+      equipment: equipmentPayload,
+
+      observations: orderObservations || null,
+
+      equipmentPhotoUrl: equipmentPhotoUrl || null,
+
+      estimatedDate: estimatedDeliveryDate || null,
+
+      id_user: user?.id_user || null,
+
+      failures: fallas.map((falla) => ({
+        id_failure_type: falla.id_failure_type,
+        description: falla.description.trim(),
+      })),
+    };
+
     setSubmitting(true);
 
     try {
-      let id_equipment;
-      if(selectedEquipment==null){
-        const registE = await fetch(`${BACKEND_URL}/api/equipments`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(equipmentData),
-          credentials: 'include',
-        });
+      const response = await fetch(`${BACKEND_URL}/api/orders`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(orderPayload),
+        credentials: "include",
+      });
 
-        if (!registE.ok) {
-          throw new Error(`Error ${registE.status} al registrar el equipo`);
-        }
+      if (!response.ok) {
+        const errorBody = await response.json().catch(() => ({}));
 
-        const equipment = await registE.json();
-        setEquipmentRegistered(equipment);
-
-
-        id_equipment = equipment.id_equipment;
-        if (!id_equipment) {
-          throw new Error("El backend no devolvió id_equipment");
-        }
-    }else{
-      setEquipmentRegistered(selectedEquipment)
-      id_equipment = selectedEquipment.id_equipment;
-      if (!id_equipment) {
-        throw new Error("No se registro el equipo correctamente");
-      }
-    }
-      
-    const failuresPayload = fallas
-        .filter((f) => f.id_failure_type !== null)
-        .map(({ id_failure_type, description }) => ({
-          id_failure_type,
-          failureDescription: description,
-          id_equipment,
-        }));
-
-      const orderPayload = {
-        id_equipment,
-        observations: orderObservations || null,
-        equipmentPhotoUrl: equipmentPhotoUrl || null,
-        estimatedDate: estimatedDeliveryDate || null,
-        id_user: user?.id_user,
-      };
-
-      const requests: Promise<Response>[] = [];
-
-      if (failuresPayload.length > 0) {
-        requests.push(
-          fetch(`${BACKEND_URL}/api/failures`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(failuresPayload),
-            credentials: 'include',
-          })
-        );
-      }
-
-      requests.push(
-        fetch(`${BACKEND_URL}/api/orders`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(orderPayload),
-          credentials: 'include',
-        })
-      );
-
-      const responses = await Promise.all(requests);
-
-      const fallaResponse = responses.find((_, i) => failuresPayload.length > 0 && i === 0);
-      if (fallaResponse && !fallaResponse.ok) {
-        const errBody = await fallaResponse.json().catch(() => ({}));
-        const detalle = Array.isArray(errBody.details) ? errBody.details.join(" ") : "";
         throw new Error(
-          errBody.message
-            ? `${errBody.message} ${detalle}`.trim()
-            : `Error ${fallaResponse.status} al registrar las fallas`
+          errorBody.message ||
+          `Error ${response.status} al registrar la orden`
         );
       }
 
-      const orderResponse = responses[responses.length - 1];
-      if (!orderResponse.ok) {
-        const errBody = await orderResponse.json().catch(() => ({}));
-        throw new Error(errBody.message || `Error ${orderResponse.status} al registrar la orden`);
-      }
+      const order = await response.json();
+
+      console.log("Orden creada:", order);
 
       setSubmitSuccess(true);
+
     } catch (error) {
       console.error("Error al registrar la orden:", error);
+
       setSubmitError(
-        error instanceof Error ? error.message : "Ocurrió un error al registrar la orden."
+        error instanceof Error
+          ? error.message
+          : "Ocurrió un error al registrar la orden."
       );
     } finally {
       setSubmitting(false);
     }
-  };
+  }
   useEffect(() => {
     if (submitSuccess) {
       const timer = setTimeout(() => {
@@ -287,151 +256,151 @@ const WorkOrder = () => {
         </div>
 
         <div className={styles.orderGrid}>
-        {step === 0 && (
-        <div className={styles.gridItem}>
-          <Card className={styles.customCard} style={{ margin: '0 auto' }}>
-            <CardHeader className={styles.cardHeaderFlex}>
-              <div className={styles.titleWithIcon}>
-                <img src={UserIcon} alt="Icono Usuario" className={styles.cardIconImg} />
-                <CardTitle className={styles.cardTitleText}>Seleccion de Cliente *</CardTitle>
-              </div>
-              <CardDescription className={styles.cardDescriptionText}>
-                Busca o Agrega un Cliente a esta Orden*                   
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className={styles.searchContainer}>
-                <ActionButton label="" onClick={() => setRegisterClient(true)} variant="ghost"  />
-                <div className={styles.searchRow}>
-                <SearchBar<Client>
-                  showFilters={false}
-                  searchEndpoint="/api/clients"
-                  searchPlaceholder="Busca Clientes por nombre, apellido o correo electrónico"
-                  onResults={(data) => {
-                    setResults(data);
-                    setShowDropdown(data.data.length > 0);
-                  }}
-                  onClear={() => {
-                    setResults(null);
-                    setShowDropdown(false);
-                  }}
-                />
-                  
-                </div>
-               {showDropdown && results && (
-                <ul className={styles.resultsDropdown}>
-                  {results.data.map((client) => (
-                    <li
-                      key={client.id_client}
-                      className={styles.dropdownItem}
-                      onClick={() => handleSelectClient(client)}
-                    >
-                        <div className={styles.dropdownDist}>
-                          <div className={styles.itemContainer}>
-                            <span className={styles.itemName}>
-                              {client.clientName}
-                            </span>
+          {step === 0 && (
+            <div className={styles.gridItem}>
+              <Card className={styles.customCard} style={{ margin: '0 auto' }}>
+                <CardHeader className={styles.cardHeaderFlex}>
+                  <div className={styles.titleWithIcon}>
+                    <img src={UserIcon} alt="Icono Usuario" className={styles.cardIconImg} />
+                    <CardTitle className={styles.cardTitleText}>Seleccion de Cliente *</CardTitle>
+                  </div>
+                  <CardDescription className={styles.cardDescriptionText}>
+                    Busca o Agrega un Cliente a esta Orden*
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className={styles.searchContainer}>
+                    <ActionButton label="" onClick={() => setRegisterClient(true)} variant="ghost" />
+                    <div className={styles.searchRow}>
+                      <SearchBar<Client>
+                        showFilters={false}
+                        searchEndpoint="/api/clients"
+                        searchPlaceholder="Busca Clientes por nombre, apellido o correo electrónico"
+                        onResults={(data) => {
+                          setResults(data);
+                          setShowDropdown(data.data.length > 0);
+                        }}
+                        onClear={() => {
+                          setResults(null);
+                          setShowDropdown(false);
+                        }}
+                      />
 
-                            <span className={styles.itemEmail}>
-                              {client.clientEmail}
-                            </span>
-                          </div>
+                    </div>
+                    {showDropdown && results && (
+                      <ul className={styles.resultsDropdown}>
+                        {results.data.map((client) => (
+                          <li
+                            key={client.id_client}
+                            className={styles.dropdownItem}
+                            onClick={() => handleSelectClient(client)}
+                          >
+                            <div className={styles.dropdownDist}>
+                              <div className={styles.itemContainer}>
+                                <span className={styles.itemName}>
+                                  {client.clientName}
+                                </span>
 
-                          <div>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedClient(client);
-                                setShowClientModal(true);
-                              }}
-                            >
-                              <img
-                                src={EyeIcon}
-                                alt="IconoOjo"
-                                className={styles.eyeIconImg}
-                              />
-                            </button>
-                          </div>
+                                <span className={styles.itemEmail}>
+                                  {client.clientEmail}
+                                </span>
+                              </div>
+
+                              <div>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedClient(client);
+                                    setShowClientModal(true);
+                                  }}
+                                >
+                                  <img
+                                    src={EyeIcon}
+                                    alt="IconoOjo"
+                                    className={styles.eyeIconImg}
+                                  />
+                                </button>
+                              </div>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+
+                  {selectedClient && (
+                    <div className={styles.selectedBadge}>
+                      <div className={styles.badgeHeader}>
+                        <span className={styles.clientTitle}>{selectedClient.clientName}</span>
+                        <span className={styles.idChip}>ID #{selectedClient.id_client}</span>
+                      </div>
+                      <div className={styles.infoGrid}>
+                        <div className={styles.infoRow}>
+                          <span className={styles.label}>CUIT</span>
+                          <span className={styles.value}>{selectedClient.cuit}</span>
                         </div>
-                     </li>
-                  ))}
-                </ul>
-              )}
+                        <div className={styles.infoRow}>
+                          <span className={styles.label}>Email</span>
+                          <span className={styles.value}>{selectedClient.clientEmail}</span>
+                        </div>
+                        <div className={styles.infoRow}>
+                          <span className={styles.label}>Teléfono</span>
+                          <span className={styles.value}>{selectedClient.clientPhone}</span>
+                        </div>
+                        <div className={styles.infoRow}>
+                          <span className={styles.label}>Categoría</span>
+                          <span className={styles.categoryBadge}>
+                            {selectedClient.categoryClientName || "Sin categoría"}
+                          </span>
+                        </div>
+                        <div className={styles.infoRow}>
+                          <span className={styles.label}>Última reparación</span>
+                          <span className={styles.value}>{selectedClient.lastRepair || "---"}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {showClientModal && selectedClient &&
+                    <ClientDetailModal
+                      client={selectedClient}
+                      //equipos={[]}
+                      open={showClientModal}
+                      onClose={() => setShowClientModal(false)}
+                    />
+                  }
+                  {registerClient &&
+                    <div className={styles.modalOverlay} onClick={() => setRegisterClient(false)}>
+                      <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+                        <ClientRegister />
+                      </div>
+                    </div>
+                  }
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* ── Paso 2: Equipo (nuevo o buscar) ── */}
+          {step === 1 && (
+            <div className={styles.gridItem}>
+              <div className={styles.equipoTabs}>
+                <button
+                  type="button"
+                  className={`${styles.equipoTab} ${equipoTab === 'nuevo' ? styles.equipoTabActive : ''}`}
+                  onClick={() => setEquipoTab('nuevo')}
+                >
+                  Equipo nuevo
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.equipoTab} ${equipoTab === 'buscar' ? styles.equipoTabActive : ''}`}
+                  onClick={() => setEquipoTab('buscar')}
+                >
+                  Buscar existente
+                </button>
               </div>
 
-              {selectedClient && (
-                <div className={styles.selectedBadge}>
-                  <div className={styles.badgeHeader}>
-                    <span className={styles.clientTitle}>{selectedClient.clientName}</span>
-                    <span className={styles.idChip}>ID #{selectedClient.id_client}</span>
-                  </div>
-                  <div className={styles.infoGrid}>
-                    <div className={styles.infoRow}>
-                      <span className={styles.label}>CUIT</span>
-                      <span className={styles.value}>{selectedClient.cuit}</span>
-                    </div>
-                    <div className={styles.infoRow}>
-                      <span className={styles.label}>Email</span>
-                      <span className={styles.value}>{selectedClient.clientEmail}</span>
-                    </div>
-                    <div className={styles.infoRow}>
-                      <span className={styles.label}>Teléfono</span>
-                      <span className={styles.value}>{selectedClient.clientPhone}</span>
-                    </div>
-                    <div className={styles.infoRow}>
-                      <span className={styles.label}>Categoría</span>
-                      <span className={styles.categoryBadge}>
-                        {selectedClient.categoryClientName || "Sin categoría"}
-                      </span>
-                    </div>
-                    <div className={styles.infoRow}>
-                      <span className={styles.label}>Última reparación</span>
-                      <span className={styles.value}>{selectedClient.lastRepair || "---"}</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-              {showClientModal && selectedClient &&
-                <ClientDetailModal
-                  client={selectedClient}
-                  //equipos={[]}
-                  open={showClientModal}
-                  onClose={() => setShowClientModal(false)}
-                />
-              }
-              {registerClient &&
-                <div className={styles.modalOverlay} onClick={() => setRegisterClient(false)}>
-                  <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-                    <ClientRegister />
-                  </div>
-                </div>
-              }
-            </CardContent>
-          </Card>
-        </div>
-        )}
-
-        {/* ── Paso 2: Equipo (nuevo o buscar) ── */}
-        {step === 1 && (
-        <div className={styles.gridItem}>
-          <div className={styles.equipoTabs}>
-            <button
-              type="button"
-              className={`${styles.equipoTab} ${equipoTab === 'nuevo' ? styles.equipoTabActive : ''}`}
-              onClick={() => setEquipoTab('nuevo')}
-            >
-              Equipo nuevo
-            </button>
-            <button
-              type="button"
-              className={`${styles.equipoTab} ${equipoTab === 'buscar' ? styles.equipoTabActive : ''}`}
-              onClick={() => setEquipoTab('buscar')}
-            >
-              Buscar existente
-            </button>
-          </div>
-
-          {equipoTab === 'nuevo' && (
+              {equipoTab === 'nuevo' && (
                 <Card className={styles.customCard}>
                   <CardHeader>
                     <div className={styles.titleWithIcon}>
@@ -449,9 +418,9 @@ const WorkOrder = () => {
                     </div>
                   </CardContent>
                 </Card>
-          )}
+              )}
 
-          {equipoTab === 'buscar' && (
+              {equipoTab === 'buscar' && (
                 <Card className={styles.customCard}>
                   <CardHeader>
                     <div className={styles.titleWithIcon}>
@@ -467,7 +436,7 @@ const WorkOrder = () => {
                     <div className={styles.searchContainer}>
                       <SearchBar<Equipment>
                         showFilters={false}
-                        searchEndpoint="/api/equipments/search"
+                        searchEndpoint="/api/equipments/"
                         searchPlaceholder="Busca Equipos por tipo, marca o modelo"
                         onResults={(data) => {
                           setResultsEquipment(data);
@@ -486,253 +455,253 @@ const WorkOrder = () => {
                               className={styles.dropdownItem}
                               onClick={() => handleSelectEquipment(equipment)}
                             >
-                            <div className={styles.dropdownDist}>
-                              <div className={styles.itemContainer}>
-                                <span className={styles.itemName}>
-                                  Marca: {equipment.brand}
-                                </span>
+                              <div className={styles.dropdownDist}>
+                                <div className={styles.itemContainer}>
+                                  <span className={styles.itemName}>
+                                    Marca: {equipment.brand}
+                                  </span>
 
-                                <span className={styles.itemEmail}>
-                                  Modelo: {equipment.model}
-                                </span>
+                                  <span className={styles.itemEmail}>
+                                    Modelo: {equipment.model}
+                                  </span>
+                                </div>
+
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedEquipmentForModal(equipment);
+                                    setShowEquipmentModal(true);
+                                  }}
+                                >
+                                  <img
+                                    src={MonitorIcon}
+                                    alt="Logo equipo"
+                                    className={styles.eyeIconImg}
+                                  />
+                                </button>
                               </div>
-
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSelectedEquipmentForModal(equipment);
-                                  setShowEquipmentModal(true);
-                                }}
-                              >
-                                <img
-                                  src={MonitorIcon}
-                                  alt="Logo equipo"
-                                  className={styles.eyeIconImg}
-                                />
-                              </button>
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </div>
                     {selectedEquipment && (
-                    <div className={styles.selectedBadge}>
-                      <div className={styles.badgeHeader}>
-                        <span className={styles.clientTitle}>{selectedEquipment.tipo_equipment.charAt(0).toUpperCase() + selectedEquipment.tipo_equipment.slice(1)}</span>
-                        <span className={styles.idChip}>ID #{selectedEquipment.id_equipment}</span>
-                      </div>
-                      <div className={styles.infoGrid}>
-                        <div className={styles.infoRow}>
-                          <span className={styles.label}>Marca</span>
-                          <span className={styles.value}>{selectedEquipment.brand}</span>
-                        </div>
-                        <div className={styles.infoRow}>
-                          <span className={styles.label}>Modelo</span>
-                          <span className={styles.value}>{selectedEquipment.model}</span>
-                        </div>
-                        <br />
+                      <div className={styles.selectedBadge}>
                         <div className={styles.badgeHeader}>
-                          <span className={styles.clientTitle}>Dueño Registrado:</span>
-                          <span className={styles.idChip}>ID #{selectedEquipment.client?.id_client}</span>
+                          <span className={styles.clientTitle}>{selectedEquipment.tipo_equipment.charAt(0).toUpperCase() + selectedEquipment.tipo_equipment.slice(1)}</span>
+                          <span className={styles.idChip}>ID #{selectedEquipment.id_equipment}</span>
                         </div>
-                        <div className={styles.infoRow}>
-                          <span className={styles.label}>Nombre: </span>
-                          <span className={styles.value}>{selectedEquipment.client?.clientName || "---"}</span>
-                        </div>
-                        <div className={styles.infoRow}>
-                          <span className={styles.label}>CUIT: </span>
-                          <span className={styles.value}>{selectedEquipment.client?.cuit || "---"}</span>
-                        </div>
-                        <div className={styles.infoRow}>
-                          <span className={styles.label}>Email: </span>
-                          <span className={styles.value}>{selectedEquipment.client?.clientEmail || "---"}</span>
-                        </div>
+                        <div className={styles.infoGrid}>
+                          <div className={styles.infoRow}>
+                            <span className={styles.label}>Marca</span>
+                            <span className={styles.value}>{selectedEquipment.brand}</span>
+                          </div>
+                          <div className={styles.infoRow}>
+                            <span className={styles.label}>Modelo</span>
+                            <span className={styles.value}>{selectedEquipment.model}</span>
+                          </div>
+                          <br />
+                          <div className={styles.badgeHeader}>
+                            <span className={styles.clientTitle}>Dueño Registrado:</span>
+                            <span className={styles.idChip}>ID #{selectedEquipment.client?.id_client}</span>
+                          </div>
+                          <div className={styles.infoRow}>
+                            <span className={styles.label}>Nombre: </span>
+                            <span className={styles.value}>{selectedEquipment.client?.clientName || "---"}</span>
+                          </div>
+                          <div className={styles.infoRow}>
+                            <span className={styles.label}>CUIT: </span>
+                            <span className={styles.value}>{selectedEquipment.client?.cuit || "---"}</span>
+                          </div>
+                          <div className={styles.infoRow}>
+                            <span className={styles.label}>Email: </span>
+                            <span className={styles.value}>{selectedEquipment.client?.clientEmail || "---"}</span>
+                          </div>
 
+                        </div>
                       </div>
-                    </div>
                     )}
                   </CardContent>
                 </Card>
+              )}
+            </div>
           )}
-        </div>
-        )}
 
-        {/* ── Paso 3: Fallas (form con buscador + chips acumulados) ── */}
-        {step === 2 && (
-        <div className={styles.gridItem}>
-          <Card className={styles.customCard} style={{ margin: '0 auto' }}>
-            <CardHeader className={styles.cardHeaderFlex}>
-              <div className={styles.titleWithIcon}>
-                <img src={CautionIcon} alt="Icono de Fallas" className={styles.cardIconImg} />
-                <CardTitle className={styles.cardTitleText}>Fallas del equipo *</CardTitle>
-              </div>
-              <CardDescription className={styles.cardDescriptionText}>
-                Agregá cada falla con su tipo y una descripción. Se van acumulando numeradas.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {fallas.length > 0 && (
-                <div className={styles.fallasChips}>
-                  {fallas.map((falla, index) => (
-                    <span key={index} className={styles.fallaChip}>
-                      <span className={styles.fallaChipNum}>{index + 1}</span>
-                      {falla.failureName}
-                      <button
-                        type="button"
-                        className={styles.fallaChipRemove}
-                        onClick={() => quitaFalla(index)}
-                        aria-label="Quitar falla"
-                      >
-                        ✕
+          {/* ── Paso 3: Fallas (form con buscador + chips acumulados) ── */}
+          {step === 2 && (
+            <div className={styles.gridItem}>
+              <Card className={styles.customCard} style={{ margin: '0 auto' }}>
+                <CardHeader className={styles.cardHeaderFlex}>
+                  <div className={styles.titleWithIcon}>
+                    <img src={CautionIcon} alt="Icono de Fallas" className={styles.cardIconImg} />
+                    <CardTitle className={styles.cardTitleText}>Fallas del equipo *</CardTitle>
+                  </div>
+                  <CardDescription className={styles.cardDescriptionText}>
+                    Agregá cada falla con su tipo y una descripción. Se van acumulando numeradas.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {fallas.length > 0 && (
+                    <div className={styles.fallasChips}>
+                      {fallas.map((falla, index) => (
+                        <span key={index} className={styles.fallaChip}>
+                          <span className={styles.fallaChipNum}>{index + 1}</span>
+                          {falla.failureDescription}
+                          <button
+                            type="button"
+                            className={styles.fallaChipRemove}
+                            onClick={() => quitaFalla(index)}
+                            aria-label="Quitar falla"
+                          >
+                            ✕
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {agregando ? (
+                    <FallaForm
+                      onGuardar={handleGuardarFalla}
+                      onCancelar={fallas.length > 0 ? () => setAgregando(false) : undefined}
+                    />
+                  ) : (
+                    <div className={styles.addFallaRow}>
+                      <button type="button" className={styles.addFallaBtn} onClick={() => setAgregando(true)}>
+                        <span className={styles.addFallaCircle}>+</span>
+                        Agregar otra falla
                       </button>
-                    </span>
-                  ))}
-                </div>
-              )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          )}
 
-              {agregando ? (
-                <FallaForm
-                  onGuardar={handleGuardarFalla}
-                  onCancelar={fallas.length > 0 ? () => setAgregando(false) : undefined}
-                />
-              ) : (
-                <div className={styles.addFallaRow}>
-                  <button type="button" className={styles.addFallaBtn} onClick={() => setAgregando(true)}>
-                    <span className={styles.addFallaCircle}>+</span>
-                    Agregar otra falla
-                  </button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-        )}
-
-        {/* ── Paso 4: Detalles (opcional) ── */}
-        {step === 3 && (
-        <>
-        {/* ── Prueba visual ── */}
-        <div className={styles.gridItem}>
-          <VisualProof
-            value={equipmentPhotoUrl}
-            onChange={(url) => setEquipmentPhotoUrl(url)}
-          />
-        </div>
-
-        {/* ── Observaciones Generales ── */}
-        <div className={styles.gridItem}>
-          <Card className={styles.customCard} style={{ margin: '0 auto' }}>
-            <CardHeader className={styles.cardHeaderFlex}>
-              <div className={styles.titleWithIcon}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#002347" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-                  <polyline points="14 2 14 8 20 8" />
-                  <line x1="16" y1="13" x2="8" y2="13" />
-                  <line x1="16" y1="17" x2="8" y2="17" />
-                  <line x1="10" y1="9" x2="8" y2="9" />
-                </svg>
-                <CardTitle className={styles.cardTitleText}>Observaciones Generales</CardTitle>
-              </div>
-              <CardDescription className={styles.cardDescriptionText}>
-                Ingresá detalles adicionales sobre el estado de recepción, accesorios que deja el cliente o aclaraciones internas.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className={styles.formFieldArea}>
-                <textarea
-                  value={orderObservations}
-                  onChange={(e) => setOrderObservations(e.target.value)}
-                  placeholder="Ej: Deja cargador y funda de regalo. El equipo tiene la pantalla astillada en la esquina superior izquierda..."
-                  rows={4}
-                  className={styles.customTextarea}
-                  style={{
-                    width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #E2E8F0',
-                    fontSize: '14px', fontFamily: 'inherit', resize: 'vertical', outline: 'none', boxSizing: 'border-box'
-                  }}
+          {/* ── Paso 4: Detalles (opcional) ── */}
+          {step === 3 && (
+            <>
+              {/* ── Prueba visual ── */}
+              <div className={styles.gridItem}>
+                <VisualProof
+                  value={equipmentPhotoUrl}
+                  onChange={(url) => setEquipmentPhotoUrl(url)}
                 />
               </div>
-            </CardContent>
-          </Card>
-        </div>
 
-        {/* ── Fecha Estimada de Entrega ── */}
-        <div className={styles.gridItem}>
-          <Card className={styles.customCard} style={{ margin: '0 auto' }}>
-            <CardHeader className={styles.cardHeaderFlex}>
-              <div className={styles.titleWithIcon}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#002347" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                  <line x1="16" y1="2" x2="16" y2="6" />
-                  <line x1="8" y1="2" x2="8" y2="6" />
-                  <line x1="3" y1="10" x2="21" y2="10" />
-                </svg>
-                <CardTitle className={styles.cardTitleText}>Fecha Estimada de Entrega</CardTitle>
+              {/* ── Observaciones Generales ── */}
+              <div className={styles.gridItem}>
+                <Card className={styles.customCard} style={{ margin: '0 auto' }}>
+                  <CardHeader className={styles.cardHeaderFlex}>
+                    <div className={styles.titleWithIcon}>
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#002347" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                        <line x1="10" y1="9" x2="8" y2="9" />
+                      </svg>
+                      <CardTitle className={styles.cardTitleText}>Observaciones Generales</CardTitle>
+                    </div>
+                    <CardDescription className={styles.cardDescriptionText}>
+                      Ingresá detalles adicionales sobre el estado de recepción, accesorios que deja el cliente o aclaraciones internas.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className={styles.formFieldArea}>
+                      <textarea
+                        value={orderObservations}
+                        onChange={(e) => setOrderObservations(e.target.value)}
+                        placeholder="Ej: Deja cargador y funda de regalo. El equipo tiene la pantalla astillada en la esquina superior izquierda..."
+                        rows={4}
+                        className={styles.customTextarea}
+                        style={{
+                          width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #E2E8F0',
+                          fontSize: '14px', fontFamily: 'inherit', resize: 'vertical', outline: 'none', boxSizing: 'border-box'
+                        }}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
-              <CardDescription className={styles.cardDescriptionText}>
-                Establecé un plazo aproximado para que el cliente sepa cuándo podría estar listo el diagnóstico o la reparación.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className={styles.formFieldArea} style={{ maxWidth: '300px' }}>
-                <input
-                  type="date"
-                  value={estimatedDeliveryDate}
-                  onChange={(e) => setEstimatedDeliveryDate(e.target.value)}
-                  className={styles.customDateInput}
-                  style={{
-                    width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #E2E8F0',
-                    fontSize: '14px', color: '#334155', outline: 'none'
-                  }}
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        </>
-        )}
 
-        {/* ── Paso 5: Confirmar ── */}
-        {step === 4 && (
-        <div className={styles.gridItem}>
-          <Card className={styles.customCard} style={{ margin: '0 auto' }}>
-            <CardHeader className={styles.cardHeaderFlex}>
-              <div className={styles.titleWithIcon}>
-                <img src={ClipboardCheck} alt="Icono de confirmar" className={styles.cardIconImg} />
-                <CardTitle className={styles.cardTitleText}>Revisar y confirmar</CardTitle>
+              {/* ── Fecha Estimada de Entrega ── */}
+              <div className={styles.gridItem}>
+                <Card className={styles.customCard} style={{ margin: '0 auto' }}>
+                  <CardHeader className={styles.cardHeaderFlex}>
+                    <div className={styles.titleWithIcon}>
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#002347" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                        <line x1="16" y1="2" x2="16" y2="6" />
+                        <line x1="8" y1="2" x2="8" y2="6" />
+                        <line x1="3" y1="10" x2="21" y2="10" />
+                      </svg>
+                      <CardTitle className={styles.cardTitleText}>Fecha Estimada de Entrega</CardTitle>
+                    </div>
+                    <CardDescription className={styles.cardDescriptionText}>
+                      Establecé un plazo aproximado para que el cliente sepa cuándo podría estar listo el diagnóstico o la reparación.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className={styles.formFieldArea} style={{ maxWidth: '300px' }}>
+                      <input
+                        type="date"
+                        value={estimatedDeliveryDate}
+                        onChange={(e) => setEstimatedDeliveryDate(e.target.value)}
+                        className={styles.customDateInput}
+                        style={{
+                          width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #E2E8F0',
+                          fontSize: '14px', color: '#334155', outline: 'none'
+                        }}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
-              <CardDescription className={styles.cardDescriptionText}>
-                Revisá que esté todo bien antes de registrar la orden.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className={styles.infoGrid}>
-                <div className={styles.infoRow}>
-                  <span className={styles.label}>Cliente</span>
-                  <span className={styles.value}>{selectedClient?.clientName || "---"}</span>
-                </div>
-                <div className={styles.infoRow}>
-                  <span className={styles.label}>Equipo</span>
-                  <span className={styles.value}>
-                    {selectedEquipment
-                      ? `${selectedEquipment.brand} ${selectedEquipment.model}`
-                      : `${deviceValues.brand} ${deviceValues.model}`}
-                  </span>
-                </div>
-                <div className={styles.infoRow}>
-                  <span className={styles.label}>Fallas cargadas</span>
-                  <span className={styles.value}>{fallas.filter((f) => f.id_failure_type !== null).length}</span>
-                </div>
-                <div className={styles.infoRow}>
-                  <span className={styles.label}>Fecha estimada</span>
-                  <span className={styles.value}>{estimatedDeliveryDate || "Sin definir"}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        )}
+            </>
+          )}
+
+          {/* ── Paso 5: Confirmar ── */}
+          {step === 4 && (
+            <div className={styles.gridItem}>
+              <Card className={styles.customCard} style={{ margin: '0 auto' }}>
+                <CardHeader className={styles.cardHeaderFlex}>
+                  <div className={styles.titleWithIcon}>
+                    <img src={ClipboardCheck} alt="Icono de confirmar" className={styles.cardIconImg} />
+                    <CardTitle className={styles.cardTitleText}>Revisar y confirmar</CardTitle>
+                  </div>
+                  <CardDescription className={styles.cardDescriptionText}>
+                    Revisá que esté todo bien antes de registrar la orden.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className={styles.infoGrid}>
+                    <div className={styles.infoRow}>
+                      <span className={styles.label}>Cliente</span>
+                      <span className={styles.value}>{selectedClient?.clientName || "---"}</span>
+                    </div>
+                    <div className={styles.infoRow}>
+                      <span className={styles.label}>Equipo</span>
+                      <span className={styles.value}>
+                        {selectedEquipment
+                          ? `${selectedEquipment.brand} ${selectedEquipment.model}`
+                          : `${deviceValues.brand} ${deviceValues.model}`}
+                      </span>
+                    </div>
+                    <div className={styles.infoRow}>
+                      <span className={styles.label}>Fallas cargadas</span>
+                      <span className={styles.value}>{fallas.filter((f) => f.id_failure_type !== null).length}</span>
+                    </div>
+                    <div className={styles.infoRow}>
+                      <span className={styles.label}>Fecha estimada</span>
+                      <span className={styles.value}>{estimatedDeliveryDate || "Sin definir"}</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </div>
 
         {/* ── Feedback de envío — antes no existía nada visible para el usuario ── */}

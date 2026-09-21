@@ -45,7 +45,6 @@ const ClientMiniCard = ({
     const date = new Date(dateValue);
     if (isNaN(date.getTime())) return String(dateValue);
 
-    // Ejemplo: "14/07/2026"
     return new Intl.DateTimeFormat('es-AR', {
       day: '2-digit',
       month: '2-digit',

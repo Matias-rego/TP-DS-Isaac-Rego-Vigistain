@@ -4,6 +4,10 @@ import type { StatusQueryDto } from "./status.schema.js";
 import { BaseRepository } from "@/shared/base.repository.js";
 import { v7 as uuidv7 } from "uuid";
 import { StatusHistory } from "./status.entity.js";
+import type { PrismaClient, Prisma } from "@/generated/prisma/client.js";
+
+type Db = PrismaClient | Prisma.TransactionClient;
+
 
 export class StatusHistoryRepository extends BaseRepository<StatusHistory, StatusQueryDto> {
 
@@ -81,8 +85,8 @@ export class StatusHistoryRepository extends BaseRepository<StatusHistory, Statu
         return entries.map((entry) => this.toDomain(entry));
     }
 
-    public async create(item: StatusHistory): Promise<StatusHistory> {
-        const entry = await this.prisma.status_History.create({
+    public async create(item: StatusHistory, db: Db = this.prisma): Promise<StatusHistory> {
+        const entry = await db.status_History.create({
             data: {
                 id_status_history: uuidv7(),
                 id_order: item.id_order,
@@ -95,8 +99,8 @@ export class StatusHistoryRepository extends BaseRepository<StatusHistory, Statu
         return this.toDomain(entry);
     }
 
-    public async update(id: string, item: Partial<StatusHistory>): Promise<StatusHistory | undefined> {
-        const entry = await this.prisma.status_History.update({
+    public async update(id: string, item: Partial<StatusHistory>, db: Db = this.prisma): Promise<StatusHistory | undefined> {
+        const entry = await db.status_History.update({
             where: {
                 id_status_history: id,
             },

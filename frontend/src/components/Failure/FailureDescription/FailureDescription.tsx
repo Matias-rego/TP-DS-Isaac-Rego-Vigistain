@@ -38,7 +38,7 @@ const FailureDescription = ({
       if (!result.ok) throw new Error(`Error ${result.status}`);
 
       const response: PaginatedResponse<Failure_Type> = await result.json();
-      setTiposFallas(response.data); // <--- Extraés el arreglo desde .data
+      setTiposFallas(response.data); 
     } catch (error) {
       console.error("Error al buscar tipos de falla:", error);
       setTiposFallas([]);

@@ -12,7 +12,7 @@ export const registerSchema = z.object({
     username: username,
     password: password,
     email: email,
-    urlPicture: url,
+    urlPicture: url.optional(),
 }).strict();
 
 export type RegisterDto = z.infer<typeof registerSchema>;

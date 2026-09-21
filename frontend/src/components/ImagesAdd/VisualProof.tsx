@@ -4,10 +4,8 @@ import styles from "./VisualProof.module.css";
 import { uploadFoto } from "@/lib/upload";
 
 interface VisualProofProps {
-  /** URL de la foto ya subida */
   value: string | null;
 
-  /** Se llama con la URL devuelta por /api/uploads, o null si se quita */
   onChange: (url: string | null) => void;
 }
 

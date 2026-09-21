@@ -1,0 +1,90 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #F5F7FA;
+}
+
+.main {
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 28px 32px 50px;
+  box-sizing: border-box;
+}
+
+/* ================================
+   CABECERA DE ORDEN
+================================ */
+
+.orderHeader {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+/* ================================
+   PIPELINE
+================================ */
+
+.pipelineSection {
+  width: 100%;
+  margin-bottom: 28px;
+}
+
+/* ================================
+   CONTENIDO PRINCIPAL
+================================ */
+
+.contentGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(380px, 0.85fr);
+  gap: 24px;
+  align-items: start;
+}
+
+/* ================================
+   COLUMNA CLIENTE + EQUIPO
+================================ */
+
+.detailsColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+
+/* ================================
+   PRESUPUESTO
+================================ */
+
+.budgetColumn {
+  min-width: 0;
+}
+
+/* ================================
+   RESPONSIVE
+================================ */
+
+@media (max-width: 1100px) {
+  .contentGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .budgetColumn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 700px) {
+  .main {
+    padding: 20px 16px 40px;
+  }
+
+  .contentGrid {
+    gap: 18px;
+  }
+
+  .detailsColumn {
+    gap: 18px;
+  }
+}
