@@ -8,10 +8,10 @@
 
 */
 -- AlterTable
-ALTER TABLE `budget` ADD COLUMN `nroBudget` INTEGER NOT NULL;
+ALTER TABLE `Budget` ADD COLUMN `nroBudget` INTEGER NOT NULL;
 
 -- AlterTable
-ALTER TABLE `order` ADD COLUMN `nroOrder` INTEGER NOT NULL;
+ALTER TABLE `Order` ADD COLUMN `nroOrder` INTEGER NOT NULL;
 
 -- CreateIndex
 CREATE UNIQUE INDEX `Budget_nroBudget_key` ON `Budget`(`nroBudget`);

@@ -24,10 +24,6 @@ function getLatestStatus(history?: Status_History[]) {
   )[0];
 }
 
-function formatDate(value?: string | Date | null) {
-  if (!value) return null;
-  return new Intl.DateTimeFormat('es-AR', { day: '2-digit', month: 'short' }).format(new Date(value));
-}
 
 function formatMoney(value?: number | null) {
   if (value === null || value === undefined) return null;

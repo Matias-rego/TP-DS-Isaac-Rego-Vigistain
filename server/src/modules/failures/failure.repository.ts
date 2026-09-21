@@ -2,7 +2,7 @@ import { BaseRepository } from "@/shared/base.repository.js";
 import type { PaginatedResult } from "@/shared/base.repository.js";
 import type { FailureQueryDto } from "./failure.schema.js";
 import { Failure } from "./failure.entity.js";
-import type { Failure as Failure_P , Prisma } from "@/generated/prisma/client.js";
+import type { Failure as Failure_P, Prisma } from "@/generated/prisma/client.js";
 import { v7 as uuidv7 } from "uuid";
 
 type FailureWithType = Failure_P & Prisma.FailureGetPayload<{ include: { failureType: true } }>;
@@ -95,7 +95,7 @@ export class FailureRepository extends BaseRepository<Failure, FailureQueryDto> 
                         description: item.description,
                         status: item.status,
                     },
-                    include : { failureType: true},
+                    include: { failureType: true },
                 }),
             ),
         );
@@ -104,12 +104,14 @@ export class FailureRepository extends BaseRepository<Failure, FailureQueryDto> 
     }
 
     public async update(id: string, item: Partial<Failure>): Promise<Failure | undefined> {
+        const { failureType: _failureType, ...rest } = item;
+
         const failure = await this.prisma.failure.update({
             where: {
                 id_failure: id,
             },
             data: {
-                ...item,
+                ...rest,
             },
             include: { failureType: true },
         });

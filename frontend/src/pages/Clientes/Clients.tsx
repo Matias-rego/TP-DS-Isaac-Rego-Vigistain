@@ -146,10 +146,10 @@ const Clientes = () => {
           <SearchBar<Client>
             showFilters={true}
             filters={CLIENT_FILTERS}
-            searchEndpoint="/api/clients"
+            searchEndpoint="/api/clients/search/"
             searchPlaceholder="Buscar clientes por nombre, apellido o correo electrónico"
-            onResults={(data) => setResults(data.data)}
-            onClear={() => setResults([])}
+            onResults={(data) => setResults(data)}
+            onClear={() => setResults(null)}
           />
         </div>
 

@@ -2,7 +2,7 @@ import Nav from "@/pages/Nav/Nav";
 import Footer from "@/components/Footer/Footer";
 import styles from "./OrderDirectory.module.css";
 import '../../../index.css';
-import { useEffect, useMemo, useState, useCallback, type ReactElement } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import type { Order, EnumOrderStatus, Status_History } from "@/types/types";
 import { Wrench, FileText, AlertTriangle, Banknote } from "lucide-react";
 import DescriptiveMiniCard from "@/components/Common/Cards/DescriptiveMiniCard/DescriptiveMiniCard";
