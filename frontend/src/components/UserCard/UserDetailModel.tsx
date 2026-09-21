@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
 import DetailModal from "../Modals/DetailModal";
-import type { DetailFieldConfig, DetailItemConfig, DetailModalAction } from "../Modals/DetailModal";
+import type { DetailFieldConfig, DetailItemConfig } from "../Modals/DetailModal";
 import styles from './UserDetailModal.module.css';
 import { eventBus } from "@/lib/eventBus";
 import { BACKEND_URL } from "@/lib/config";
 import ActionButton from "../Common/Buttons/ActionButton";
 import ConfirmDialog from "../Common/ConfirmDialog/ConfirmDialog";
-import type { User as UserBase, PaginatedResponse} from "@/types/types";
+import type { User as UserBase } from "@/types/types";
 
 interface User extends UserBase {
-  onClick?: (id: number) => void;
+  onClick?: (id: string) => void;
 }
 
 interface OrderSummary {

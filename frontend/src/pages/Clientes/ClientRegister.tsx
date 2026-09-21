@@ -1,4 +1,4 @@
-import { eventBus, EVENTS } from "@/lib/eventBus";
+import { EVENTS } from "@/lib/eventBus";
 import AltaForm from "../CRUDS/Alta/AltaForm";
 import type { FieldConfig } from "../CRUDS/Alta/AltaForm";
 

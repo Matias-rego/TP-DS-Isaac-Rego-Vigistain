@@ -39,3 +39,20 @@ const server = httpServer.listen(config.PORT, () => {
         console.log(`Servidor: http://${address.address}:${address.port}`);
     }
 });
+
+function shutdown(signal: string) {
+    console.log(`\n${signal} received, shutting down server...`);
+    server.close(() => {
+        console.log('HTTP server closed.');
+        process.exit(0);
+    });
+
+    // In case something is left hanging (open connections, etc.)
+    setTimeout(() => {
+        console.error('Forcing shutdown after timeout.');
+        process.exit(1);
+    }, 10000).unref();
+}
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));

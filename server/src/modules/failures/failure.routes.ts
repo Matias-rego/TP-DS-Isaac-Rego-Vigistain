@@ -17,7 +17,7 @@ const budgetRepo = new BudgetRepository(prisma);
 const addedCostRepo = new AddedCostRepository(prisma);
 const orderRepo = new OrderRepository(prisma);
 const statusRepo = new StatusHistoryRepository(prisma);
-const statusService = new StatusService(statusRepo, orderRepo);
+const statusService = new StatusService(statusRepo, orderRepo, budgetRepo);
 const budgetService = new BudgetService(budgetRepo, addedCostRepo, statusService);
 
 const ctrl = new FailureController(

@@ -4,7 +4,7 @@ import type { BudgetQueryDto } from "./budget.schema.js";
 import type { BudgetRepository } from "./budget.repository.js";
 import type { AddedCostRepository } from "@/modules/addedCosts/addedcost.repository.js";
 import type { StatusService } from "@/modules/status/status.service.js";
-import { Budget } from "./budget.entity.js";
+import type { Budget } from "./budget.entity.js";
 
 interface CreateBudgetInput {
     id_order: string;
