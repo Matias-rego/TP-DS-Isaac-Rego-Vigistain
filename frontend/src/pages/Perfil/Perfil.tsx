@@ -7,17 +7,6 @@ import { Badge } from '@/components/ui/badge';
 import { BACKEND_URL } from '@/lib/config';
 import styles from './Perfil.module.css';
 import type { User } from "../../types/types";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-
-
 
 const Perfil = () => {
   const [usuario, setUsuario] = useState<User | null>(null);

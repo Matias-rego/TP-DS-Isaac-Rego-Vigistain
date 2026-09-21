@@ -72,7 +72,6 @@ const DeviceForm = ({ values, onChange }: DeviceFormProps) => {
 
   return (
     <div className={styles.form}>
-      {/* ── Tipo de dispositivo ── */}
       <div className={styles.group}>
         <label className={styles.label}>
           Tipo de dispositivo <span className={styles.required}>*</span>
@@ -105,7 +104,6 @@ const DeviceForm = ({ values, onChange }: DeviceFormProps) => {
         )}
       </div>
 
-      {/* ── Marca y Modelo ── */}
       <div className={styles.row}>
         <div className={styles.group}>
           <label htmlFor="brand" className={styles.label}>
@@ -142,7 +140,6 @@ const DeviceForm = ({ values, onChange }: DeviceFormProps) => {
         </div>
       </div>
 
-      {/* ── Observaciones ── */}
       <div className={styles.group}>
         <label htmlFor="observations" className={styles.label}>
           Observaciones

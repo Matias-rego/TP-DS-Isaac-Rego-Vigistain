@@ -2,9 +2,10 @@ import type { PaginatedResult } from "@/shared/base.repository.js";
 import type { CreateFailuresDto, FailureQueryDto } from "./failure.schema.js";
 import type { FailureRepository } from "./failure.repository.js";
 import { Failure } from "./failure.entity.js";
+import { BudgetService } from "../budgets/budget.service.js";
 
 export class FailureService {
-    constructor(private repo: FailureRepository) { }
+    constructor(private repo: FailureRepository, private budgetService: BudgetService) { }
 
     findAll(query?: FailureQueryDto): Promise<PaginatedResult<Failure>> {
         return this.repo.findAll(query);
@@ -14,19 +15,17 @@ export class FailureService {
         return this.repo.findById(id);
     }
 
-    findByEquipmentId(id_equipment: string): Promise<Failure[]> {
-        return this.repo.findByEquipmentId(id_equipment);
+    findByOrderId(id_order: string): Promise<Failure[]> {
+        return this.repo.findByOrderId(id_order);
     }
 
     // Mapea "failureDescription" (nombre del campo en el DTO) a
     // "description" (nombre real del campo en el entity/modelo). Sin
-    // status: no hay un estado "recién creada" en tu enum (solo
-    // diagnosticada/resuelta), así que queda sin definir hasta que se
-    // diagnostique.
+    // status: dejamos que la DB aplique su @default(diagnosticada).
     createMany(items: CreateFailuresDto): Promise<Failure[]> {
         const failures = items.map((item) => new Failure(
             item.id_failure_type,
-            item.id_equipment,
+            item.id_order,
             item.failureDescription,
         ));
 
@@ -39,5 +38,8 @@ export class FailureService {
 
     delete(id: string): Promise<{ id: string } | undefined> {
         return this.repo.delete(id);
+    }
+    async sumFailureCosts(id_order: string): Promise<number>{
+        return this.budgetService.sumFailureCost(id_order);
     }
 }

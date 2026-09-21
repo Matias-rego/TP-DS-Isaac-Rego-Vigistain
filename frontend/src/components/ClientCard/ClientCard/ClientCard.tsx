@@ -1,22 +1,12 @@
 import styles from './ClientCard.module.css';
+import type { Client } from '@/types/types';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-export interface ClientCardProps {
-  id_client: string;
-  clientName: string;
-  clientEmail: string;
-  clientPhone: string;
-  cuit: string;
-  dateOfRegistration: Date | string;
-  status?: boolean;
+export interface ClientCardProps extends Client {
   categoryClientName?: string;
   lastRepair?: string;
   tags?: string[];
   onClick?: (id: string) => void;
 }
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function getInitials(nombre: string): string {
   return nombre
@@ -66,7 +56,6 @@ export default function ClientCard({
       className={`${styles.card} ${!status ? styles.inactive : ''}`}
       onClick={() => onClick?.(id_client)}
     >
-      {/* ── Header ── */}
       <div className={styles.header}>
         <div
           className={styles.avatar}
@@ -80,7 +69,6 @@ export default function ClientCard({
         </div>
       </div>
 
-      {/* ── Info ── */}
       <div className={styles.infoBox}>
         {lastRepair && (
           <div className={styles.infoRow}>
@@ -101,7 +89,6 @@ export default function ClientCard({
         </div>
       </div>
 
-      {/* ── Tags ── */}
       {(categoryClientName || tags.length > 0) && (
         <div className={styles.tags}>
           {categoryClientName && (

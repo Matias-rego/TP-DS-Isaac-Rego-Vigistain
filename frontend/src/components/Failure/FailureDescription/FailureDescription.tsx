@@ -8,8 +8,8 @@ import type { Failure_Type, PaginatedResponse} from "@/types/types";
   interface FailureDescriptionProps {
     description: string;
     onChangeDescription: (value: string) => void;
-    selectedFailureType: number | null;
-    onChangeSelectedFailureType: (id: number | null) => void;
+    selectedFailureType: string | null;
+    onChangeSelectedFailureType: (id: string | null) => void;
     placeholder?: string;
   }
 
@@ -38,7 +38,7 @@ const FailureDescription = ({
       if (!result.ok) throw new Error(`Error ${result.status}`);
 
       const response: PaginatedResponse<Failure_Type> = await result.json();
-      setTiposFallas(response.data); // <--- Extraés el arreglo desde .data
+      setTiposFallas(response.data); 
     } catch (error) {
       console.error("Error al buscar tipos de falla:", error);
       setTiposFallas([]);
@@ -52,7 +52,7 @@ const FailureDescription = ({
   }, [authLoading, isAuth, findCategories]);
 
   // Click en un tag: lo selecciona. Si ya estaba seleccionado, lo deselecciona (toggle off).
-  const handleTagClick = (id: number) => {
+  const handleTagClick = (id: string) => {
     if (selectedFailureType === id) {
       onChangeSelectedFailureType(null);
     } else {

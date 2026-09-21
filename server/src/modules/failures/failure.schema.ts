@@ -6,7 +6,7 @@ export const createFailuresSchema = z.array(
     z.object({
         id_failure_type: id,
         failureDescription: description,
-        id_equipment: id,
+        id_order: id,
     }).strict(),
     {
         error: (issue) => {
@@ -33,3 +33,10 @@ export const failureQuerySchema = QuerySchema.extend({
 });
 
 export type FailureQueryDto = z.infer<typeof failureQuerySchema>;
+
+export const modifyFailureSchema = z.object({
+  id_failure_type: id,
+  description: description,
+}).strict();
+
+export type ModifyFailuresDto = z.infer<typeof modifyFailureSchema>;

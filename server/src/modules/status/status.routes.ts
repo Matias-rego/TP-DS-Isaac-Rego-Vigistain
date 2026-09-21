@@ -7,15 +7,15 @@ import { StatusController } from './status.controller.js';
 import { StatusService } from './status.service.js';
 import { StatusHistoryRepository } from './status.repository.js';
 import { OrderRepository } from '@/modules/orders/order.repository.js';
-// NOTA: ajustá esta ruta de import al nombre/ubicación real de tu middleware
-// de autenticación (el que exporta la función `authenticate`).
 import authenticate from '@/middlewares/authenticate.middleware.js';
+import { BudgetRepository } from '../budgets/budget.repository.js';
 
 const statusRepo = new StatusHistoryRepository(prisma);
 const orderRepo = new OrderRepository(prisma);
+const budgetRepo = new BudgetRepository(prisma);
 
 const ctrl = new StatusController(
-  new StatusService(statusRepo, orderRepo)
+  new StatusService(statusRepo, orderRepo, budgetRepo)
 );
 
 const router = Router();

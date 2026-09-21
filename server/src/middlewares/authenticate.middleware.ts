@@ -4,12 +4,6 @@ import type { $Enums } from "@/database/prisma.js";
 import { config } from '@/utils/config.js';
 import type { AccessTokenPayload } from "@/modules/auths/auth.type.js";
 
-declare module "express-serve-static-core" {
-  interface Request {
-    user?: AccessTokenPayload;
-  }
-}
-
 export const authenticate = (allowedRoles: $Enums.EnumRol[] = []) => {
   return (req: Request, res: Response, next: NextFunction) => {
     const token = req.cookies?.access_token;

@@ -4,10 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import type { User } from '../../types/types';
 import { BACKEND_URL } from '@/lib/config';
-import { LogOut, X, Home, Wrench, ClipboardList, Users, User as UserIcon } from 'lucide-react';
+import { LogOut, X, Home, ClipboardList, Users, User as UserIcon } from 'lucide-react';
 import ThemeToggle from '../../components/Toggle/ThemeToggle/ThemeToggle';
 import { useAuth } from '@/lib/AuthContext';
-import userPlusIcon from "@/assets/userPlusIcon.svg";
 import UserToggle from '@/components/Toggle/UserToggle/UserToggle';
 
 // Logo de TechFix (icono transparente en Cloudinary)
@@ -100,15 +99,6 @@ const Nav = () => {
           <li>
             <button type="button" className={styles.navButton} onClick={() => navigate('/home')}>
               Inicio
-            </button>
-          </li>
-          <li>
-            <button
-              type="button"
-              className={styles.navButton}
-              onClick={() => alert('La sección Servicios todavía está en desarrollo.')}
-            >
-              Servicios
             </button>
           </li>
           <li>
@@ -224,14 +214,6 @@ const Nav = () => {
           >
             <span className={styles.drawerLinkIcon}><Home size={20} /></span>
             Inicio
-          </button>
-          <button
-            type="button"
-            className={styles.drawerLink}
-            onClick={() => { setMenuOpen(false); alert('La sección Servicios todavía está en desarrollo.'); }}
-          >
-            <span className={styles.drawerLinkIcon}><Wrench size={20} /></span>
-            Servicios
           </button>
           <button
             type="button"
