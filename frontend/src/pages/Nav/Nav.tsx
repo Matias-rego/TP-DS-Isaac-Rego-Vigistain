@@ -4,10 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import type { User } from '../../types/types';
 import { BACKEND_URL } from '@/lib/config';
-import { LogOut, X, Home, Wrench, ClipboardList, Users, User as UserIcon } from 'lucide-react';
+import { LogOut, X, Home, ClipboardList, Users, User as UserIcon } from 'lucide-react';
 import ThemeToggle from '../../components/Toggle/ThemeToggle/ThemeToggle';
 import { useAuth } from '@/lib/AuthContext';
-import userPlusIcon from "@/assets/userPlusIcon.svg";
 import UserToggle from '@/components/Toggle/UserToggle/UserToggle';
 
 // Logo de TechFix (icono transparente en Cloudinary)

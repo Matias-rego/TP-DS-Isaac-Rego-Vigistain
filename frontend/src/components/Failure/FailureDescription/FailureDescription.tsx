@@ -51,6 +51,7 @@ const FailureDescription = ({
     }
   }, [authLoading, isAuth, findCategories]);
 
+  // Click en un tag: lo selecciona. Si ya estaba seleccionado, lo deselecciona (toggle off).
   const handleTagClick = (id: string) => {
     if (selectedFailureType === id) {
       onChangeSelectedFailureType(null);

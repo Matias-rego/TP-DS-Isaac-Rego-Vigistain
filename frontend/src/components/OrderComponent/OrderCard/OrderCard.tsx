@@ -24,6 +24,7 @@ function getLatestStatus(history?: Status_History[]) {
   )[0];
 }
 
+
 function formatMoney(value?: number | null) {
   if (value === null || value === undefined) return null;
   return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(value);

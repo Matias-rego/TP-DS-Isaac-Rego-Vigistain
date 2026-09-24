@@ -4,3 +4,6 @@ allowBuilds:
   bcrypt: true
   esbuild: true
   prisma: true
+
+overrides:
+  '@types/express-serve-static-core': '5.1.1'

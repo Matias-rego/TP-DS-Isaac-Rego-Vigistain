@@ -4,7 +4,7 @@ import ConfirmDialog from "@/components/Common/ConfirmDialog/ConfirmDialog";
 import { Trash2 } from "lucide-react";
 import { BACKEND_URL } from "@/lib/config";
 import styles from "./AddedCostBudgetTable.module.css";
-import type { AddedCost, EnumTypeAddedCost } from "@/types/types"
+import type { EnumTypeAddedCost } from "@/types/types"
 
 const TYPE_LABELS: Record<EnumTypeAddedCost, string> = {
   respuesto: "Repuesto",
@@ -32,18 +32,10 @@ export interface AddedCostBudgetTableProps {
   allowAdd?: boolean;
 }
 
-const createEmptyRow = (): AddedCostRow => ({
-  rowId: crypto.randomUUID(),
-  type_addedCost: "respuesto",
-  addedCostDescription: "",
-  addedCostAmount: 0,
-});
-
 const AddedCostBudgetTable = ({
   items,
   onChange,
   disabled = false,
-  allowAdd = true,
 }: AddedCostBudgetTableProps) => {
 
   const [deletingRowId, setDeletingRowId] = useState<string | null>(null);
@@ -53,9 +45,6 @@ const AddedCostBudgetTable = ({
 
   const updateRow = (rowId: string, patch: Partial<AddedCostRow>) => {
     onChange(items.map((row) => (row.rowId === rowId ? { ...row, ...patch } : row)));
-  };
-  const addRow = () => {
-    onChange([...items, createEmptyRow()]);
   };
   const confirmRemove = async () => {
     if (!pendingDelete) return;
