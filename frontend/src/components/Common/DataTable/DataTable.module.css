@@ -1,8 +1,8 @@
-/* TableRtl.module.css */
+drawer/* TableRtl.module.css */
 
 .tableContainer {
     width: 100%;
-    overflow-x: auto;
+    overflow-x: scroll; /* scroll (no auto): la barra queda siempre visible para poder agarrarla */
     max-height: 350px;
     overflow-y: auto;
     border-radius: 24px;
@@ -14,18 +14,19 @@
     );
     border: 1px solid rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(14px);
-    /*box-shadow:
+    box-shadow:
         0 10px 30px rgba(0, 0, 0, 0.35),
         inset 0 1px 0 rgba(255, 255, 255, 0.04);
-        */
     padding: 1rem;
 }
+
 .tableBody {
   max-height: 300px;
   overflow-y: auto;
 }
 .table {
   width: 100%;
+  min-width: 640px;
   border-collapse: collapse;
   color: #f8fafc;
   font-family: "Geist Variable", sans-serif;
@@ -135,18 +136,21 @@
 /* Scrollbar */
 
 .tableContainer::-webkit-scrollbar {
-  height: 8px;
+  height: 14px; /* más alta = más fácil de agarrar con el mouse */
 }
 
 .tableContainer::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.tableContainer::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.4);
+  background: rgba(148, 163, 184, 0.2); /* pista visible (antes transparente = no se veía) */
   border-radius: 999px;
 }
 
+.tableContainer::-webkit-scrollbar-thumb {
+  background: rgba(59, 130, 246, 0.85); /* azul, bien visible */
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
 .tableContainer::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.7);
+  background: rgba(59, 130, 246, 1);
 }
