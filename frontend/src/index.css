@@ -1,15 +1,11 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+
 @import "@fontsource-variable/geist";
 
-@source "../node_modules/embla-carousel";
-@source inline("{bg,text,border,ring,shadow}-{slate,zinc,neutral,stone,gray,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-{50,100,200,300,400,500,600,700,800,900,950}");
-@source inline("{p,px,py,pt,pb,pl,pr,m,mx,my,mt,mb,ml,mr}-{0,1,2,3,4,5,6,7,8,9,10,11,12,14,16,20,24,28,32}");
-@source inline("{w,h,max-w,min-w}-{full,screen,auto,fit,max,min,0,1,2,3,4,5,6,7,8,9,10,11,12,14,16,20,24,28,32,36,40,48,56,64,72,80,96}");
-@source inline("flex flex-col flex-row flex-wrap items-{start,end,center,baseline,stretch} justify-{start,end,center,between,around,evenly}");
-@source inline("rounded{,-sm,-md,-lg,-xl,-2xl,-full} border{,-t,-b,-l,-r} font-{thin,light,normal,medium,semibold,bold,extrabold,black}");
-@source inline("opacity-{0,5,10,20,25,30,40,50,60,70,75,80,90,95,100} shadow{,-sm,-md,-lg,-xl,-2xl} overflow-{hidden,auto,scroll,visible}");
-
+html {
+  /* clave en mobile: el drawer off-canvas (position:fixed) se sale a la derecha;
+     body overflow-x no alcanza a recortarlo, html sí. Mata el scroll horizontal global */
+  overflow-x: hidden;
+}
 body {
   margin: 0;
   padding: 0;
@@ -92,8 +88,6 @@ body {
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 }
-
-@custom-variant dark (&:is(.dark *));
 
 * {
   box-sizing: border-box;
@@ -233,7 +227,7 @@ a {
   box-shadow: 0 16px 36px rgba(229, 57, 53, 0.32);
 }
 
-@theme inline {
+:root {
   --font-heading: var(--font-sans);
   --font-sans: 'Geist Variable', sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
@@ -324,17 +318,16 @@ a {
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-  html {
-    @apply font-sans;
-  }
-}
+     @layer base {
+       * {
+         border-color: var(--border);
+       }
+  
+       html {
+         font-family: var(--font-sans, 'Geist Variable', sans-serif);
+       }
+     }
+
 [data-radix-popper-content-wrapper] {
   z-index: 99999 !important;
 }
@@ -344,6 +337,13 @@ a {
   margin-bottom: 0 !important;
 }
 
-[data-side="bottom-center"] ~ * {
-  padding-bottom: 0 !important;
+[data-slot="badge"] {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--tf-primary-soft);
+  color: var(--tf-primary);
+  font-size: 0.8rem;
+  font-weight: 600;
 }
