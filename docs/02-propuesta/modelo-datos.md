@@ -48,21 +48,21 @@ erDiagram
         EnumEquipmentType tipo_equipment
         string brand
         string model
-        string observations nullable
+        string observations "nullable"
         string id_client FK
     }
     Order {
         string id_order PK
         int nroOrder UK
         string id_equipment FK
-        string id_user FK nullable
+        string id_user "FK, nullable"
         EnumOrderStatus status
-        string observations nullable
-        string equipmentPhotoUrl nullable
+        string observations "nullable"
+        string equipmentPhotoUrl "nullable"
         datetime dateOfEntry
-        datetime estimatedDate nullable
-        datetime deliveryDate nullable
-        decimal totalCharged nullable
+        datetime estimatedDate "nullable"
+        datetime deliveryDate "nullable"
+        decimal totalCharged "nullable"
     }
     Failure_Type {
         string id_failure_type PK
@@ -83,12 +83,12 @@ erDiagram
         string id_user FK
         EnumOrderStatus status
         datetime dateOfChange
-        string comment nullable
+        string comment "nullable"
     }
     Budget {
         string id_budget PK
         int nroBudget UK
-        string id_order FK UK
+        string id_order "FK, UK"
         decimal laborCost
         decimal discount
         EnumBudgetStatus status
