@@ -23,118 +23,126 @@ El negocio consiste en un taller de reparaciones de dispositivos electrónicos q
 
 ```mermaid
 erDiagram
-    %% Enums Representation (Visualized as documentation notes or conceptual blocks)
-    %% In Mermaid we represent models as entities and their properties
-
     USER {
-        int id_user PK
+        string id_user PK
         string userName UK
         string email UK
         string password_hash
         EnumRol rol
         boolean status
+        boolean validationStatus
         string urlPicture
     }
 
     CLIENT {
-        int id_client PK
-        string clientName UK
+        string id_client PK
+        string clientName
         string clientEmail UK
         string clientPhone
-        string dniCuit UK
+        string cuit UK
         DateTime dateOfRegistration
         boolean status
-        int id_category_client FK
+        string id_client_type FK
     }
 
-    CATEGORY_CLIENT {
-        int id_category_client PK
-        string categoryClientName UK
+    CLIENT_TYPE {
+        string id_client_type PK
+        string clientTypeName UK
         int amountForCategoryUp
     }
 
     FAILURE_TYPE {
-        int id_failure_type PK
+        string id_failure_type PK
         string failureDescription UK
-        float estimatedImport
+        Decimal estimatedImport
     }
 
     FAILURE {
-        int id_failure PK
-        int id_failure_type FK
-        int id_equipment FK
+        string id_failure PK
+        string id_failure_type FK
+        string id_order FK
         string description
         DateTime dateOfFailure
         EnumFailureStatus status
     }
 
     EQUIPMENT {
-        int id_equipment PK
-        string tipo_equipment
+        string id_equipment PK
+        EnumEquipmentType tipo_equipment
         string brand
         string model
-        string observations
-        int id_client FK
+        string observations "nullable"
+        string id_client FK
     }
 
     ORDER {
-        int id_order PK
-        int id_equipment FK
-        int id_user FK "nullable"
+        string id_order PK
+        int nroOrder UK
+        string id_equipment FK
+        string id_user FK "nullable"
         EnumOrderStatus status
         string observations "nullable"
         string equipmentPhotoUrl "nullable"
         DateTime dateOfEntry
         DateTime estimatedDate "nullable"
         DateTime deliveryDate "nullable"
-        float totalCharged "nullable"
+        Decimal totalCharged "nullable"
     }
 
     STATUS_HISTORY {
-        int id_status_history PK
-        int id_order FK
-        string previousStatus
-        string newStatus
-        int id_user FK
+        string id_status_history PK
+        string id_order FK
+        EnumOrderStatus status
+        string id_user FK
         DateTime dateOfChange
         string comment "nullable"
     }
 
     BUDGET {
-        int id_budget PK
-        int id_order FK "unique"
-        float laborCost
-        float discount
-        float estimatedTotal
+        string id_budget PK
+        int nroBudget UK
+        string id_order FK "unique"
+        Decimal laborCost
+        Decimal discount
         EnumBudgetStatus status
+        DateTime budgetDate
+    }
+
+    ADDED_COST {
+        string id_addedCost PK
+        string id_budget FK
+        EnumTypeAddedCost type_addedCost
+        string addedCostDescription
+        Decimal addedCostAmount
     }
 
     PAYMENT_TYPE {
-        int id_payment_type PK
+        string id_payment_type PK
         string paymentTypeName UK
         EnumPaymentMethod paymentMethod
         EnumPaymentType type_of_payment
-        float percentaje
+        Decimal percentage
     }
 
     PAYMENT {
-        int id_payment PK
-        int id_payment_type FK
-        int id_budget FK
+        string id_payment PK
+        string id_payment_type FK
+        string id_budget FK
         DateTime dateOfPayment
-        float amount
+        Decimal amount
     }
 
     %% Relationships
-    CATEGORY_CLIENT ||--o{ CLIENT : "has clients"
+    CLIENT_TYPE ||--o{ CLIENT : "has clients"
     CLIENT ||--o{ EQUIPMENT : "owns equipments"
-    EQUIPMENT ||--o{ FAILURE : "reports failures"
-    FAILURE_TYPE ||--o{ FAILURE : "categorizes failure"
     EQUIPMENT ||--o{ ORDER : "belongs to order"
+    ORDER ||--o{ FAILURE : "contains failures"
+    FAILURE_TYPE ||--o{ FAILURE : "categorizes failure"
     USER ||--o{ ORDER : "manages order"
     ORDER ||--o{ STATUS_HISTORY : "tracks status changes"
     USER ||--o{ STATUS_HISTORY : "authorizes changes"
     ORDER ||--|| BUDGET : "has budget"
+    BUDGET ||--o{ ADDED_COST : "includes additional costs"
     BUDGET ||--o{ PAYMENT : "collects payment"
     PAYMENT_TYPE ||--o{ PAYMENT : "processed via"
 ```
