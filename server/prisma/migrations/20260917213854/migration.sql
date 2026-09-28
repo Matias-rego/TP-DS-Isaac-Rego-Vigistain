@@ -5,4 +5,4 @@
 
 */
 -- AlterTable
-ALTER TABLE `budget` DROP COLUMN `estimatedTotal`;
+ALTER TABLE `Budget` DROP COLUMN `estimatedTotal`;

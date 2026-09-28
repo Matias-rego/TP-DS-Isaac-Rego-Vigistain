@@ -39,3 +39,10 @@
   border-color: var(--tf-primary);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--tf-primary) 20%, transparent);
 }
+
+/* ── Responsive mobile: el form de edición pasa a 1 columna ── */
+@media (max-width: 640px) {
+  .editFormGrid {
+    grid-template-columns: 1fr;
+  }
+}

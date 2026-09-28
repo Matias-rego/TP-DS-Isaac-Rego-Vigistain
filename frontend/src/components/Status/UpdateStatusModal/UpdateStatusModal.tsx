@@ -61,7 +61,7 @@ const UpdateStatusModal = ({ open, order, onClose, onConfirm }: UpdateStatusModa
 
   const [status, setStatus] = useState<EnumOrderStatus | undefined>(undefined);
   const [comment, setComment] = useState('');
-  const [notifyClient, setNotifyClient] = useState(false);
+  const [notifyClient] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { user } = useAuth();

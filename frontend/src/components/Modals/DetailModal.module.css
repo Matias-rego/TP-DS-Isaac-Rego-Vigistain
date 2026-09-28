@@ -304,3 +304,23 @@
   font-weight: 600;
   letter-spacing: 0.025em;
 }
+
+/* ── Responsive mobile ── */
+@media (max-width: 640px) {
+  /* de 2 columnas a 1: los campos quedaban muy apretados en celular */
+  .grid {
+    grid-template-columns: 1fr;
+    column-gap: 0;
+    row-gap: 1rem;
+  }
+  .header {
+    padding: 1rem 1.1rem;
+  }
+  .body {
+    padding: 1rem 1.1rem;
+  }
+  .footer {
+    padding: 0.85rem 1.1rem;
+    flex-wrap: wrap;
+  }
+}

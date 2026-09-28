@@ -5,4 +5,4 @@
 
 */
 -- AlterTable
-ALTER TABLE `addedcost` MODIFY `type_addedCost` ENUM('repuesto', 'procedimientoEspecial', 'garantia', 'reparacionExpress', 'limpiezaPuestaAPunto', 'serviciosSoftware') NOT NULL;
+ALTER TABLE `AddedCost` MODIFY `type_addedCost` ENUM('repuesto', 'procedimientoEspecial', 'garantia', 'reparacionExpress', 'limpiezaPuestaAPunto', 'serviciosSoftware') NOT NULL;

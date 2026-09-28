@@ -6,13 +6,13 @@
 
 */
 -- DropForeignKey
-ALTER TABLE `failure` DROP FOREIGN KEY `Failure_id_equipment_fkey`;
+ALTER TABLE `Failure` DROP FOREIGN KEY `Failure_id_equipment_fkey`;
 
 -- DropIndex
-DROP INDEX `Failure_id_equipment_fkey` ON `failure`;
+DROP INDEX `Failure_id_equipment_fkey` ON `Failure`;
 
 -- AlterTable
-ALTER TABLE `failure` DROP COLUMN `id_equipment`,
+ALTER TABLE `Failure` DROP COLUMN `id_equipment`,
     ADD COLUMN `id_order` CHAR(36) NOT NULL;
 
 -- AddForeignKey

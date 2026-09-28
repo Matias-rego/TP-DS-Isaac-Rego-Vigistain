@@ -4,11 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import type { User } from '../../types/types';
 import { BACKEND_URL } from '@/lib/config';
-import { LogOut, X, Home, Wrench, ClipboardList, Users, User as UserIcon } from 'lucide-react';
+import { LogOut, X, Home, ClipboardList, Users, User as UserIcon, UserRoundCog } from 'lucide-react';
 import ThemeToggle from '../../components/Toggle/ThemeToggle/ThemeToggle';
 import { useAuth } from '@/lib/AuthContext';
-import userPlusIcon from "@/assets/userPlusIcon.svg";
-import UserToggle from '@/components/Toggle/UserToggle/UserToggle';
+
 
 // Logo de TechFix (icono transparente en Cloudinary)
 const LOGO_URL = "https://res.cloudinary.com/dll6qurcd/image/upload/v1783738139/teckfixFvicon_qt61a7.png";
@@ -147,9 +146,9 @@ const Nav = () => {
 
 
         <div className={styles.mobileRight}>
-          {user?.rol === 'admin' && (
+        {/*  {user?.rol === 'admin' && (
             <UserToggle />
-          )}
+          )} */} 
           <ThemeToggle />
         {/*  <img
             src={usuario?.urlPicture}
@@ -232,6 +231,15 @@ const Nav = () => {
             <span className={styles.drawerLinkIcon}><Users size={20} /></span>
             Clientes
           </button>
+          {user?.rol === 'admin' && (     
+            <>
+              
+              <button type="button" className={styles.drawerLink} onClick={() => navigate('/userManagement')}>
+                <span className={styles.drawerLinkIcon}><UserRoundCog size={20}/></span>
+                Usuarios
+              </button>
+            </>
+          )}
           <button
             type="button"
             className={styles.drawerLink}
@@ -240,6 +248,8 @@ const Nav = () => {
             <span className={styles.drawerLinkIcon}><UserIcon size={20} /></span>
             Mi perfil
           </button>
+
+          
 
         </nav>
 

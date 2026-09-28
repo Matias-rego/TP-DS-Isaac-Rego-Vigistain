@@ -7,10 +7,12 @@ import type { StatusService } from "@/modules/status/status.service.js";
 import type { RegisterOrderDto } from "./order.schema.js";
 import { v7 as uuidv7 } from "uuid";
 
-type CreateOrderInput = RegisterOrderDto & {
+type CreateOrderInput = Omit<RegisterOrderDto, "estimatedDate"> & {
     status: Order["status"];
     dateOfEntry: Date;
+    estimatedDate?: Date;
 };
+
 export class OrderService {
     constructor(
         private prisma: PrismaClient,
@@ -76,27 +78,30 @@ export class OrderService {
                 tx,
             );
 
+            const id_order = order.id_order!;
+
             // 3. Crear fallas
             await tx.failure.createMany({
                 data: failures.map((f) => ({
                     id_failure: uuidv7(),
-                    id_order: order.id_order,
+                    id_order,
                     id_failure_type: f.id_failure_type,
                     description: f.description,
                 })),
             });
 
+
             // 4. Status history inicial (dentro de la misma transacción)
             if (id_user) {
                 await this.statusService.createFirstStatus(
-                    order.id_order,
+                    id_order,
                     id_user,
-                    order.status,
+                    order.status!,
                     tx, // <-- requiere que este método acepte un client transaccional
                 );
             }
 
-            return order.id_order;
+            return id_order;
         });
 
         // fuera de la transacción: releemos con todas las relaciones

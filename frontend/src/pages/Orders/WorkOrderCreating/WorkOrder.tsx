@@ -46,7 +46,6 @@ const WorkOrder = () => {
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [selectedEquipmentForModal, setSelectedEquipmentForModal] = useState<Equipment | null>(null);
   const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null);
-  const [equipmentRegistered, setEquipmentRegistered] = useState<Equipment | null>(null);
   const [showClientModal, setShowClientModal] = useState(false);
   const [registerClient, setRegisterClient] = useState(false);
   const [orderObservations, setOrderObservations] = useState("");

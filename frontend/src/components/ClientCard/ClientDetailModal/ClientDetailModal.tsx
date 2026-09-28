@@ -5,7 +5,6 @@ import styles from './ClientDetailModal.module.css';
 import { eventBus } from "@/lib/eventBus";
 import { BACKEND_URL } from "@/lib/config";
 import type { Equipment as EquipmentBase } from "@/types/types";
-import EquipmentMiniDescriptiveCard from "@/components/EquipmentComponent/EquipmentMiniDescriptiveCard/EquipmentMiniDescriptiveCard";
 import type { Client as BaseClient } from "@/types/types";
 import EquipmentDetailModal from "@/components/EquipmentComponent/EquipmentDetailModal/EquipmentDetailModal";
 import ConfirmDialog from "@/components/Common/ConfirmDialog/ConfirmDialog";

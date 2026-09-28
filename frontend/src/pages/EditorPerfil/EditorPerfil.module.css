@@ -348,3 +348,31 @@
   color: #dc2626;
   margin-top: -2px;
 }
+
+/* ── Responsive mobile ── */
+@media (max-width: 640px) {
+  .container {
+    padding: 12px;
+  }
+  .card {
+    padding: 24px 18px;
+  }
+  /* botones a ancho completo: en mobile el 40%/55% quedaban chiquitos y descentrados */
+  .button2,
+  .button3 {
+    width: 100%;
+  }
+  /* avatar y preview más chicos para no comerse la pantalla */
+  .avatarRoot {
+    width: 9rem;
+    height: 9rem;
+  }
+  .previewWrap,
+  .preview {
+    width: 120px;
+    height: 120px;
+  }
+  .dropZone {
+    width: 100%;
+  }
+}

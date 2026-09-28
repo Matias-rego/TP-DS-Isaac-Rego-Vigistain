@@ -1,6 +1,6 @@
 import type { $Enums } from "@/database/prisma.js";
 import type { Equipment, Client, Status_History, Failure } from "@/generated/prisma/client.js";
-import { Budget } from "@/modules/budgets/budget.entity.js"; // ajustá el path real si no es este
+import type { Budget } from "@/modules/budgets/budget.entity.js"; // ajustá el path real si no es este
 
 export class Order {
     constructor(

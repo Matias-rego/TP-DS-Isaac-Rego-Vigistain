@@ -18,7 +18,7 @@ interface FailureExt extends Omit<Failure, 'failureType'> {
 
 const STATUS_CONFIG: Record<EnumFailureStatus, { label: string; className: string }> = {
   DIAGNOSTICADA: { label: 'Diagnosticada', className: 'inProgress' },
-  RESUELTA:      { label: 'Resuelta',      className: 'resolved' },
+  RESUELTA: { label: 'Resuelta', className: 'resolved' },
 };
 
 export interface FailureMiniCardProps {
@@ -48,7 +48,7 @@ const failureFields: DetailFieldConfig<FailureExt>[] = [
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(value);
 
-const FailureMiniCard = ({ failure, onUpdated, onDeleted }: FailureMiniCardProps) => {
+const FailureMiniCard = ({ failure, onDeleted }: FailureMiniCardProps) => {
   const [showFailureDetailModal, setShowFailureDetailModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
@@ -161,8 +161,8 @@ const FailureMiniCard = ({ failure, onUpdated, onDeleted }: FailureMiniCardProps
           }}
           title={
             confirmingDelete ? 'Eliminar Falla'
-            : isEditing ? 'Editar Falla'
-            : 'Detalle de la Falla'
+              : isEditing ? 'Editar Falla'
+                : 'Detalle de la Falla'
           }
           data={isEditing ? formData : failure}
           fields={isEditing || confirmingDelete ? [] : failureFields}
@@ -171,9 +171,9 @@ const FailureMiniCard = ({ failure, onUpdated, onDeleted }: FailureMiniCardProps
             isEditing || confirmingDelete
               ? []
               : [
-                  { label: 'Editar Falla', variant: 'secondary', onClick: () => setIsEditing(true) },
-                  { label: 'Eliminar Falla', variant: 'danger', onClick: () => setConfirmingDelete(true) },
-                ]
+                { label: 'Editar Falla', variant: 'secondary', onClick: () => setIsEditing(true) },
+                { label: 'Eliminar Falla', variant: 'danger', onClick: () => setConfirmingDelete(true) },
+              ]
           }
           hideFooter={isEditing || confirmingDelete}
         >

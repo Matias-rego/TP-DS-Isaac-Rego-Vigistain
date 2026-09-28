@@ -13,11 +13,6 @@ export class ClientService {
     findById(id: string): Promise<Client | undefined> {
         return this.repo.findById(id);
     }
-
-    // Un cliente nuevo siempre arranca con 0 órdenes, así que se le asigna
-    // la categoría base. Si no existe ninguna categoría configurada,
-    // lanzamos error en vez de crear el cliente sin categoría (antes eso
-    // pasaba en silencio con un `connect` a un id undefined).
     async create(input: Omit<Client, "id_client">): Promise<Client | undefined> {
         const category = await this.repo.findDefaultCategoryForOrderCount(0);
 

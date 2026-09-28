@@ -290,7 +290,7 @@ export default function BudgetPdfDocument({ budget }: BudgetPdfDocumentProps) {
         View,
         { style: styles.totalRow },
         e(Text, { style: styles.totalLabel }, 'Total estimado'),
-        e(Text, { style: styles.totalValue }, formatMoney(estimatedTotal)),
+        e(Text, { style: styles.totalValue }, formatMoney(estimatedTotal ?? 0)),
     );
 
     const footerNote = e(

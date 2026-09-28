@@ -9,7 +9,7 @@ import {useNavigate} from "react-router-dom";
 const UserToggle = () => {
     const navigate = useNavigate();
     
-    const { resolvedTheme, setTheme } = useTheme();
+    const { resolvedTheme } = useTheme();
 
     const esOscuro = resolvedTheme === "dark";
 

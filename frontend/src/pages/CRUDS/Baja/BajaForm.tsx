@@ -3,7 +3,6 @@ import useDebounce from '@/components/useDebounce';
 import { eventBus } from '@/lib/eventBus';
 import { BACKEND_URL } from '@/lib/config';
 import styles from './BajaForm.module.css';
-import { useAuth } from '@/lib/AuthContext';
 import type { PaginatedResponse } from "@/types/types";
 
 // ─── Field config para el detalle ────────────────────────────────────────────

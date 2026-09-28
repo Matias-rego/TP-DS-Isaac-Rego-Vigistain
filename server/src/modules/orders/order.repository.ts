@@ -4,6 +4,7 @@ import type { OrderQueryDto } from "./order.schema.js";
 import { BaseRepository } from "@/shared/base.repository.js";
 import { v7 as uuidv7 } from "uuid";
 import { Order } from "./order.entity.js";
+import { $Enums } from "@/database/prisma.js";
 import { toBudgetDomain } from "@/modules/budgets/budget.repository.js";
 
 const orderInclude = {
@@ -108,13 +109,69 @@ export class OrderRepository extends BaseRepository<Order, OrderQueryDto> {
         return this.toDomain(order);
     }
 
+    public async getStats() {
+        const now = new Date();
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+
+        const [active, pendingBudget, inRepair, deliveredThisMonth] = await Promise.all([
+            this.prisma.order.count({
+                where: {
+                    status: {
+                        notIn: [
+                            $Enums.EnumOrderStatus.entregado,
+                            $Enums.EnumOrderStatus.cancelado,
+                        ],
+                    },
+                },
+            }),
+            this.prisma.order.count({
+                where: {
+                    status: {
+                        in: [
+                            $Enums.EnumOrderStatus.recibido,
+                            $Enums.EnumOrderStatus.diagnostico,
+                        ],
+                    },
+                },
+            }),
+            this.prisma.order.count({
+                where: { status: $Enums.EnumOrderStatus.reparacion },
+            }),
+            this.prisma.order.count({
+                where: {
+                    status: $Enums.EnumOrderStatus.entregado,
+                    deliveryDate: {
+                        gte: startOfMonth,
+                        lt: startOfNextMonth,
+                    },
+                },
+            }),
+        ]);
+
+        return {
+            activas: active,
+            pendientesPresupuesto: pendingBudget,
+            enReparacion: inRepair,
+            entregadasMes: deliveredThisMonth,
+        };
+    }
+
     public async update(id: string, item: Partial<Order>): Promise<Order | undefined> {
         const order = await this.prisma.order.update({
             where: {
                 id_order: id,
             },
             data: {
-                ...item,
+                id_equipment: item.id_equipment,
+                id_user: item.id_user,
+                status: item.status,
+                observations: item.observations,
+                equipmentPhotoUrl: item.equipmentPhotoUrl,
+                dateOfEntry: item.dateOfEntry,
+                estimatedDate: item.estimatedDate,
+                deliveryDate: item.deliveryDate,
+                totalCharged: item.totalCharged,
             },
         });
 

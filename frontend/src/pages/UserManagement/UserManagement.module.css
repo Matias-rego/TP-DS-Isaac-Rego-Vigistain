@@ -66,3 +66,19 @@
   padding: 20px;
   box-shadow: var(--shadow-soft);
 }
+
+/* ── Responsive mobile ── */
+@media (max-width: 640px) {
+  .content {
+    padding: 20px 12px 48px;
+  }
+  .title {
+    font-size: 1.4rem;
+  }
+  .searchRow {
+    padding: 12px;
+  }
+  .gridSection {
+    padding: 14px;
+  }
+}
