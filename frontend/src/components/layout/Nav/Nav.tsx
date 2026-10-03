@@ -2,10 +2,10 @@ import styles from './Nav.module.css';
 import { useNavigate } from 'react-router-dom';
 //import { parseJwt } from '../App/App';
 import { useEffect, useState } from 'react';
-import type { User } from '../../types/types';
+import type { User } from '../../../types/types';
 import { BACKEND_URL } from '@/lib/config';
 import { LogOut, X, Home, ClipboardList, Users, User as UserIcon, UserRoundCog } from 'lucide-react';
-import ThemeToggle from '../../components/Toggle/ThemeToggle/ThemeToggle';
+import ThemeToggle from '../../Toggle/ThemeToggle/ThemeToggle';
 import { useAuth } from '@/lib/AuthContext';
 
 
@@ -13,7 +13,7 @@ import { useAuth } from '@/lib/AuthContext';
 const LOGO_URL = "https://res.cloudinary.com/dll6qurcd/image/upload/v1783738139/teckfixFvicon_qt61a7.png";
 
 const Nav = () => {
-  const {user, isAuth, loading: authLoading } = useAuth()
+  const { user, isAuth, loading: authLoading } = useAuth()
   const [usuario, setUsuario] = useState<User | null>(null);
   const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
@@ -26,7 +26,7 @@ const Nav = () => {
         //if (!decoded?.id_user) throw new Error('Token inválido');
 
         const response = await fetch(`${BACKEND_URL}/api/auth/me`,
-          {method: 'GET' , credentials: 'include' });
+          { method: 'GET', credentials: 'include' });
 
         if (!response.ok) throw new Error(`Error ${response.status}`);
 
@@ -58,21 +58,21 @@ const Nav = () => {
   }, [menuOpen]);
 
   const confirmarLogout = async () => {
-    try{
+    try {
       const response = await fetch(
         `${BACKEND_URL}/api/auth/logout`,
-        { 
+        {
           method: "POST",
-          credentials : "include",
+          credentials: "include",
         }
       )
-      if (response){
-      setShowLogoutModal(false);
-      window.location.replace('/login');
-      }else{
+      if (response) {
+        setShowLogoutModal(false);
+        window.location.replace('/login');
+      } else {
         console.log("Error en logout");
       }
-    }catch(error){
+    } catch (error) {
       console.error("Error al intentar logout: ", error);
     }
   };
@@ -86,13 +86,13 @@ const Nav = () => {
     <>
       <nav className={styles.navContainer}>
         {/* Logo */}
-          <div className={styles.logo} onClick={() => navigate('/home')}>
-            <img src={LOGO_URL} alt="TechFix" style={{ height: 74, width: 74, objectFit: 'contain' }} />
-            <div className={styles.logoCopy}>
-              <span className={styles.logoText}>TechFix</span>
-              <span className={styles.logoSubtitle}>Reparamos lo que te conecta</span>
-            </div>
+        <div className={styles.logo} onClick={() => navigate('/home')}>
+          <img src={LOGO_URL} alt="TechFix" style={{ height: 74, width: 74, objectFit: 'contain' }} />
+          <div className={styles.logoCopy}>
+            <span className={styles.logoText}>TechFix</span>
+            <span className={styles.logoSubtitle}>Reparamos lo que te conecta</span>
           </div>
+        </div>
 
 
         <ul className={styles.navLinks}>
@@ -122,7 +122,7 @@ const Nav = () => {
 
         {/* Acciones desktop */}
         <div className={styles.navActions}>
-        {/*
+          {/*
           {user?.rol === 'admin' && (
             <UserToggle />
           )}
@@ -146,11 +146,11 @@ const Nav = () => {
 
 
         <div className={styles.mobileRight}>
-        {/*  {user?.rol === 'admin' && (
+          {/*  {user?.rol === 'admin' && (
             <UserToggle />
-          )} */} 
+          )} */}
           <ThemeToggle />
-        {/*  <img
+          {/*  <img
             src={usuario?.urlPicture}
             alt={usuario?.userName}
             className={styles.avatarMobile}
@@ -231,11 +231,11 @@ const Nav = () => {
             <span className={styles.drawerLinkIcon}><Users size={20} /></span>
             Clientes
           </button>
-          {user?.rol === 'admin' && (     
+          {user?.rol === 'admin' && (
             <>
-              
+
               <button type="button" className={styles.drawerLink} onClick={() => navigate('/userManagement')}>
-                <span className={styles.drawerLinkIcon}><UserRoundCog size={20}/></span>
+                <span className={styles.drawerLinkIcon}><UserRoundCog size={20} /></span>
                 Usuarios
               </button>
             </>
@@ -249,7 +249,7 @@ const Nav = () => {
             Mi perfil
           </button>
 
-          
+
 
         </nav>
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import useDebounce from '@/components/useDebounce';
+import useDebounce from '@/hooks/useDebounce';
 import { eventBus } from '@/lib/eventBus';
 import { BACKEND_URL } from '@/lib/config';
 import styles from './BajaForm.module.css';
@@ -75,7 +75,7 @@ export default function BajaForm<T extends object>({
     }
 
     const fetchResults = async () => {
- 
+
       try {
         // La búsqueda va como query string (?search=...), no como segmento
         // de ruta: el backend la valida con req.validated.query, no con
@@ -88,7 +88,7 @@ export default function BajaForm<T extends object>({
           setResults([]);
           return;
         }
- 
+
         const data: PaginatedResponse<T> | T[] = await result.json();
         // findAll devuelve { data, metadata }; soportamos también un array
         // plano por si algún endpoint todavía no está paginado.

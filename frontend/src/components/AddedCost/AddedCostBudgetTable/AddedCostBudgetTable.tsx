@@ -1,5 +1,5 @@
 import { useState } from "react";
-import TableRtl, { type ColumnConfig } from "@/components/Common/DataTable/DataTable";
+import DataTable, { type ColumnConfig } from "@/components/Common/DataTable/DataTable";
 import ConfirmDialog from "@/components/Common/ConfirmDialog/ConfirmDialog";
 import { Trash2 } from "lucide-react";
 import { BACKEND_URL } from "@/lib/config";
@@ -158,7 +158,7 @@ const AddedCostBudgetTable = ({
     <div className={styles.wrap}>
       {deleteError && <p className={styles.errorText}>{deleteError}</p>}
 
-      <TableRtl<AddedCostRow>
+      <DataTable<AddedCostRow>
         data={items}
         idField="rowId"
         columns={columns}

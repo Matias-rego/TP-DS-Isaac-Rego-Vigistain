@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import useDebounce from '@/components/useDebounce';
+import useDebounce from '@/hooks/useDebounce';
 import { BACKEND_URL } from '@/lib/config';
 import styles from './SearchBar.module.css';
 import { X } from 'lucide-react';
@@ -16,7 +16,7 @@ export interface FilterConfig {
   key: string;
   label: string;
   type: 'select' | 'date';
-  options?: FilterOption[]; 
+  options?: FilterOption[];
   placeholder?: string;
 }
 
@@ -77,7 +77,7 @@ export default function SearchBar<T>({
   }, []);
 
   // Fetch cuando cambia el query o los filtros
-useEffect(() => {
+  useEffect(() => {
     const trimmedQuery = debouncedQuery.trim();
     const hasQuery = trimmedQuery.length > 0;
     const hasFilters = Object.values(activeFilters).some(v => v !== '');
@@ -120,10 +120,10 @@ useEffect(() => {
 
         const data = await res.json();
         onResults(data);
-      }catch (e) {
+      } catch (e) {
         console.error('SearchBar fetch error:', e);
         onResults(emptyResponse());
-      }finally {
+      } finally {
         setLoading(false);
       }
     };
@@ -145,12 +145,7 @@ useEffect(() => {
     <div className={styles.wrapper}>
       {/* ── Search input ── */}
       <div className={styles.searchBox}>
-        <svg className={styles.searchIcon} width="16" height="16" viewBox="0 0 24 24"
-          fill="none" stroke="currentColor" strokeWidth="2"
-          strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="11" cy="11" r="8" />
-          <line x1="21" y1="21" x2="16.65" y2="16.65" />
-        </svg>
+        <span className={styles.searchIcon} aria-hidden="true" />
         <input
           className={styles.searchInput}
           type="text"
@@ -173,12 +168,7 @@ useEffect(() => {
             className={`${styles.filterBtn} ${activeFilterCount > 0 ? styles.filterBtnActive : ''}`}
             onClick={() => setDropdownOpen(prev => !prev)}
           >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="4" y1="6" x2="20" y2="6"/>
-              <line x1="8" y1="12" x2="16" y2="12"/>
-              <line x1="11" y1="18" x2="13" y2="18"/>
-            </svg>
+            <span className={styles.filterIcon} aria-hidden="true" />
             Filters
             {activeFilterCount > 0 && (
               <span className={styles.filterBadge}>{activeFilterCount}</span>

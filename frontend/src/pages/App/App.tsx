@@ -17,6 +17,8 @@ import { WebSocketManager } from "@/lib/WebSocketManager";
 import OrderDirectory from "../Orders/OrderDirectory/OrderDirectory";
 import ManageOrder from "@/pages/Orders/ManageOrder/ManageOrder";
 import BudgetPdfPreview from "@/components/PDF/BudgetPdfPreview";
+import AppLayout from "@/components/layout/AppLayout";
+import Management from "@/features/Management/pages/Management";
 export const capitalize = (text: string): string => {
   if (!text) return ""; 
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
@@ -78,8 +80,13 @@ const App = () => {
           <Route path="/clientes" element={<RutaPrivada><Clientes /></RutaPrivada>} />
           <Route path="/createOrder" element={<RutaPrivada><WorkOrder /></RutaPrivada>} />
           <Route path="/manageOrder" element={<RutaPrivada><OrderDirectory/></RutaPrivada>} />
+          <Route path="/manageOrder" element={<RutaPrivada><OrderDirectory/></RutaPrivada>} />
           <Route path="/manageOrder/:id_order" element = {<RutaPrivada><ManageOrder /></RutaPrivada>}/>
           <Route path="/showBudget/:id_budget" element = {<RutaPrivada><BudgetPdfPreview/></RutaPrivada>} />
+          
+          <Route element={<AppLayout />}>
+            <Route path="/management" element = {<RutaPrivada><Management /></RutaPrivada>}/>
+          </Route>
         </Route>
 
         {/* Ruta para capturar errores 404 */}

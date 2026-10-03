@@ -3,7 +3,7 @@ import SearchBar from '../../components/SearchBar/SearchBar';
 import type { FilterConfig } from '../../components/SearchBar/SearchBar';
 import ClientGrid from '@/components/ClientCard/ClientGrid/ClientGrid';
 import ActionButton from '../../components/Common/Buttons/ActionButton';
-import Nav from '../Nav/Nav';
+import Nav from '../../components/layout/Nav/Nav';
 import Footer from '../../components/Footer/Footer';
 import styles from './Clients.module.css';
 import ClientRegister from './ClientRegister';
@@ -146,7 +146,7 @@ const Clientes = () => {
           <SearchBar<Client>
             showFilters={true}
             filters={CLIENT_FILTERS}
-            searchEndpoint="/api/clients/search/"
+            searchEndpoint="/api/clients/"
             searchPlaceholder="Buscar clientes por nombre, apellido o correo electrónico"
             onResults={(data) => setResults(data)}
             onClear={() => setResults(null)}
