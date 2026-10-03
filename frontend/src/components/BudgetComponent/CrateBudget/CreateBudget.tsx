@@ -215,13 +215,25 @@ const CreateBudget = ({ order }: CreateBudgetProps) => {
 
     const closeModalAddedCost = () => {
         setNewAddedCost(false);
-        // Defensivo: por si CreateAddedCost no emite budgetChanged solo.
         if (budget?.id_budget) {
             fetchAddedCosts(budget.id_budget);
             refreshBudget(budget.id_budget);
         }
     };
-    
+    useEffect(() => {
+        const refresh = () => {
+            if (budget?.id_budget) {
+                fetchAddedCosts(budget.id_budget);
+                refreshBudget(budget.id_budget);
+            }
+        };
+        const offBudget = eventBus.on(EVENTS.budgetChanged, refresh);
+        const offAddedCost = eventBus.on(EVENTS.addedCostChanged, refresh);
+        return () => {
+            offBudget();
+            offAddedCost();
+        };
+    }, [budget?.id_budget]);
 
 return (
     <div className={styles.page}>
