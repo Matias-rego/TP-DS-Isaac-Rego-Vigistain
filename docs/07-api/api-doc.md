@@ -35,7 +35,7 @@ All paths above are relative to `/api`.
 - IDs de entidades: UUID v7 en formato string. Se rechazan IDs que no sean UUID v7.
 - Listados paginados aceptan `search`, `page`, `limit`, `sortOrder` y el `sortBy` permitido por módulo. Defaults comunes: `page=1`, `limit=50`, `sortOrder=asc`; el repositorio limita el tamaño efectivo de página a 200.
 - Las respuestas de listados paginados tienen forma `{ data: [], metadata: { page, limit, total, totalPages } }`.
-- Un body que tiene schema `strict` rechaza propiedades no declaradas. Campos opcionales pueden omitirse; las enumeraciones solo aceptan sus valores documentados en el [modelo de datos](../docs/02-propuesta/modelo-datos.md).
+- Un body que tiene schema `strict` rechaza propiedades no declaradas. Campos opcionales pueden omitirse; las enumeraciones solo aceptan sus valores documentados en el [modelo de datos](../02-propuesta/modelo-datos.md).
 - Error de validación: `400` `{ "message": "Validation failed", "errors": { ... } }`.
 - Error no controlado: `{ "message": "Internal server error", "error": "..." }` en desarrollo. En producción se omite `error`.
 - Un recurso inexistente normalmente responde `404` `{ "message": "... no encontrado" }`; el texto varía según el módulo.
