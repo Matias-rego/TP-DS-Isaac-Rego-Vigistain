@@ -1,16 +1,5 @@
-import {
-    Card,
-    CardHeader,
-    CardTitle,
-    CardDescription,
-    CardFooter,
-    CardContent,
-} from "@/components/ui/card";
-import imgAddedCost1 from "@/assets/imgAddedCost1.svg";
-import AddedCostBudgetTable, {type AddedCostRow} from "@/components/AddedCost/AddedCostBudgetTable/AddedCostBudgetTable";
-import ActionButton from "@/components/Common/Buttons/ActionButton";
+import  {type AddedCostRow} from "@/components/AddedCost/AddedCostBudgetTable/AddedCostBudgetTable";
 import DetailBudget from "@/components/BudgetComponent/DetailBudget/DetailBudget";
-import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Budget, Order } from "@/types/types";
@@ -18,6 +7,8 @@ import styles from "./CreateBudget.module.css";
 import CreateAddedCost from "@/components/AddedCost/CreateAddedCost/CreateAddedCost";
 import BACKEND_URL from "@/lib/config";
 import { EVENTS, eventBus } from "@/lib/eventBus";
+import AddedCostsCard from "../AddedCostCard/AddedCostsCard";
+import LaborCostCard from "../LaborCostCard/LaborCostCard";
 
 interface CreateBudgetProps {
     order: Order;
@@ -26,12 +17,6 @@ interface CreateBudgetProps {
 
 const CreateBudget = ({ order }: CreateBudgetProps) => {
     const [budget, setBudget] = useState<Budget | null>(order.budget ?? null);
-    const [inputCost, setInputCost] = useState(
-        order.budget?.laborCost != null ? String(order.budget.laborCost) : ""
-    );
-    const [savingLabor, setSavingLabor] = useState(false);
-    const [laborError, setLaborError] = useState<string | null>(null);
-
     const [addedCosts, setAddedCosts] = useState<AddedCostRow[]>([]);
     const [addedCostsError, setAddedCostsError] = useState<string | null>(null);
 
@@ -102,47 +87,30 @@ const CreateBudget = ({ order }: CreateBudgetProps) => {
         return unsubscribe;
     }, [budget?.id_budget]);
 
-    const handleSaveLaborCost = async () => {
-        const numValue = parseFloat(inputCost) || 0;
-        setSavingLabor(true);
-        setLaborError(null);
+    const handleSaveLaborCost = async (laborCost: number) => {
+        const method = budget ? 'PUT' : 'POST';
+        const url = budget
+            ? `${BACKEND_URL}/api/budgets/modifyBudget/${budget.id_budget}`
+            : `${BACKEND_URL}/api/budgets`;
 
-        try {
-            const method = budget ? "PUT" : "POST";
-            const url = budget
-                ? `${BACKEND_URL}/api/budgets/${budget.id_budget}`
-                : `${BACKEND_URL}/api/budgets`;
+        const payload = budget ? { laborCost } : { id_order: order.id_order, laborCost };
 
-            const payload = budget
-                ? { laborCost: numValue }
-                : { id_order: order.id_order, laborCost: numValue };
+        const response = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify(payload),
+        });
 
-            const response = await fetch(url, {
-                method,
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify(payload),
-            });
-
-            if (!response.ok) {
-                const errorBody = await response.json().catch(() => ({}));
-                throw new Error(
-                    errorBody.message || `Error ${response.status} al guardar el presupuesto`
-                );
-            }
-
-            const updatedBudget: Budget = await response.json();
-            setBudget(updatedBudget);
-            eventBus.emit(EVENTS.budgetChanged, updatedBudget);
-        } catch (e) {
-            console.error("Error guardando el presupuesto:", e);
-            setLaborError(
-                e instanceof Error ? e.message : "No se pudo guardar el presupuesto."
-            );
-        } finally {
-            setSavingLabor(false);
+        if (!response.ok) {
+            const errorBody = await response.json().catch(() => ({}));
+            throw new Error(errorBody.message || `Error ${response.status} al guardar el presupuesto`);
         }
-    };
+
+        const updatedBudget: Budget = await response.json();
+        setBudget(updatedBudget);
+        eventBus.emit(EVENTS.budgetChanged, updatedBudget);
+        };
 
     const handleAddedCostsChange = async (next: AddedCostRow[]) => {
         const prevById = new Map(addedCosts.map((row) => [row.rowId, row]));
@@ -238,160 +206,22 @@ const CreateBudget = ({ order }: CreateBudgetProps) => {
 return (
     <div className={styles.page}>
         <div className={styles.layout}>
-            {/* COLUMNA IZQUIERDA: MANO DE OBRA + COSTOS AGREGADOS */}
-            <main className={styles.main}>
-                {/* MANO DE OBRA */}
-                <Card className={styles.card}>
-                    <CardHeader className={styles.cardHeader}>
-                        <div className={styles.sectionHeading}>
-                            <div className={styles.sectionIcon}>
-                                <span>$</span>
-                            </div>
+           <main className={styles.main}>
+                <LaborCostCard
+                    savedLaborCost={budget?.laborCost}
+                    isNewBudget={budget == null}
+                    onSave={handleSaveLaborCost}
+                />
 
-                            <div>
-                                <CardTitle className={styles.cardTitle}>
-                                    Mano de Obra
-                                </CardTitle>
+                <AddedCostsCard
+                    items={addedCosts}
+                    onChange={handleAddedCostsChange}
+                    onAdd={() => setNewAddedCost(true)}
+                    disabled={!budget}
+                    error={addedCostsError}
+                />
+                </main>
 
-                                <CardDescription className={styles.cardDescription}>
-                                    Ingresa el costo de la mano de obra
-                                </CardDescription>
-                            </div>
-                        </div>
-                    </CardHeader>
-
-                    <CardContent className={styles.cardContent}>
-                        <div className={styles.field}>
-                            <label
-                                htmlFor="laborCost"
-                                className={styles.label}
-                            >
-                                Mano de obra especializada
-                            </label>
-
-                            <div className={styles.inputWrapper}>
-                                <Input
-                                    id="laborCost"
-                                    name="laborCost"
-                                    value={inputCost}
-                                    type="number"
-                                    placeholder="0.00"
-                                    onChange={(e) =>
-                                        setInputCost(e.target.value)
-                                    }
-                                    className={styles.input}
-                                    disabled={savingLabor}
-                                />
-
-                                <span className={styles.inputSuffix}>
-                                    ARS
-                                </span>
-                            </div>
-
-                            <p className={styles.helperText}>
-                                Tarifa del técnico aplicada al presupuesto.
-                            </p>
-
-                            {laborError && (
-                                <p className={styles.errorText}>
-                                    {laborError}
-                                </p>
-                            )}
-                        </div>
-
-                        <div className={styles.savedValue}>
-                            <span>Valor guardado actual</span>
-                            <strong>
-                                ${Number(budget?.laborCost ?? 0).toFixed(2)}
-                            </strong>
-                        </div>
-                    </CardContent>
-
-                    <CardFooter className={styles.cardFooter}>
-                        <ActionButton
-                            label={
-                                savingLabor
-                                    ? "Guardando..."
-                                    : "Actualizar mano de obra"
-                            }
-                            onClick={handleSaveLaborCost}
-                            icon={null}
-                            disabled={savingLabor}
-                        />
-
-                        {budget == null && (
-                            <p className={styles.helperText}>
-                                Para crear el presupuesto ingresa el valor de
-                                mano de obra inicial.
-                            </p>
-                        )}
-                    </CardFooter>
-                </Card>
-
-                {/* COSTOS ADICIONALES */}
-                <Card className={styles.card}>
-                    <CardHeader className={styles.cardHeader}>
-                        <div className={styles.sectionHeading}>
-                            <div
-                                className={`${styles.sectionIcon} ${styles.sectionIconImage}`}
-                            >
-                                <img
-                                    src={imgAddedCost1}
-                                    alt="Icono de agregar costo"
-                                />
-                            </div>
-
-                            <div>
-                                <CardTitle className={styles.cardTitle}>
-                                    Costos Adicionales y Repuestos
-                                </CardTitle>
-
-                                <CardDescription
-                                    className={styles.cardDescription}
-                                >
-                                    Agrega los costos adicionales a tu
-                                    presupuesto.
-                                </CardDescription>
-                            </div>
-                        </div>
-                    </CardHeader>
-
-                    <CardContent
-                        className={`${styles.cardContent} ${styles.tableContent}`}
-                    >
-                        {addedCostsError && (
-                            <p className={styles.errorText}>
-                                {addedCostsError}
-                            </p>
-                        )}
-
-                        <AddedCostBudgetTable
-                            items={addedCosts}
-                            onChange={handleAddedCostsChange}
-                            allowAdd={false}
-                            disabled={!budget}
-                        />
-                    </CardContent>
-
-                    <CardFooter
-                        className={`${styles.cardFooter} ${styles.cardFooterBetween}`}
-                    >
-                        <span className={styles.tableHelper}>
-                            Agrega repuestos, insumos u otros costos.
-                        </span>
-
-                        <ActionButton
-                            label="Agregar Costo"
-                            onClick={() => setNewAddedCost(true)}
-                            icon={null}
-                            variant="neutral"
-                            disabled={!budget}
-                        />
-                    </CardFooter>
-                </Card>
-            </main>
-
-            {/* COLUMNA DERECHA: DETAIL BUDGET */}
             {budget != null && (
                 <aside className={styles.sidebar}>
                     <div className={styles.summarySticky}>
@@ -406,7 +236,6 @@ return (
             )}
         </div>
 
-        {/* MODAL AGREGAR COSTO */}
         {newAddedCost && budget && (
             <div
                 className={styles.modalOverlay}

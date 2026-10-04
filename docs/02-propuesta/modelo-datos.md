@@ -17,6 +17,7 @@ erDiagram
     Budget ||--o{ AddedCost : incluye
     Budget ||--o{ Payment : recibe
     Payment_Type ||--o{ Payment : clasifica
+    Order ||--o{ Status_History : historial
 
     User {
         string id_user PK
@@ -93,6 +94,7 @@ erDiagram
         decimal discount
         EnumBudgetStatus status
         datetime budgetDate
+        string clientSuggestion "nullable"
     }
     AddedCost {
         string id_addedCost PK

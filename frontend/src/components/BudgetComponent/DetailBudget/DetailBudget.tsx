@@ -209,6 +209,13 @@ export default function DetailBudget({
           </span>
         </button>
       </div>
+      {budget.clientSuggestion !== null && (
+        <div className={styles.suggSection}>
+          <span className={styles.suggTitle}>Sugerencia del Cliente</span>
+          <p className={styles.suggText}>{budget.clientSuggestion}</p>
+        </div>
+      )}
+
 
       {/* Actions */}
       <div className={styles.actions}>
