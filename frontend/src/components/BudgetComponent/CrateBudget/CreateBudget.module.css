@@ -3,37 +3,42 @@
    ===================================================== */
 
 .page {
-  min-height: 100vh;
   width: 100%;
-  background-color: #f8fafc;
-  padding: 1.5rem;
   box-sizing: border-box;
+
+  /* Habilita la @container query de abajo */
+  container-name: field;
+  container-type: inline-size;
 }
 
 .layout {
   display: grid;
-  grid-template-columns: 1fr;   /* una columna por default */
+  grid-template-columns: minmax(0, 1fr);   /* una columna por default */
   gap: 1.5rem;
-  max-width: 1280px;
-  margin: 0 auto;
+  width: 100%;
 }
 
-/* Columna Principal (Mano de Obra + Costos Adicionales) */
+/* Columna principal (Mano de Obra + Costos Adicionales) */
 .main {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  min-width: 0; /* Previene desbordamiento en flex childs */
+  min-width: 0;
 }
 
 .sidebar {
-    min-width: 0;
+  min-width: 0;
 }
 
 .summarySticky {
-    position: sticky;
-    top: 24px;
+  position: sticky;
+  top: 24px;
 }
+
+.sidebar :global(*) {
+  box-sizing: border-box;
+}
+
 
 /* =====================================================
    CARDS
@@ -279,91 +284,70 @@
    ===================================================== */
 
 .modalOverlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
 }
 
 .modalContent {
-    position: relative;
-    background: var(--tf-card);
-    color: var(--tf-text);
-    border: 1px solid var(--tf-border);
-    border-radius: var(--radius-md, 14px);
-    padding: 24px;
-    max-width: 600px;
-    width: 90%;
-    max-height: 85vh;
-    overflow-y: auto;
-    box-shadow: var(--shadow-medium);
+  position: relative;
+  background: var(--tf-card);
+  color: var(--tf-text);
+  border: 1px solid var(--tf-border);
+  border-radius: var(--radius-md, 14px);
+  padding: 24px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-medium);
 }
 
 .modalClose {
-    position: absolute;
-    top: 8px;
-    right: 12px;
-    background: none;
-    border: none;
-    font-size: 24px;
-    line-height: 1;
-    cursor: pointer;
-    color: var(--tf-muted);
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--tf-muted);
 }
 
 .modalClose:hover {
-    color: var(--tf-text);
+  color: var(--tf-text);
 }
 
 /* =====================================================
    RESPONSIVE
    ===================================================== */
-@container field (min-width: 700px) {
+
+/* Dos columnas cuando el CONTENEDOR (.page) mide 900px o más */
+@container field (min-width: 900px) {
   .layout {
     grid-template-columns: minmax(0, 1fr) 380px;
+    align-items: start;
   }
 }
-@media (max-width: 767px) {
-  .page {
-    padding: 18px;
-  }
 
+/* Una columna: el resumen va primero */
+@container field (max-width: 899px) {
   .sidebar {
-    order: -1; 
+    order: -1;
   }
 
   .summarySticky {
     position: static;
   }
 }
+
 @media (max-width: 576px) {
-    .page {
-        padding: 12px;
-    }
-
-    .main {
-        gap: 16px;
-    }
-
-    .cardHeader,
-    .cardContent {
-        padding: 16px;
-    }
-
-    .cardFooter {
-        padding: 14px 16px 16px;
-    }
-
-    .tableContent {
-        padding: 0 16px 16px;
-    }
-
-    .savedValue {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 4px;
-    }
+  .main {
+    gap: 16px;
+  }
 }

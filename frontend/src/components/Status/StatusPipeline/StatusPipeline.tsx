@@ -9,6 +9,7 @@ import {
   ClipboardCheck,
   PackageCheck,
   ArrowRight,
+  ArrowLeft
 } from "lucide-react";
 import type { Order, EnumOrderStatus, Status_History } from "@/types/types";
 import { formatDate } from "@/lib/utils";
@@ -46,31 +47,15 @@ function getLastOccurrence(
   )[0];
 }
 
-function formatElapsedSince(date: Date | string): string {
-  const start = new Date(date).getTime();
-  if (isNaN(start)) return "";
-
-  const diffMs = Math.max(0, Date.now() - start);
-  const totalMinutes = Math.floor(diffMs / 60000);
-  const days = Math.floor(totalMinutes / (60 * 24));
-  const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
-  const minutes = totalMinutes % 60;
-
-  if (days > 0) return `${days}d ${hours}h`;
-  if (hours > 0) return `${hours}h ${minutes}m`;
-  return `${minutes}m`;
-}
-
 export interface PipelineDeReparacionProps {
   order: Order;
   onAdvance?: (nextStatus: EnumOrderStatus) => void;
+  onRetreat?: (prevStatus: EnumOrderStatus) => void;
 }
 
-const PipelineDeReparacion = ({ order, onAdvance }: PipelineDeReparacionProps) => {
+const PipelineDeReparacion = ({ order, onAdvance, onRetreat }: PipelineDeReparacionProps) => {
   const latestEntry = getLatestEntry(order.statusHistory);
   const currentStatus = latestEntry?.status ?? order.status;
-  const currentSince = latestEntry?.dateOfChange ?? order.dateOfEntry;
-
   const isCancelled = currentStatus === "cancelado";
   const currentIndex = PIPELINE_STEPS.findIndex((s) => s.status === currentStatus);
 
@@ -78,32 +63,37 @@ const PipelineDeReparacion = ({ order, onAdvance }: PipelineDeReparacionProps) =
     !isCancelled && currentIndex >= 0 && currentIndex < PIPELINE_STEPS.length - 1
       ? PIPELINE_STEPS[currentIndex + 1]
       : null;
+   const prevStep =
+    !isCancelled && currentIndex > 0 ? PIPELINE_STEPS[currentIndex - 1] : null;
 
   return (
     <div className={styles.wrap}>
       <div className={styles.header}>
-        <div className={styles.titleGroup}>
-          <span className={styles.titleDot} />
-          <h3 className={styles.title}>Pipeline de Reparación</h3>
-          {!isCancelled && (
-            <span className={styles.elapsedPill}>
-              {formatElapsedSince(currentSince)} transcurridos en fase actual
-            </span>
+        <div className={styles.titleGroup}>{/* igual */}</div>
+
+        <div className={styles.actions}>
+          {prevStep && (
+            <button
+              type="button"
+              className={styles.advanceButton}
+              onClick={() => onRetreat?.(prevStep.status)}
+            >
+              <ArrowLeft size={14} />
+              Volver a &quot;{prevStep.label}&quot;
+            </button>
+          )}
+          {nextStep && (
+            <button
+              type="button"
+              className={styles.advanceButton}
+              onClick={() => onAdvance?.(nextStep.status)}
+            >
+              Avanzar a &quot;{nextStep.label}&quot;
+              <ArrowRight size={14} />
+            </button>
           )}
         </div>
-
-        {nextStep && (
-          <button
-            type="button"
-            className={styles.advanceButton}
-            onClick={() => onAdvance?.(nextStep.status)}
-          >
-            Avanzar a &quot;{nextStep.label}&quot;
-            <ArrowRight size={14} />
-          </button>
-        )}
       </div>
-
       {isCancelled ? (
         <div className={styles.cancelledBanner}>Esta orden fue cancelada.</div>
       ) : (

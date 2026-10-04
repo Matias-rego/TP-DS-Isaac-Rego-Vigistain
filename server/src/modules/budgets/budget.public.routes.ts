@@ -24,24 +24,8 @@ const ctrl = new BudgetController(
     new BudgetService(budgetRepo, addedCostRepo, statusService)
 );
 
-const router = Router();
+const publicRouter = Router();
+publicRouter.post('/:token/respond', ctrl.handleResponse);
+publicRouter.get('/:token', ctrl.getBudgetByToken);
 
-router.get('/', validate({ query: budgetQuerySchema }), ctrl.getAllBudgets);
-
-router.get('/ofOrder/:id', validate({ params: idSchema }), ctrl.getBudgetOfOrder);
-
-router.get('/:id', validate({ params: idSchema }), ctrl.getOneBudget);
-
-router.post('/', authenticate(), validate({ body: registerBudgetSchema }), ctrl.registerBudget);
-
-router.put('/:id', validate({ params: idSchema, body: modifyBudgetSchema }), ctrl.modifyBudget);
-
-router.put('/modifyBudget/:id', validate({ params: idSchema, body: modifyBudgetSchema }), ctrl.modifyBudgetTech);
-
-router.delete('/:id', validate({ params: idSchema }), ctrl.deleteBudget);
-
-router.post('/:id/send-email', validate({ params: idSchema }) ,ctrl.sendBudgetEmail);
-
-
-
-export default router;
+export default publicRouter;

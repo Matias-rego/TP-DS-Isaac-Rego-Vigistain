@@ -1,10 +1,3 @@
-// ─── eventBus.ts ─────────────────────────────────────────────────────────────
-// Bus de eventos minimalista para comunicar componentes desacoplados
-// (ej: un Alta dispara, una DataTable escucha y refresca).
-//
-// No usa WebSocket porque el cambio y la actualización ocurren
-// en la misma sesión/pestaña del mismo usuario.
-
 type EventCallback = (payload?: unknown) => void;
 
 class EventBus {
