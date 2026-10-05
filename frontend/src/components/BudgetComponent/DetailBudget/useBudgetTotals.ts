@@ -53,6 +53,14 @@ export function useBudgetTotals(id_order?: string, id_budget?: string): BudgetTo
     const unsubscribe = eventBus.on(EVENTS.budgetChanged, fetchTotals);
     return unsubscribe;
   }, [fetchTotals]);
-
+  useEffect(() => {
+    fetchTotals();
+    const offBudget = eventBus.on(EVENTS.budgetChanged, fetchTotals);
+    const offAddedCost = eventBus.on(EVENTS.addedCostChanged, fetchTotals);
+    return () => {
+      offBudget();
+      offAddedCost();
+    };
+  }, [fetchTotals]);
   return { failuresTotal, addedCostsTotal, loading, error };
 }

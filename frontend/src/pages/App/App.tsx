@@ -19,6 +19,7 @@ import ManageOrder from "@/pages/Orders/ManageOrder/ManageOrder";
 import BudgetPdfPreview from "@/components/PDF/BudgetPdfPreview";
 import AppLayout from "@/components/layout/AppLayout";
 import Management from "@/features/Management/pages/Management";
+import BudgetResponse from "@/pages/Budget/BudgetResponse/BudgetResponse";
 export const capitalize = (text: string): string => {
   if (!text) return ""; 
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
@@ -63,6 +64,7 @@ const App = () => {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/auth/validateCuenta/:token" element={<Validation />} />
+        <Route path="/budgets/response/:token" element={<BudgetResponse />} />
 
         {/* Usamos el Layout ContenedorConAuth para agruparlas            */}
 

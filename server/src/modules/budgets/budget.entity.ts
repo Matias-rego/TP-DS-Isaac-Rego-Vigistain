@@ -21,6 +21,7 @@ export class Budget {
         public order?: OrderForBudgetCalculation, // ← antes era OrderWithRelations
         public addedCosts?: AddedCost[],
         public payments?: Payment[],
+        public clientSuggestion?: string,
     ) { }
 
     get estimatedTotal(): number | undefined {

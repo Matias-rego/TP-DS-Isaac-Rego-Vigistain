@@ -179,6 +179,7 @@ export interface Budget {
   budgetDate: Date;
   payments?: Payment[];
   addedCosts: AddedCost[];
+  clientSuggestion?: string | null;
 }
 
 export interface Payment_Type {
