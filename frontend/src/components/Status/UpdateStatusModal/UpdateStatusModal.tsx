@@ -8,6 +8,8 @@ import { useAuth } from '@/lib/AuthContext';
 import { EVENTS, eventBus } from '@/lib/eventBus';
 import Diagnostic from './Diagnostic/Diagnostic';
 import Budget from './Budget/Budget';
+import { getBlockReason } from '@/lib/statusRules';
+
 
 const STATUS_LABELS: Record<EnumOrderStatus, string> = {
   recibido:      'Recibido',
@@ -44,9 +46,11 @@ export interface UpdateStatusModalProps {
   order: Order;
   onClose: () => void;
   onConfirm: (createdStatusHistory: Status_History) => void | Promise<void>;
+  targetStatus?: EnumOrderStatus;
+  direction?: 'advance' | 'retreat';
 }
 
-const UpdateStatusModal = ({ open, order, onClose, onConfirm }: UpdateStatusModalProps) => {
+const UpdateStatusModal = ({ open, order, onClose, onConfirm, targetStatus, direction}: UpdateStatusModalProps) => {
   const currentStatus = useMemo(
     () => getCurrentStatus(order.statusHistory),
     [order.statusHistory]
@@ -59,7 +63,7 @@ const UpdateStatusModal = ({ open, order, onClose, onConfirm }: UpdateStatusModa
   // queda para más adelante.
   const availableStatuses = ALL_STATUSES;
 
-  const [status, setStatus] = useState<EnumOrderStatus | undefined>(undefined);
+  const [selectedStatus, setSelectedStatus] = useState<EnumOrderStatus | undefined>(undefined);
   const [comment, setComment] = useState('');
   const [notifyClient] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -68,9 +72,19 @@ const UpdateStatusModal = ({ open, order, onClose, onConfirm }: UpdateStatusModa
 
   if (!open) return null;
 
-  const canSubmit = status !== undefined && !submitting;
-  const commentLabel = status ? (COMMENT_LABELS[status] ?? 'Comentarios') : 'Comentarios';
+    const isFixed = targetStatus !== undefined;
+    const isRetreat = direction === 'retreat';
+    // Fijo desde afuera, o el que eligió el técnico en el select
+    const status = targetStatus ?? selectedStatus;
+    const blockReason = status ? getBlockReason(order, status) : null;
+    const canSubmit = status !== undefined && !submitting && !blockReason;
+    const commentLabel = status ? (COMMENT_LABELS[status] ?? 'Comentarios') : 'Comentarios';
 
+    const title = !isFixed
+      ? 'Actualizar Estado de Orden'
+      : isRetreat
+        ? `Volver a "${STATUS_LABELS[targetStatus]}"`
+        : `Avanzar a "${STATUS_LABELS[targetStatus]}"`;
   const handleConfirm = async () => {
     if (!canSubmit || !status) return;
 
@@ -115,46 +129,49 @@ const UpdateStatusModal = ({ open, order, onClose, onConfirm }: UpdateStatusModa
   };
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
+    <div className={styles.overlay} onClick={() => !submitting && onClose()}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Actualizar Estado de Orden</h2>
+          <h2 className={styles.title}>{title}</h2>
           <button className={styles.closeBtn} onClick={onClose} aria-label="Cerrar modal">
             <X size={18} />
           </button>
         </div>
 
-        <div className={styles.field}>
-          <label className={styles.label} htmlFor="new-status">Nuevo Estado</label>
-          <select
-            id="new-status"
-            className={styles.select}
-            value={status ?? ''}
-            onChange={(e) => setStatus(e.target.value as EnumOrderStatus)}
-            disabled={submitting}
-          >
-            <option value="" disabled>Seleccioná un estado...</option>
-            {availableStatuses.map((s) => (
-              <option key={s} value={s}>
-                {STATUS_LABELS[s]}
-                {s === currentStatus ? ' (actual)' : ''}
-              </option>
-            ))}
-          </select>
-        </div>
+        {isRetreat && (
+          <p className={styles.warning}>
+            Vas a retroceder el estado de la orden. El cambio queda registrado en el historial.
+          </p>
+        )}
 
-        <div className={styles.field}>
-          {status === 'diagnostico' && (
-            <div>
-              <Diagnostic order={order} />
-            </div>
-          )}
-          {status === 'presupuestado' && (
-            <div>
-              <Budget order={order} />
-            </div>
-          )}
-        </div>
+        {/* El select solo existe en modo libre */}
+        {!isFixed && (
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="new-status">Nuevo Estado</label>
+            <select
+              id="new-status"
+              className={styles.select}
+              value={selectedStatus ?? ''}
+              onChange={(e) => setSelectedStatus(e.target.value as EnumOrderStatus)}
+              disabled={submitting}
+            >
+              <option value="" disabled>Seleccioná un estado...</option>
+              {ALL_STATUSES.map((s) => (
+                <option key={s} value={s}>
+                  {STATUS_LABELS[s]}
+                  {s === currentStatus ? ' (actual)' : ''}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {!isRetreat && (
+          <div className={styles.field}>
+            {status === 'diagnostico' && <Diagnostic order={order} />}
+            {status === 'presupuestado' && <Budget order={order} />}
+          </div>
+        )}
 
         <div className={styles.field}>
           <label className={styles.label} htmlFor="status-comment">{commentLabel}</label>
@@ -181,28 +198,20 @@ const UpdateStatusModal = ({ open, order, onClose, onConfirm }: UpdateStatusModa
         </label>
            */}
 
-        {errorMessage && (
-          <p className={styles.errorText}>{errorMessage}</p>
-        )}
+        {blockReason && <p className={styles.warning}>{blockReason}</p>}
+        {errorMessage && <p className={styles.errorText}>{errorMessage}</p>}
 
         <div className={styles.actions}>
           <ActionButton
-            label="Confirmar Cambio"
+            label={isRetreat ? 'Confirmar retroceso' : 'Confirmar Cambio'}
             icon={null}
-            variant="primary"
+            variant={isRetreat ? 'danger' : 'primary'}
             fullWidth
             disabled={!canSubmit}
             loading={submitting}
             onClick={handleConfirm}
           />
-          <ActionButton
-            label="Cancelar"
-            icon={null}
-            variant="ghost"
-            fullWidth
-            onClick={onClose}
-            disabled={submitting}
-          />
+          <ActionButton label="Cancelar" icon={null} variant="ghost" fullWidth onClick={onClose} disabled={submitting} />
         </div>
       </div>
     </div>

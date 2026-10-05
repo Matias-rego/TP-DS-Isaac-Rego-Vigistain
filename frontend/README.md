@@ -17,57 +17,34 @@ If you are developing a production application, we recommend updating the config
 
 ```js
 export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+  # Frontend
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+  Interfaz web del sistema de gestión del taller, implementada con React, TypeScript y Vite. Se comunica con la API Express y recibe actualizaciones de estado en tiempo real mediante Socket.IO.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+  ## Desarrollo
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+  Desde este directorio:
 
-```js
-// eslint.config.js
+  ```bash
+  pnpm install
+  pnpm dev
+  ```
+
+  Vite inicia la aplicación en `http://localhost:5173` por defecto. Configurar las URLs del backend en `frontend/.env`; los valores y pasos están en la [guía de instalación](../docs/05-instalacion/instalacion-configuracion.md).
+
+  ## Variables de entorno
+
+  - `VITE_BACKEND_URL`: origen de la API; default `http://localhost:3000`.
+  - `VITE_WS_URL`: origen de Socket.IO; opcional, default `ws://localhost:3000`.
+
+  ## Scripts
+
+  | Comando | Descripción |
+  |---|---|
+  | `pnpm dev` | Servidor Vite de desarrollo. |
+  | `pnpm build` | Verificación TypeScript y build de producción. |
+  | `pnpm lint` | ESLint. |
+  | `pnpm preview` | Previsualización del build. |
+
+  La documentación general está en el [README del proyecto](../README.md), la [referencia de API](../server/api-doc.md) y el [índice de documentación](../docs/README.MD).
 import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
