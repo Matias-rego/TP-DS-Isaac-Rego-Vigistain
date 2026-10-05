@@ -1,8 +1,8 @@
-import Nav from "../Nav/Nav";
+import Nav from "../../components/layout/Nav/Nav";
 import styles from './Gestion.module.css';
 import { useEffect, useState, useCallback } from "react";
 import TarjetaGestion from "../../components/TarjetaGestion/TarjetaGestion";
-import TableRtl from "@/components/Common/DataTable/DataTable";
+import DataTable from "@/components/Common/DataTable/DataTable";
 import type { ColumnConfig } from "@/components/Common/DataTable/DataTable";
 import AltaTipoFalla from '@/pages/TipoFalla/AltaTipoFalla';
 import BajaTipoFalla from '@/pages/TipoFalla/BajaTipoFalla';
@@ -142,87 +142,87 @@ const Gestion = () => {
   }, [busquedaTP]);
 
   const opciones = [
-    { key: 'falla',   titulo: 'Tipo de Falla',   icon: <Wrench size={26} />,     descripcion: 'Administrá los tipos de falla que pueden ocurrir en los dispositivos.' },
-    { key: 'cliente', titulo: 'Tipo de Cliente', icon: <Users size={26} />,      descripcion: 'Administrá los tipos de cliente que interactúan con tu negocio.' },
-    { key: 'pago',    titulo: 'Tipo de Pago',    icon: <CreditCard size={26} />, descripcion: 'Administrá los métodos de pago que tus clientes pueden utilizar.' },
+    { key: 'falla', titulo: 'Tipo de Falla', icon: <Wrench size={26} />, descripcion: 'Administrá los tipos de falla que pueden ocurrir en los dispositivos.' },
+    { key: 'cliente', titulo: 'Tipo de Cliente', icon: <Users size={26} />, descripcion: 'Administrá los tipos de cliente que interactúan con tu negocio.' },
+    { key: 'pago', titulo: 'Tipo de Pago', icon: <CreditCard size={26} />, descripcion: 'Administrá los métodos de pago que tus clientes pueden utilizar.' },
   ];
 
   return (
     <>
-    <div className={styles.bodyContainer}>
-      <Nav />
-      <div className={styles.container}>
-        <div className={styles.header}>
-          <h1 className={styles.titleHeader}>Gestión</h1>
-          <p className={styles.descriptionHeader}>
-            {seleccion === null
-              ? 'Elegí qué querés administrar: tipos de falla, tipos de cliente o tipos de pago.'
-              : 'Gestioná los registros de esta categoría. Podés volver para elegir otra.'}
-          </p>
-        </div>
+      <div className={styles.bodyContainer}>
+        <Nav />
+        <div className={styles.container}>
+          <div className={styles.header}>
+            <h1 className={styles.titleHeader}>Gestión</h1>
+            <p className={styles.descriptionHeader}>
+              {seleccion === null
+                ? 'Elegí qué querés administrar: tipos de falla, tipos de cliente o tipos de pago.'
+                : 'Gestioná los registros de esta categoría. Podés volver para elegir otra.'}
+            </p>
+          </div>
 
-        {seleccion === null ? (
-          
-          <div className={styles.opcionesGrid}>
-            {opciones.map((o) => (
-              <button key={o.key} type="button" className={styles.opcionCard} onClick={() => setSeleccion(o.key)}>
-                <span className={styles.opcionIcon}>{o.icon}</span>
-                <h3 className={styles.opcionTitulo}>{o.titulo}</h3>
-                <p className={styles.opcionDesc}>{o.descripcion}</p>
-                <span className={styles.opcionAbrir}>Abrir →</span>
+          {seleccion === null ? (
+
+            <div className={styles.opcionesGrid}>
+              {opciones.map((o) => (
+                <button key={o.key} type="button" className={styles.opcionCard} onClick={() => setSeleccion(o.key)}>
+                  <span className={styles.opcionIcon}>{o.icon}</span>
+                  <h3 className={styles.opcionTitulo}>{o.titulo}</h3>
+                  <p className={styles.opcionDesc}>{o.descripcion}</p>
+                  <span className={styles.opcionAbrir}>Abrir →</span>
+                </button>
+              ))}
+            </div>
+          ) : (
+
+            <div className={styles.detalle}>
+              <button type="button" className={styles.volverBtn} onClick={() => setSeleccion(null)}>
+                <ArrowLeft size={18} /> Volver
               </button>
-            ))}
-          </div>
-        ) : (
-          
-          <div className={styles.detalle}>
-            <button type="button" className={styles.volverBtn} onClick={() => setSeleccion(null)}>
-              <ArrowLeft size={18} /> Volver
-            </button>
 
-            {seleccion === 'falla' && (
-              <TarjetaGestion
-                titulo="Tipo de Falla"
-                descripcion="Administrá los tipos de falla que pueden ocurrir en los dispositivos. Agregá, editá o eliminá categorías para mantener tu sistema organizado."
-                childrenTable={
-                  <TableRtl data={failureTypesData} idField="id_failure_type" columns={COLUMNS_TF} caption="Tabla de Tipos de Fallas" showTotal={false} />
-                }
-                childrenFuncionAlta={<AltaTipoFalla />}
-                childrenFuncionBaja={<BajaTipoFalla />}
-                childrenFuncionModify={<ModificacionTipoFalla />}
-              />
-            )}
+              {seleccion === 'falla' && (
+                <TarjetaGestion
+                  titulo="Tipo de Falla"
+                  descripcion="Administrá los tipos de falla que pueden ocurrir en los dispositivos. Agregá, editá o eliminá categorías para mantener tu sistema organizado."
+                  childrenTable={
+                    <DataTable data={failureTypesData} idField="id_failure_type" columns={COLUMNS_TF} caption="Tabla de Tipos de Fallas" showTotal={false} />
+                  }
+                  childrenFuncionAlta={<AltaTipoFalla />}
+                  childrenFuncionBaja={<BajaTipoFalla />}
+                  childrenFuncionModify={<ModificacionTipoFalla />}
+                />
+              )}
 
-            {seleccion === 'cliente' && (
-              <TarjetaGestion
-                titulo="Tipo de Cliente"
-                descripcion="Administrá los tipos de cliente que interactúan con tu negocio. Agregá, editá o eliminá categorías para segmentar tus servicios."
-                childrenTable={
-                  <TableRtl data={clientTypesData} idField="id_client_type" columns={COLUMNS_TC} caption="Tabla de Tipos de Cliente" showTotal={false} />
-                }
-                childrenFuncionAlta={<AltaTipoCliente />}
-                childrenFuncionBaja={<BajaTipoCliente />}
-                childrenFuncionModify={<ModifyClientCategory />}
-              />
-            )}
+              {seleccion === 'cliente' && (
+                <TarjetaGestion
+                  titulo="Tipo de Cliente"
+                  descripcion="Administrá los tipos de cliente que interactúan con tu negocio. Agregá, editá o eliminá categorías para segmentar tus servicios."
+                  childrenTable={
+                    <DataTable data={clientTypesData} idField="id_client_type" columns={COLUMNS_TC} caption="Tabla de Tipos de Cliente" showTotal={false} />
+                  }
+                  childrenFuncionAlta={<AltaTipoCliente />}
+                  childrenFuncionBaja={<BajaTipoCliente />}
+                  childrenFuncionModify={<ModifyClientCategory />}
+                />
+              )}
 
-            {seleccion === 'pago' && (
-              <TarjetaGestion
-                titulo="Tipo de Pago"
-                descripcion="Administrá los métodos de pago que tus clientes pueden utilizar. Agregá, editá o eliminá métodos para dar más flexibilidad."
-                childrenTable={
-                  <TableRtl data={paymentTypesData} idField="id_payment_type" columns={COLUMNS_PT} caption="Tabla de Tipos de Pago" showTotal={false} />
-                }
-                childrenFuncionAlta={<RegisterPaymentType />}
-                childrenFuncionBaja={<DeletePaymentType />}
-                childrenFuncionModify={<ModifyPaymentType />}
-              />
-            )}
-          </div>
-        )}
+              {seleccion === 'pago' && (
+                <TarjetaGestion
+                  titulo="Tipo de Pago"
+                  descripcion="Administrá los métodos de pago que tus clientes pueden utilizar. Agregá, editá o eliminá métodos para dar más flexibilidad."
+                  childrenTable={
+                    <DataTable data={paymentTypesData} idField="id_payment_type" columns={COLUMNS_PT} caption="Tabla de Tipos de Pago" showTotal={false} />
+                  }
+                  childrenFuncionAlta={<RegisterPaymentType />}
+                  childrenFuncionBaja={<DeletePaymentType />}
+                  childrenFuncionModify={<ModifyPaymentType />}
+                />
+              )}
+            </div>
+          )}
+        </div>
+        <Footer />
       </div>
-      <Footer />
-    </div>
     </>
   );
 };

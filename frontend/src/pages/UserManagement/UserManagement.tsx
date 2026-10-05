@@ -1,4 +1,4 @@
-import Nav from "../Nav/Nav";
+import Nav from "../../components/layout/Nav/Nav";
 import Footer from "@/components/Footer/Footer";
 import styles from "./UserManagement.module.css";
 import SearchBar from "@/components/SearchBar/SearchBar";
@@ -129,7 +129,7 @@ const UserManagement = () => {
     },
   ], [availableRoles]);
 
-    return(
+  return (
     <div className={styles.page}>
       <Nav />
       <div className={styles.content}>

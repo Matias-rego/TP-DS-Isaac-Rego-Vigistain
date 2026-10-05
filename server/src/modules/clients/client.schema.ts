@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { name, phone, email, cuit } from "@/utils/fields.js";
+import { name, phone, email, cuit, date, id } from "@/utils/fields.js";
 import { QuerySchema } from "@/shared/common.schema.js";
 import { enumSchema } from "@/utils/fields.js";
 
@@ -22,17 +22,16 @@ export const modifyClientSchema = z.object({
 
 export type ModifyClientDto = z.infer<typeof modifyClientSchema>;
 
-// Reemplaza al viejo getPartialClient: "search" cubre nombre/email/cuit,
-// y "categoryClient" filtra por el nombre del tipo de cliente asociado
-// (lo que antes hacía el filtro `categoryClient` de req.query a mano).
 export const clientQuerySchema = QuerySchema.extend({
-    categoryClient: z.string().optional(),
     sortBy: enumSchema([
         "clientName",
         "clientEmail",
         "cuit",
         "dateOfRegistration",
     ], "sortBy").default("dateOfRegistration"),
+    dateFrom: date.optional(),
+    dateTo: date.optional(),
+    id_client_type: id.optional(),
 });
 
 export type ClientQueryDto = z.infer<typeof clientQuerySchema>;

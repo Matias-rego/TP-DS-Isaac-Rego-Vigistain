@@ -29,6 +29,11 @@
 }
 
 .searchIcon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background-color: currentColor;
+  mask: url('@/assets/SearchIcon.svg') center / contain no-repeat;
   color: var(--tf-muted);
   flex-shrink: 0;
 }
@@ -80,6 +85,15 @@
 .filterWrapper {
   position: relative;
   flex-shrink: 0;
+}
+
+.filterIcon {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  flex: 0 0 15px;
+  background-color: currentColor;
+  mask: url('@/assets/FiltersIcon.svg') center / contain no-repeat;
 }
 
 .filterBtn {

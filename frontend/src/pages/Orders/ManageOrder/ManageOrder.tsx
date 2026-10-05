@@ -2,7 +2,7 @@ import BACKEND_URL from "@/lib/config";
 import type { EnumOrderStatus, Order } from "@/types/types";
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import Nav from "@/pages/Nav/Nav";
+import Nav from "@/components/layout/Nav/Nav";
 import OrderDetailNav from "@/components/OrderComponent/OrderDetailNav/OrderDetailNav";
 import StatusPipeline from "@/components/Status/StatusPipeline/StatusPipeline";
 import Footer from "@/components/Footer/Footer";
