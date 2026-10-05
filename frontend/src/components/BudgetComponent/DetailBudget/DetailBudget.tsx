@@ -76,7 +76,6 @@ const IconSend = (
 export default function DetailBudget({
   budget,
   onIssue,
-  onCancel,
   loading = false,
   currencySymbol = '$',
 }: DetailBudgetProps) {
@@ -93,8 +92,8 @@ export default function DetailBudget({
   } = useBudgetTotals(budget.id_order, budget.id_budget);
 
   const totalPaid = useMemo(
-    () => (budget?.payments ?? []).reduce((acc: number, p) => acc + (Number(p.amount) || 0), 0),
-    [budget?.payments]
+    () => (budget.payments ?? []).reduce((acc: number, p) => acc + (Number(p.amount) || 0), 0),
+    [budget.payments]
   );
 
   const estimatedTotal = failuresTotal + addedCostsTotal + budget.laborCost;

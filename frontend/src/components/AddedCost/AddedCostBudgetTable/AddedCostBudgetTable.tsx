@@ -7,7 +7,7 @@ import styles from "./AddedCostBudgetTable.module.css";
 import type { EnumTypeAddedCost } from "@/types/types"
 
 const TYPE_LABELS: Record<EnumTypeAddedCost, string> = {
-  respuesto: "Repuesto",
+  repuesto: "Repuesto",
   procedimientoEspecial: "Procedimiento especial",
   garantia: "Garantía",
   reparacionExpress: "Reparación express",
