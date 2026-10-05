@@ -4,31 +4,31 @@ import { ChevronDown } from 'lucide-react';
 import { FilterField } from './FilterField';
 import styles from '../Filters.module.css';
 
-export interface FilterOption {
-  value: string;
+export interface FilterOption<T extends string = string> {
+  value: T;
   label: string;
 }
 
-interface SelectFilterProps {
+interface SelectFilterProps<T extends string> {
   label: string;
-  value: string | undefined;
-  onChange: (value: string | undefined) => void;
-  options: FilterOption[];
+  value: T | undefined;
+  onChange: (value: T | undefined) => void;
+  options: FilterOption<T>[];
   placeholder?: string;
 }
 
-export const SelectFilter = ({
+export const SelectFilter = <T extends string>({
   label,
   value,
   onChange,
   options,
   placeholder = 'Todos',
-}: SelectFilterProps) => {
+}: SelectFilterProps<T>) => {
   const listId = useId();
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const selectedIndex = Math.max(0, options.findIndex((option) => option.value === value) + 1);
-  const listOptions = [{ value: '', label: placeholder }, ...options];
+  const listOptions = [{ value: '' as T | '', label: placeholder }, ...options];
   const selectedLabel = listOptions[selectedIndex]?.label ?? placeholder;
 
   const chooseOption = (index: number) => {

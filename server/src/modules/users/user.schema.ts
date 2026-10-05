@@ -27,6 +27,7 @@ export const userQuerySchema = QuerySchema.extend({
         "rol",
         "id_user"
     ], "sortBy").default("userName"),
+    ofRol: EnumRol.optional(),
 }).strict();
 
 export type UserQueryDto = z.infer<typeof userQuerySchema>;

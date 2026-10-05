@@ -20,6 +20,7 @@ import BudgetPdfPreview from "@/components/PDF/BudgetPdfPreview";
 import AppLayout from "@/components/layout/AppLayout";
 import Management from "@/features/Management/pages/Management";
 import BudgetResponse from "@/pages/Budget/BudgetResponse/BudgetResponse";
+import UsersManagement from "@/features/users/pages/UserManagement";
 export const capitalize = (text: string): string => {
   if (!text) return ""; 
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
@@ -87,6 +88,7 @@ const App = () => {
           <Route path="/showBudget/:id_budget" element = {<RutaPrivada><BudgetPdfPreview/></RutaPrivada>} />
           
           <Route element={<AppLayout />}>
+            <Route path="/user" element = {<RutaPrivada><UsersManagement /></RutaPrivada>}/>
             <Route path="/management" element = {<RutaPrivada><Management /></RutaPrivada>}/>
           </Route>
         </Route>
