@@ -17,7 +17,7 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-async function enviarPdfPorMail(budget: BudgetWithRelations, tokenVerificacionPres: string): Promise<void> {
+async function enviarPdfPorMail(budget: BudgetWithRelations): Promise<void> {
     const pdfBuffer = await renderBudgetPdf(budget);
     const client = budget.order.equipment.client;
 
@@ -26,7 +26,7 @@ async function enviarPdfPorMail(budget: BudgetWithRelations, tokenVerificacionPr
             from: `"TechFix" <${config.EMAIL_USER}>`,
             to: client.clientEmail,
             subject: `Presupuesto N° ${budget.nroBudget} - TechFix`,
-            html: crearMailPresupuesto(client.clientName, budget.nroBudget, tokenVerificacionPres),
+            html: crearMailPresupuesto(client.clientName, budget.nroBudget),
             attachments: [
                 {
                     filename: `presupuesto-${budget.nroBudget}.pdf`,
@@ -43,8 +43,7 @@ async function enviarPdfPorMail(budget: BudgetWithRelations, tokenVerificacionPr
 }
 
 
-function crearMailPresupuesto(clientName: string, nroBudget: number, tokenVerificacionPres: string) {
-    const linkClientResponse = `${config.FRONTEND_URL}/budgets/response/${tokenVerificacionPres}`;
+function crearMailPresupuesto(clientName: string, nroBudget: number) {
     return `
     <!DOCTYPE html>
     <html>
@@ -71,14 +70,7 @@ function crearMailPresupuesto(clientName: string, nroBudget: number, tokenVerifi
                         <tr>
                             <td style="padding: 20px 0 10px 0; color: #475569; font-size: 16px; line-height: 24px;">
                                 Hola, <strong>${clientName}</strong>.<br><br>
-                                Te adjuntamos el pdf del presupuesto correspondiente a tu equipo y ademas un link en donde podras indicar tu respuesta, aprobarlo, realizar sugerencias o rechazarlo en caso de que asi lo consideres, tendras 48 horas para responder.  Cualquier consulta, quedamos a disposición.
-                            </td>
-                            <td style="padding: 20px 0; text-align: center;">
-                                <a href="${linkClientResponse}" 
-                                   target="_blank" 
-                                   style="background-color: #2563eb; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 6px; font-weight: bold; font-size: 16px; display: inline-block;">
-                                   Ver y Responder Presupuesto
-                                </a>
+                                Te adjuntamos el presupuesto correspondiente a tu equipo. Cualquier consulta, quedamos a disposición.
                             </td>
                         </tr>
                         <tr>

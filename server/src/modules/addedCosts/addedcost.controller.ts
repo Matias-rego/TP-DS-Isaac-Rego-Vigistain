@@ -2,7 +2,6 @@ import type { NextFunction, Request, Response } from "express";
 import type { IdDto } from "@/shared/common.schema.js";
 import type { RegisterAddedCostDto, ModifyAddedCostDto, AddedCostQueryDto } from "./addedcost.schema.js";
 import type { AddedCostService } from "./addedcost.service.js";
-import { emitEvent } from "@/websocket.js";
 
 export class AddedCostController {
     constructor(private service: AddedCostService) { }
@@ -12,7 +11,6 @@ export class AddedCostController {
 
         try {
             const addedCost = await this.service.create(data);
-            emitEvent("addedCost:changed", addedCost);
             return res.status(201).json(addedCost);
         } catch (error) {
             next(error);
@@ -62,7 +60,6 @@ export class AddedCostController {
 
         try {
             const addedCost = await this.service.update(id, data);
-            emitEvent("addedCost:changed", addedCost);
             return res.json(addedCost);
         } catch (error) {
             next(error);
@@ -74,7 +71,6 @@ export class AddedCostController {
 
         try {
             const result = await this.service.delete(id);
-            emitEvent("addedCost:deleted", { id });
             return res.json(result);
         } catch (error) {
             next(error);

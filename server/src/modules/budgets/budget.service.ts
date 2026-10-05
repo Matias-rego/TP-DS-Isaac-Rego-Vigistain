@@ -5,7 +5,6 @@ import type { BudgetRepository } from "./budget.repository.js";
 import type { AddedCostRepository } from "@/modules/addedCosts/addedcost.repository.js";
 import type { StatusService } from "@/modules/status/status.service.js";
 import type { Budget } from "./budget.entity.js";
-import { string } from "zod";
 
 interface CreateBudgetInput {
     id_order: string;
@@ -36,6 +35,9 @@ export class BudgetService {
         return this.repo.findByOrderId(id_order);
     }
 
+    // estimatedTotal = mano de obra + costo estimado de cada falla de la
+    // orden (Failure_Type.estimatedImport) - descuento. Todavía no hay
+    // AddedCost en este punto (recién se está creando el presupuesto).
     async create(input: CreateBudgetInput): Promise<Budget> {
         const discount = input.discount ?? 0;
         const failureCosts = await this.repo.sumFailureCosts(input.id_order);
@@ -48,6 +50,8 @@ export class BudgetService {
             estimatedTotal,
         } as Budget);
 
+        // El presupuesto se genera después del diagnóstico: al crearlo,
+        // la orden pasa a "presupuestado".
         await this.statusService.createStatus({
             id_order: input.id_order,
             id_user: input.id_user,
@@ -58,6 +62,8 @@ export class BudgetService {
     }
 
     async update(id: string, input: Partial<Budget>): Promise<Budget | undefined> {
+        // Si cambia laborCost o discount hay que recalcular el total; el
+        // resto de los campos (ej. status) se puede actualizar directo.
         if (input.laborCost !== undefined || input.discount !== undefined) {
             return this.recalculateEstimatedTotal(id, input);
         }
@@ -65,18 +71,9 @@ export class BudgetService {
         return this.repo.update(id, input);
     }
 
-    async modifyBudget(id: string, input: Partial<Budget>): Promise<Budget | undefined> {
-        const budget = await this.repo.findById(id);
-        if (!budget) throw new Error('Presupuesto no encontrado');
-
-        return this.update(id, {
-            status: 'pendiente',
-            ...input,
-            
-        });
-    }
-
-
+    // Recalcula y persiste estimatedTotal. La usa tanto update() (si
+    // cambia laborCost/discount) como AddedCostService, después de
+    // crear/editar/borrar un costo adicional.
     async recalculateEstimatedTotal(id: string, overrides: Partial<Budget> = {}): Promise<Budget | undefined> {
         const current = await this.repo.findById(id);
         if (!current) return undefined;
@@ -105,33 +102,5 @@ export class BudgetService {
     async sumFailureCost(id_order:string): Promise<number>{
         const result = this.repo.sumFailureCosts(id_order);
         return result;
-    };
-    async respondToBudget(id_budget: string, data: { status: $Enums.EnumBudgetStatus; client_suggestion?: string | null }): Promise<Budget | undefined> {
-        const budget = await this.repo.findById(id_budget);
-        if(!budget){
-            throw new Error(`Presupuesto con id ${id_budget} no encontrado`);
-        };
-        if (budget.status !== 'pendiente') {
-            throw new Error('El presupuesto ya fue respondido');
-        };
-        const result = await this.repo.update(id_budget, {
-            status: data.status,
-            clientSuggestion: String(data.client_suggestion) ?? null,
-        });
-        if(data.status === 'aprobado'){
-            const idUser = await this.statusService.findLastUserByStatus(
-                budget.id_order,
-                'presupuestado'
-            );
-            if(!idUser){
-                throw new Error('No se pudo encontrar el id del usuario que presupuesto');
-            }
-            await this.statusService.createStatus({
-                id_order: budget.id_order,
-                id_user: String(idUser),
-                status: $Enums.EnumOrderStatus.aprobado,
-            });
-        }
-        return result;
-    }
+    } 
 }

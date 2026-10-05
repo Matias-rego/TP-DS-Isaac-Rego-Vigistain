@@ -190,7 +190,7 @@ model Budget {
   payments                Payment[]
   addedCosts              AddedCost[]
   budgetDate              DateTime              @default(now())
-  clientSuggestion        String?               
+
   @@map("Budget")
 }
 

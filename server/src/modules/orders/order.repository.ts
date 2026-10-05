@@ -212,10 +212,8 @@ export class OrderRepository extends BaseRepository<Order, OrderQueryDto> {
                 discount: rawBudget.discount,
                 status: rawBudget.status,
                 budgetDate: rawBudget.budgetDate,
-                clientSuggestion: rawBudget.clientSuggestion ?? null,
                 addedCosts: "addedCosts" in rawBudget ? rawBudget.addedCosts : undefined,
                 order: "failures" in order ? { failures: order.failures } : undefined,
-                
             })
             : undefined;
 

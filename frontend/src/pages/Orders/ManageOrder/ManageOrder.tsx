@@ -1,6 +1,6 @@
 import BACKEND_URL from "@/lib/config";
-import type { EnumOrderStatus, Order } from "@/types/types";
-import { useCallback, useEffect, useState } from "react";
+import type { Order } from "@/types/types";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Nav from "@/pages/Nav/Nav";
 import OrderDetailNav from "@/components/OrderComponent/OrderDetailNav/OrderDetailNav";
@@ -8,150 +8,73 @@ import StatusPipeline from "@/components/Status/StatusPipeline/StatusPipeline";
 import Footer from "@/components/Footer/Footer";
 import ClientDetailCard from "@/components/ClientCard/ClientDetailCard/ClientDetailCard";
 import EquipmentDetailCard from "@/components/EquipmentComponent/EquipmentDetailCard/EquipmentDetailCard";
-import CreateBudget from "@/components/BudgetComponent/CrateBudget/CreateBudget";
-import UpdateStatusModal from "@/components/Status/UpdateStatusModal/UpdateStatusModal";
+import DetailBudget from "@/components/BudgetComponent/DetailBudget/DetailBudget";
 import styles from "./ManageOrder.module.css";
-import Diagnostic from "@/components/Status/UpdateStatusModal/Diagnostic/Diagnostic";
 
-type Transition = { target: EnumOrderStatus; direction: "advance" | "retreat" };
 
 const ManageOrder = () => {
-  const { id_order } = useParams<{ id_order: string }>();
   const [order, setOrder] = useState<Order | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [transition, setTransition] = useState<Transition | null>(null);
-
-  const getCurrentStatus = (o: Order): EnumOrderStatus => {
-    const latest = [...(o.statusHistory ?? [])].sort(
-      (a, b) => new Date(b.dateOfChange).getTime() - new Date(a.dateOfChange).getTime()
-    )[0];
-    return latest?.status ?? o.status;
-  };
-
-  const fetchOrder = useCallback(
-    async (silent = false, signal?: AbortSignal) => {
-      if (!id_order) return;
-
-      if (!silent) {
-        setLoading(true);
-        setError(null);
-      }
-
-      try {
-        const response = await fetch(`${BACKEND_URL}/api/orders/${id_order}`, {
-          credentials: "include",
-          method: "GET",
-          signal,
-        });
-
-        if (response.status === 404) throw new Error("La orden no existe.");
-        if (!response.ok) throw new Error(`Error en la petición: ${response.status}`);
-
-        setOrder(await response.json());
-      } catch (e) {
-        if ((e as Error).name === "AbortError") return;
-        console.error("Error al obtener la orden", e);
-        if (!silent) {
-          setError(e instanceof Error ? e.message : "No se pudo cargar la orden.");
-          setOrder(null);
-        }
-      } finally {
-        if (!silent && !signal?.aborted) setLoading(false);
-      }
-    },
-    [id_order]
-  );
+  const { id_order } = useParams<{ id_order: string }>();
 
   useEffect(() => {
-    if (!id_order) {
-      setError("No se indicó la orden.");
-      setLoading(false);
-      return;
-    }
+    if (!id_order) return;
 
-    const controller = new AbortController();
-    fetchOrder(false, controller.signal);
-    return () => controller.abort();
-  }, [id_order, fetchOrder]);
+    const fetchOrder = async () => {
+      try {
+        const response = await fetch(
+          `${BACKEND_URL}/api/orders/${id_order}`,
+          {
+            credentials: "include",
+            method: "GET",
+          }
+        );
 
-  // Reglas mínimas para poder AVANZAR. Retroceder no se bloquea.
-  // Son solo ayuda visual: la validación real tiene que estar en el backend.
+        if (!response.ok) {
+          throw new Error(`Error en la petición: ${response.status}`);
+        }
 
-  const equipment = order?.equipment;
-  const client = equipment?.client;
-  
-  const renderContent = () => {
-    if (loading) {
-      return <div className={styles.state}>Cargando orden...</div>;
-    }
+        const data: Order = await response.json();
+        setOrder(data);
+      } catch (e) {
+        console.error("Error al obtener la orden", e);
+      }
+    };
 
-    if (error || !order) {
-      return (
-        <div className={`${styles.state} ${styles.stateError}`} role="alert">
-          {error ?? "No se pudo cargar la orden."}
-        </div>
-      );
-    }
-
-    return (
-      <main className={styles.main}>
-        <section className={styles.orderHeader}>
-          <OrderDetailNav order={order} />
-        </section>
-
-        <section className={styles.pipelineSection}>
-          <StatusPipeline
-            order={order}
-            onAdvance={(s) => setTransition({ target: s, direction: "advance" })}
-            onRetreat={(s) => setTransition({ target: s, direction: "retreat" })}
-          />
-        </section>
-
-        <section className={styles.detailsRow}>
-          {client ? (
-            <ClientDetailCard client={client} />
-          ) : (
-            <div className={styles.missing}>Esta orden no tiene un cliente asociado.</div>
-          )}
-
-          {equipment ? (
-            <EquipmentDetailCard equipment={equipment} />
-          ) : (
-            <div className={styles.missing}>Esta orden no tiene un equipo asociado.</div>
-          )}
-        </section>
-
-        {["recibido", "diagnostico"].includes(getCurrentStatus(order))&&(
-          <section className={styles.budgetSection}>
-            <Diagnostic order={order} />
-          </section>
-        )}
-        {["presupuestado", "aprobado", "reparacion", "listo", "entregado", "cancelado"].includes(getCurrentStatus(order))&&(
-          <section className={styles.budgetSection}>
-            <CreateBudget order={order} />
-          </section>
-        )}
-
-        {transition && (
-          <UpdateStatusModal
-            key={`${transition.direction}-${transition.target}`}
-            open
-            order={order}
-            targetStatus={transition.target}
-            direction={transition.direction}
-            onClose={() => setTransition(null)}
-            onConfirm={() => fetchOrder(true)}
-          />
-        )}
-      </main>
-    );
-  };
+    fetchOrder();
+  }, [id_order]);
 
   return (
     <div className={styles.page}>
       <Nav />
-      {renderContent()}
+
+      {order && order.equipment && order.equipment.client && order.budget && (
+        <main className={styles.main}>
+
+          <section className={styles.orderHeader}>
+            <OrderDetailNav order={order} />
+          </section>
+
+          <section className={styles.pipelineSection}>
+            <StatusPipeline order={order} />
+          </section>
+
+          <section className={styles.contentGrid}>
+
+            <div className={styles.detailsColumn}>
+              <ClientDetailCard client={order.equipment.client} />
+
+              <EquipmentDetailCard equipment={order.equipment} />
+            </div>
+
+            <div className={styles.budgetColumn}>
+              <DetailBudget budget={order.budget} />
+            </div>
+
+          </section>
+
+        </main>
+      )}
+
       <Footer />
     </div>
   );

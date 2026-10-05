@@ -25,7 +25,6 @@ export class AddedCostService {
     async create(input: Omit<AddedCost, "id_addedCost">): Promise<AddedCost> {
         const addedCost = await this.repo.create(input as AddedCost);
         await this.budgetService.recalculateEstimatedTotal(input.id_budget);
-        await this.budgetService.modifyBudget(input.id_budget,{});
         return addedCost;
     }
 

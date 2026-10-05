@@ -42,7 +42,6 @@ export function toBudgetDomain(budget: BudgetMappingInput): Budget {
         budget.order,
         budget.addedCosts,
         budget.payments,
-        budget.clientSuggestion ?? undefined
     );
 }
 
@@ -136,8 +135,6 @@ export class BudgetRepository extends BaseRepository<Budget, BudgetQueryDto> {
                 ...(item.status !== undefined && { status: item.status }),
                 ...(item.nroBudget !== undefined && { nroBudget: item.nroBudget }),
                 ...(item.budgetDate !== undefined && { budgetDate: item.budgetDate }),
-                ...(item.clientSuggestion !== undefined && { clientSuggestion: item.clientSuggestion }),
-    
             },
         });
 

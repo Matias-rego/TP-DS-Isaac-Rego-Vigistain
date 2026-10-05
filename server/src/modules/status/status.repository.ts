@@ -1,4 +1,4 @@
-import type { EnumOrderStatus, Status_History as StatusHistory_P } from "@/generated/prisma/client.js";
+import type { Status_History as StatusHistory_P } from "@/generated/prisma/client.js";
 import type { PaginatedResult } from "@/shared/base.repository.js";
 import type { StatusQueryDto } from "./status.schema.js";
 import { BaseRepository } from "@/shared/base.repository.js";
@@ -126,19 +126,6 @@ export class StatusHistoryRepository extends BaseRepository<StatusHistory, Statu
         return {
             id: entry.id_status_history,
         };
-    };
-    public async findLastByOrderIdAndStatus(id_order: string, status: EnumOrderStatus): Promise<StatusHistory | null> {
-        const lastStatus = await this.prisma.status_History.findFirst({
-            where: {
-                id_order,
-                status,
-            },
-            orderBy: {
-              dateOfChange  : 'desc', 
-            },
-        });
-        if (!lastStatus) return null;
-        return this.toDomain(lastStatus);
     }
 
     private toDomain(entry: StatusHistory_P & { user?: { userName: string; urlPicture: string | null } }): StatusHistory {

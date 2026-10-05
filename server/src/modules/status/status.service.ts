@@ -7,7 +7,6 @@ import type { StatusHistory } from "./status.entity.js";
 import type { PrismaClient, Prisma } from "@/generated/prisma/client.js";
 import { BudgetRepository } from "../budgets/budget.repository.js";
 import { Order } from "../orders/order.entity.js";
-import { getBlockReason } from "./status.rules.js";
 
 type Db = PrismaClient | Prisma.TransactionClient;
 
@@ -43,10 +42,10 @@ export class StatusService {
     // las filas (dateOfChange) es lo que reconstruye la secuencia completa.
     async createStatus(input: CreateStatusInput): Promise<StatusHistory> {
         const order = await this.orderRepo.findById(input.id_order);
-        if (!order) throw new Error("La orden no existe");
 
-        const reason = getBlockReason(order, input.status);
-        if (reason) throw new Error(reason);
+        if (!order) {
+            throw new Error("La orden no existe");
+        }
 
         const entry = await this.repo.create({
             id_order: input.id_order,
@@ -83,9 +82,5 @@ export class StatusService {
             } as StatusHistory,
             db,
         );
-    };
-    async findLastUserByStatus(id_order:string, status: $Enums.EnumOrderStatus): Promise<string | null >{
-        const lastStatus = await this.repo.findLastByOrderIdAndStatus(id_order, status);
-        return lastStatus?.id_user ?? null;
-    };
+    }
 }

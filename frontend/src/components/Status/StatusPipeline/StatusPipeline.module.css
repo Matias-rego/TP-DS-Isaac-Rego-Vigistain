@@ -36,13 +36,6 @@
   font-weight: 700;
   color: var(--tf-text);
 }
-.actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
 
 .elapsedPill {
   background: var(--tf-primary-soft);
