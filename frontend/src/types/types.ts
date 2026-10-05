@@ -211,7 +211,7 @@ export interface AddedCost{
 
 export interface PaginatedResponse<T> {
   data: T[];
-  metadata?: {
+  metadata: {
     page: number;
     limit: number;
     total: number;

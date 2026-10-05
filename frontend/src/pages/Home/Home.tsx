@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Nav from "@/pages/Nav/Nav";
+import Nav from "@/components/layout/Nav/Nav";
 import styles from "./Home.module.css";
 import type { User, Order } from "@/types/types";
 import Footer from "@/components/Footer/Footer";
@@ -195,34 +195,34 @@ const Home = () => {
             )}
           </div>
 
-            <div className={styles.heroVisual}>
-              <div className={styles.quickPanel}>
-                <div className={styles.quickPanelHeader}>
-                  <span className={styles.quickPanelIcon}><Zap size={22} /></span>
-                  <div>
-                    <p className={styles.quickPanelTitle}>Accesos rápidos</p>
-                    <p className={styles.quickPanelText}>Gestioná el taller sin perder tiempo.</p>
-                  </div>
-                </div>
-
-                <div className={styles.quickPanelList}>
-                  <button type="button" className={styles.quickPanelItem} onClick={() => navigate('/manageOrder')}>
-                    <span><ClipboardList size={18} /></span>
-                    <strong>Consultar órdenes</strong>
-                  </button>
-
-                  <button type="button" className={styles.quickPanelItem} onClick={() => navigate('/createOrder')}>
-                    <span><Plus size={18} /></span>
-                    <strong>Crear nueva orden</strong>
-                  </button>
-
-                  <button type="button" className={styles.quickPanelItem}>
-                    <span><Wallet size={18} /></span>
-                    <strong>Ver presupuestos</strong>
-                  </button>
+          <div className={styles.heroVisual}>
+            <div className={styles.quickPanel}>
+              <div className={styles.quickPanelHeader}>
+                <span className={styles.quickPanelIcon}><Zap size={22} /></span>
+                <div>
+                  <p className={styles.quickPanelTitle}>Accesos rápidos</p>
+                  <p className={styles.quickPanelText}>Gestioná el taller sin perder tiempo.</p>
                 </div>
               </div>
+
+              <div className={styles.quickPanelList}>
+                <button type="button" className={styles.quickPanelItem} onClick={() => navigate('/manageOrder')}>
+                  <span><ClipboardList size={18} /></span>
+                  <strong>Consultar órdenes</strong>
+                </button>
+
+                <button type="button" className={styles.quickPanelItem} onClick={() => navigate('/createOrder')}>
+                  <span><Plus size={18} /></span>
+                  <strong>Crear nueva orden</strong>
+                </button>
+
+                <button type="button" className={styles.quickPanelItem}>
+                  <span><Wallet size={18} /></span>
+                  <strong>Ver presupuestos</strong>
+                </button>
+              </div>
             </div>
+          </div>
         </section>
 
         {esTecnico && (

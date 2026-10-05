@@ -18,3 +18,4 @@
 | F-014 | Gestión de Presupuestos (`Feature/014-BudgetManagement`) | S4 | In Progress | #14 | #26 |
 | F-015 | Métricas Reales y Dashboards (`feature/metricas-reales`) | S4 | In Progress | #15 | #24 |
 | F-016 | Adaptabilidad y Responsive Mobile (`fix/responsive-mobile`) | S4 | In Progress | #16 | #30 |
+| f-017 | add reusable entity management UI (`feature/EntityManagement`)|S4 | In Progress | #17 | #30 |

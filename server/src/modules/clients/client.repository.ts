@@ -22,10 +22,14 @@ export class ClientRepository extends BaseRepository<Client, ClientQueryDto> {
                         { cuit: { contains: query.search } },
                     ],
                 } : {},
-                query?.categoryClient ? {
-                    client_type: {
-                        clientTypeName: { contains: query.categoryClient },
-                    },
+                query?.id_client_type ? {
+                    id_client_type: query.id_client_type,
+                } : {},
+                query?.dateFrom ? {
+                    dateOfRegistration: { gte: new Date(query.dateFrom) },
+                } : {},
+                query?.dateTo ? {
+                    dateOfRegistration: { lte: new Date(query.dateTo) },
                 } : {},
             ],
         };

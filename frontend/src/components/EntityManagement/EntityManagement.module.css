@@ -1,0 +1,10 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fetching {
+  opacity: 0.5;
+  transition: opacity 0.15s;
+}

@@ -12,23 +12,23 @@ import { getBlockReason } from '@/lib/statusRules';
 
 
 const STATUS_LABELS: Record<EnumOrderStatus, string> = {
-  recibido:      'Recibido',
-  diagnostico:   'Diagnóstico',
+  recibido: 'Recibido',
+  diagnostico: 'Diagnóstico',
   presupuestado: 'Presupuestado',
-  aprobado:      'Aprobado',
-  reparacion:    'Reparación',
-  listo:         'Listo',
-  entregado:     'Entregado',
-  cancelado:     'Cancelado',
+  aprobado: 'Aprobado',
+  reparacion: 'Reparación',
+  listo: 'Listo',
+  entregado: 'Entregado',
+  cancelado: 'Cancelado',
 };
 
 // Título del campo de comentario según el estado elegido. Los estados que
 // no están acá caen en el label genérico "Comentarios".
 const COMMENT_LABELS: Partial<Record<EnumOrderStatus, string>> = {
-  diagnostico:   'Comentarios del Diagnóstico',
+  diagnostico: 'Comentarios del Diagnóstico',
   presupuestado: 'Comentarios del Presupuesto',
-  reparacion:    'Comentarios de la Reparación',
-  listo:         'Comentarios de Entrega',
+  reparacion: 'Comentarios de la Reparación',
+  listo: 'Comentarios de Entrega',
 };
 
 const ALL_STATUSES = Object.keys(STATUS_LABELS) as EnumOrderStatus[];
@@ -50,7 +50,7 @@ export interface UpdateStatusModalProps {
   direction?: 'advance' | 'retreat';
 }
 
-const UpdateStatusModal = ({ open, order, onClose, onConfirm, targetStatus, direction}: UpdateStatusModalProps) => {
+const UpdateStatusModal = ({ open, order, onClose, onConfirm, targetStatus, direction }: UpdateStatusModalProps) => {
   const currentStatus = useMemo(
     () => getCurrentStatus(order.statusHistory),
     [order.statusHistory]
@@ -61,7 +61,6 @@ const UpdateStatusModal = ({ open, order, onClose, onConfirm, targetStatus, dire
   // a "diagnostico"). Ahora se puede elegir cualquiera — todavía no hay
   // una máquina de estados que valide qué transiciones son válidas, eso
   // queda para más adelante.
-  const availableStatuses = ALL_STATUSES;
 
   const [selectedStatus, setSelectedStatus] = useState<EnumOrderStatus | undefined>(undefined);
   const [comment, setComment] = useState('');
@@ -72,19 +71,19 @@ const UpdateStatusModal = ({ open, order, onClose, onConfirm, targetStatus, dire
 
   if (!open) return null;
 
-    const isFixed = targetStatus !== undefined;
-    const isRetreat = direction === 'retreat';
-    // Fijo desde afuera, o el que eligió el técnico en el select
-    const status = targetStatus ?? selectedStatus;
-    const blockReason = status ? getBlockReason(order, status) : null;
-    const canSubmit = status !== undefined && !submitting && !blockReason;
-    const commentLabel = status ? (COMMENT_LABELS[status] ?? 'Comentarios') : 'Comentarios';
+  const isFixed = targetStatus !== undefined;
+  const isRetreat = direction === 'retreat';
+  // Fijo desde afuera, o el que eligió el técnico en el select
+  const status = targetStatus ?? selectedStatus;
+  const blockReason = status ? getBlockReason(order, status) : null;
+  const canSubmit = status !== undefined && !submitting && !blockReason;
+  const commentLabel = status ? (COMMENT_LABELS[status] ?? 'Comentarios') : 'Comentarios';
 
-    const title = !isFixed
-      ? 'Actualizar Estado de Orden'
-      : isRetreat
-        ? `Volver a "${STATUS_LABELS[targetStatus]}"`
-        : `Avanzar a "${STATUS_LABELS[targetStatus]}"`;
+  const title = !isFixed
+    ? 'Actualizar Estado de Orden'
+    : isRetreat
+      ? `Volver a "${STATUS_LABELS[targetStatus]}"`
+      : `Avanzar a "${STATUS_LABELS[targetStatus]}"`;
   const handleConfirm = async () => {
     if (!canSubmit || !status) return;
 

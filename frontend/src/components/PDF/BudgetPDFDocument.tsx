@@ -47,7 +47,7 @@ const EQUIPMENT_LABEL: Record<EnumEquipmentType, string> = {
 };
 
 const ADDED_COST_LABEL: Record<EnumTypeAddedCost, string> = {
-  respuesto: 'Repuesto',
+  repuesto: 'Repuesto',
   procedimientoEspecial: 'Procedimiento especial',
   garantia: 'Garantía',
   reparacionExpress: 'Reparación express',
@@ -353,7 +353,7 @@ export default function BudgetPdfDocument({ budget }: BudgetPdfDocumentProps) {
         {/* Total */}
         <View style={styles.totalRow}>
           <Text style={styles.totalLabel}>Total estimado</Text>
-          <Text style={styles.totalValue}>{}</Text>
+          <Text style={styles.totalValue}>{ }</Text>
         </View>
 
         <Text style={styles.footerNote}>

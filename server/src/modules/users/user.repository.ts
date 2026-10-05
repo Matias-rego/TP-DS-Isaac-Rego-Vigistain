@@ -8,7 +8,7 @@ import { User } from "./user.entity.js";
 export class UserRepository extends BaseRepository<User, UserQueryDto> {
 
     public findAll = async (query?: UserQueryDto): Promise<PaginatedResult<User>> => {
-const { page, limit, skip } = this.getPagination(
+        const { page, limit, skip } = this.getPagination(
             query?.page,
             query?.limit
         );
