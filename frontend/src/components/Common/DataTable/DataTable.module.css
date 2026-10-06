@@ -1,9 +1,9 @@
-drawer/* TableRtl.module.css */
+/* TableRtl.module.css */
 
 .tableContainer {
     width: 100%;
-    overflow-x: scroll; /* scroll (no auto): la barra queda siempre visible para poder agarrarla */
-    max-height: 350px;
+    overflow-x: auto; /* auto: la barra horizontal sale sola cuando la tabla no entra en su caja */
+    max-height: 70vh; /* más alta: la tabla se extiende hacia abajo y muestra más filas */
     overflow-y: auto;
     border-radius: 24px;
     background: linear-gradient(
