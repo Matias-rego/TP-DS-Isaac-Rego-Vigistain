@@ -36,9 +36,12 @@ router.post('/', authenticate(), validate({ body: registerBudgetSchema }), ctrl.
 
 router.put('/:id', validate({ params: idSchema, body: modifyBudgetSchema }), ctrl.modifyBudget);
 
+router.put('/modifyBudget/:id', validate({ params: idSchema, body: modifyBudgetSchema }), ctrl.modifyBudgetTech);
+
 router.delete('/:id', validate({ params: idSchema }), ctrl.deleteBudget);
 
 router.post('/:id/send-email', validate({ params: idSchema }) ,ctrl.sendBudgetEmail);
+
 
 
 export default router;

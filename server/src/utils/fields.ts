@@ -182,7 +182,7 @@ export const limit = z.coerce
     .positive({
         error: "Limit must be greater than 0",
     })
-    .max(1000, "Limit cannot be greater than 100");
+    .max(1000, "Limit cannot be greater than 1000");
 
 export const id = z
     .uuidv7({

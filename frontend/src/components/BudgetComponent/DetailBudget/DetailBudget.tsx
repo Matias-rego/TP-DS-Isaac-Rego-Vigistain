@@ -71,18 +71,11 @@ const IconSend = (
 //  </svg>
 //);
 
-const IconX = (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="18" y1="6" x2="6" y2="18" />
-    <line x1="6" y1="6" x2="18" y2="18" />
-  </svg>
-);
 
 
 export default function DetailBudget({
   budget,
   onIssue,
-  onCancel,
   loading = false,
   currencySymbol = '$',
 }: DetailBudgetProps) {
@@ -99,8 +92,8 @@ export default function DetailBudget({
   } = useBudgetTotals(budget.id_order, budget.id_budget);
 
   const totalPaid = useMemo(
-    () => (budget?.payments ?? []).reduce((acc: number, p) => acc + (Number(p.amount) || 0), 0),
-    [budget?.payments]
+    () => (budget.payments ?? []).reduce((acc: number, p) => acc + (Number(p.amount) || 0), 0),
+    [budget.payments]
   );
 
   const estimatedTotal = failuresTotal + addedCostsTotal + budget.laborCost;
@@ -215,6 +208,13 @@ export default function DetailBudget({
           </span>
         </button>
       </div>
+      {budget.clientSuggestion !== null && (
+        <div className={styles.suggSection}>
+          <span className={styles.suggTitle}>Sugerencia del Cliente</span>
+          <p className={styles.suggText}>{budget.clientSuggestion}</p>
+        </div>
+      )}
+
 
       {/* Actions */}
       <div className={styles.actions}>
@@ -227,7 +227,7 @@ export default function DetailBudget({
           loading={loading}
           onClick={() => onIssue?.({ sendEmail })}
         />
-        <div className={styles.actionsRow}>
+        {/* <div className={styles.actionsRow}>
           <ActionButton
             label="Cancelar"
             icon={IconX}
@@ -236,7 +236,7 @@ export default function DetailBudget({
             fullWidth
             onClick={onCancel}
           />
-        </div>
+        </div> */}
       </div>
     </div>
   );

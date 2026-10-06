@@ -12,6 +12,7 @@ import statusRouter from '@/modules/status/status.routes.js';
 import uploadRoutes from '@/modules/uploads/upload.routes.js';
 import budgetRoutes from '@/modules/budgets/budget.routes.js';
 import addedCostRoutes from '@/modules/addedCosts/addedcost.routes.js'
+import budgetPublicRouter from '@/modules/budgets/budget.public.routes.js';
 import { authenticate } from '@/middlewares/authenticate.middleware.js';
 
 const router = express.Router();
@@ -29,6 +30,7 @@ router.use('/equipments', authenticate([]), equipmentRoutes);
 router.use('/orders', authenticate([]), orderRouter);
 router.use('/status', authenticate([]), statusRouter);
 router.use('/added-cost', authenticate([]), addedCostRoutes);
+router.use('/budgets/public', budgetPublicRouter);
 router.use('/budgets', authenticate([]), budgetRoutes);
 router.use('/uploads', uploadRoutes);
 

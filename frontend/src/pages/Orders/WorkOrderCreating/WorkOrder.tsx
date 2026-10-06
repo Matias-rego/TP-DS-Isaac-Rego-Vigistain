@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import Nav from "@/pages/Nav/Nav";
+import Nav from "@/components/layout/Nav/Nav";
 import styles from "./WorkOrder.module.css"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import UserIcon from "@/assets/UserIcon.svg";

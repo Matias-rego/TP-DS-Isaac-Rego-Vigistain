@@ -1,4 +1,4 @@
-import Nav from "@/pages/Nav/Nav";
+import Nav from "@/components/layout/Nav/Nav";
 import Footer from "@/components/Footer/Footer";
 import styles from "./OrderDirectory.module.css";
 import '../../../index.css';
@@ -7,7 +7,7 @@ import type { Order, EnumOrderStatus, Status_History } from "@/types/types";
 import { Wrench, FileText, AlertTriangle, Banknote } from "lucide-react";
 import DescriptiveMiniCard from "@/components/Common/Cards/DescriptiveMiniCard/DescriptiveMiniCard";
 import SearchBar, { type FilterConfig } from "@/components/SearchBar/SearchBar";
-import TableRtl, { type ColumnConfig } from "@/components/Common/DataTable/DataTable";
+import DataTable, { type ColumnConfig } from "@/components/Common/DataTable/DataTable";
 import OrderDescription from "@/components/OrderComponent/OrderDescription/OrderDescription";
 import { BACKEND_URL } from "@/lib/config";
 import UpdateStatusModal from "@/components/Status/UpdateStatusModal/UpdateStatusModal";
@@ -20,14 +20,14 @@ import { useNavigate } from "react-router-dom";
 
 // Mismo tono que venimos usando en OrderCard / StatusMiniDescriptiveCard
 const STATUS_META: Record<EnumOrderStatus, { label: string; tone: 'info' | 'warning' | 'success' | 'danger' }> = {
-  recibido:      { label: 'Recibido',           tone: 'info' },
-  diagnostico:   { label: 'En diagnóstico',     tone: 'warning' },
-  presupuestado: { label: 'Presupuestado',      tone: 'info' },
-  aprobado:      { label: 'Aprobado',           tone: 'warning' },
-  reparacion:    { label: 'En reparación',      tone: 'warning' },
-  listo:         { label: 'Listo para retirar', tone: 'success' },
-  entregado:     { label: 'Entregado',          tone: 'success' },
-  cancelado:     { label: 'Cancelado',          tone: 'danger' },
+  recibido: { label: 'Recibido', tone: 'info' },
+  diagnostico: { label: 'En diagnóstico', tone: 'warning' },
+  presupuestado: { label: 'Presupuestado', tone: 'info' },
+  aprobado: { label: 'Aprobado', tone: 'warning' },
+  reparacion: { label: 'En reparación', tone: 'warning' },
+  listo: { label: 'Listo para retirar', tone: 'success' },
+  entregado: { label: 'Entregado', tone: 'success' },
+  cancelado: { label: 'Cancelado', tone: 'danger' },
 };
 
 const STATUS_FILTER_OPTIONS = Object.entries(STATUS_META).map(([value, meta]) => ({
@@ -71,8 +71,8 @@ const toRow = (order: Order): OrderRow => {
 
   return {
     id_order: order.id_order,
-    nroOrder: formatDocumentNumber("#ORD",order.nroOrder,{padLength:4}),
-    orderLabel: `${formatDocumentNumber("#ORD",order.nroOrder)}`,
+    nroOrder: formatDocumentNumber("#ORD", order.nroOrder, { padLength: 4 }),
+    orderLabel: `${formatDocumentNumber("#ORD", order.nroOrder)}`,
     customer: order.equipment?.client?.clientName ?? 'Sin cliente',
     device: order.equipment
       ? `${order.equipment.brand ?? ''} ${order.equipment.model ?? ''}`.trim()
@@ -185,7 +185,7 @@ const OrderDirectory = () => {
       key: 'actions',
       label: 'Acciones',
       render: (row) => (
-        <ActionButton label="Gestion" icon={null} variant="neutral" onClick={()=>{navigate(`/manageOrder/${row.id_order}`)}}/>
+        <ActionButton label="Gestion" icon={null} variant="neutral" onClick={() => { navigate(`/manageOrder/${row.id_order}`) }} />
       ),
     }
   ];
@@ -194,53 +194,53 @@ const OrderDirectory = () => {
     <div className={styles.page}>
       <Nav />
       <main>
-      <h1 className={styles.title}>Gestión de Órdenes</h1>
+        <h1 className={styles.title}>Gestión de Órdenes</h1>
 
-      <div className={styles.cardSector}>
-        <DescriptiveMiniCard label="Reparaciones Activas" value={activeRepairs} icon={Wrench} tone="neutral" />
-        <DescriptiveMiniCard label="Presupuestos Pendientes" value={pendingBudgets} icon={FileText} tone="success" />
-        {/* Sin fuente de datos propia todavía: no hay modelo de stock/inventario en el schema actual */}
-        <DescriptiveMiniCard label="Alertas de Stock" value={0} icon={AlertTriangle} tone="danger" />
-        <DescriptiveMiniCard label="Ingresos del Día" value={formattedRevenue} icon={Banknote} tone="neutral" />
-      </div>
-
-      <div className={styles.orderSection}>
-        <div className={styles.searchOrderSection}>
-          <SearchBar<Order>
-            searchPlaceholder="Buscar por ID, cliente, equipo..."
-            searchEndpoint="/api/orders"
-            filters={filters}
-            onResults={(results) => setOrders(results.data)}
-            onClear={fetchOrders}
-          />
+        <div className={styles.cardSector}>
+          <DescriptiveMiniCard label="Reparaciones Activas" value={activeRepairs} icon={Wrench} tone="neutral" />
+          <DescriptiveMiniCard label="Presupuestos Pendientes" value={pendingBudgets} icon={FileText} tone="success" />
+          {/* Sin fuente de datos propia todavía: no hay modelo de stock/inventario en el schema actual */}
+          <DescriptiveMiniCard label="Alertas de Stock" value={0} icon={AlertTriangle} tone="danger" />
+          <DescriptiveMiniCard label="Ingresos del Día" value={formattedRevenue} icon={Banknote} tone="neutral" />
         </div>
 
-        <div className={styles.dataOrderSection}>
-          <div className={styles.tableOrderSection}>
-            {loading && <p className={styles.loadingText}>Cargando órdenes...</p>}
-            <TableRtl<OrderRow>
-              data={rows}
-              idField="id_order"
-              columns={columns}
-              onRowClick={(row) => setSelectedOrder(row.raw)}
-              selectedId={selectedOrder?.id_order}
-              
+        <div className={styles.orderSection}>
+          <div className={styles.searchOrderSection}>
+            <SearchBar<Order>
+              searchPlaceholder="Buscar por ID, cliente, equipo..."
+              searchEndpoint="/api/orders"
+              filters={filters}
+              onResults={(results) => setOrders(results.data)}
+              onClear={fetchOrders}
             />
           </div>
 
-          <div className={styles.selectedOrderOption}>
-            {selectedOrder && (
-              <div className={styles.selectedOrderContent}>
-                <OrderDescription order={selectedOrder} onClose={() => setSelectedOrder(null)} onUpdateStatus={()=>setShowModalActStatus(true)} />
-              </div>
-            )}
+          <div className={styles.dataOrderSection}>
+            <div className={styles.tableOrderSection}>
+              {loading && <p className={styles.loadingText}>Cargando órdenes...</p>}
+              <DataTable<OrderRow>
+                data={rows}
+                idField="id_order"
+                columns={columns}
+                onRowClick={(row) => setSelectedOrder(row.raw)}
+                selectedId={selectedOrder?.id_order}
+
+              />
+            </div>
+
+            <div className={styles.selectedOrderOption}>
+              {selectedOrder && (
+                <div className={styles.selectedOrderContent}>
+                  <OrderDescription order={selectedOrder} onClose={() => setSelectedOrder(null)} onUpdateStatus={() => setShowModalActStatus(true)} />
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
       </main>
-      {showModalActStatus && selectedOrder &&(
+      {showModalActStatus && selectedOrder && (
         <div>
-            <UpdateStatusModal open={showModalActStatus} order={selectedOrder} onClose={()=>setShowModalActStatus(false)} onConfirm={()=>{}}/>
+          <UpdateStatusModal open={showModalActStatus} order={selectedOrder} onClose={() => setShowModalActStatus(false)} onConfirm={() => { }} />
         </div>
       )}
       <Footer />

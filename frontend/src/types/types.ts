@@ -60,7 +60,7 @@ export const EnumFailureStatus = {
 export type EnumFailureStatus = (typeof EnumFailureStatus)[keyof typeof EnumFailureStatus];
 
 export const EnumTypeAddedCost = {
-  Repuesto: 'respuesto',
+  Repuesto: 'repuesto',
   ProcedimientoEspecial :'procedimientoEspecial',
   Garantia:'garantia',
   ReparacionExpress:'reparacionExpress',
@@ -178,6 +178,7 @@ export interface Budget {
   budgetDate: Date;
   payments?: Payment[];
   addedCosts: AddedCost[];
+  clientSuggestion?: string | null;
 }
 
 export interface Payment_Type {
@@ -210,7 +211,7 @@ export interface AddedCost{
 
 export interface PaginatedResponse<T> {
   data: T[];
-  metadata?: {
+  metadata: {
     page: number;
     limit: number;
     total: number;
