@@ -6,7 +6,7 @@ import Nav from "@/components/layout/Nav/Nav";
 import OrderDetailNav from "@/components/OrderComponent/OrderDetailNav/OrderDetailNav";
 import StatusPipeline from "@/components/Status/StatusPipeline/StatusPipeline";
 import Footer from "@/components/Footer/Footer";
-import ClientDetailCard from "@/components/ClientCard/ClientDetailCard/ClientDetailCard";
+import ClientDetailCard from "@/features/clients/components/ClientCard/ClientDetailCard/ClientDetailCard";
 import EquipmentDetailCard from "@/components/EquipmentComponent/EquipmentDetailCard/EquipmentDetailCard";
 import CreateBudget from "@/components/BudgetComponent/CrateBudget/CreateBudget";
 import UpdateStatusModal from "@/components/Status/UpdateStatusModal/UpdateStatusModal";
@@ -80,7 +80,7 @@ const ManageOrder = () => {
 
   const equipment = order?.equipment;
   const client = equipment?.client;
-  
+
   const renderContent = () => {
     if (loading) {
       return <div className={styles.state}>Cargando orden...</div>;
@@ -122,12 +122,12 @@ const ManageOrder = () => {
           )}
         </section>
 
-        {["recibido", "diagnostico"].includes(getCurrentStatus(order))&&(
+        {["recibido", "diagnostico"].includes(getCurrentStatus(order)) && (
           <section className={styles.budgetSection}>
             <Diagnostic order={order} />
           </section>
         )}
-        {["presupuestado", "aprobado", "reparacion", "listo", "entregado", "cancelado"].includes(getCurrentStatus(order))&&(
+        {["presupuestado", "aprobado", "reparacion", "listo", "entregado", "cancelado"].includes(getCurrentStatus(order)) && (
           <section className={styles.budgetSection}>
             <CreateBudget order={order} />
           </section>

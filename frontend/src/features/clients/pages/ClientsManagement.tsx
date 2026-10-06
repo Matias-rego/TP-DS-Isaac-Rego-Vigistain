@@ -1,10 +1,17 @@
 import { DateFilter, SelectFilter } from '@/components/Filters';
 import { useClientTypeOptions } from '@/features/clientTypes/useClientTypeOptions';
-import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { UserRoundPlus, X } from 'lucide-react';
+import ClientRegister from '@/pages/Clientes/ClientRegister';
 import type { ClientsQuery } from '../../clients/types';
 import { clientsService } from '../../clients/clients.service';
 import type { Client } from '../../clients/types';
 import { EntityManagement, type EntityConfig, type FiltersProps } from '@/components/EntityManagement/EntityManagement';
+import { EVENTS } from '@/lib/eventBus';
+import ClientDetailModal from '../components/ClientCard/ClientDetailModal/ClientDetailModal';
+import { useState } from 'react';
+import { QUERY_KEYS } from '@/lib/queryKeys';
+import styles from './ClientsManagement.module.css';
+
 
 const ClientFilters = ({ query, updateQuery }: FiltersProps<ClientsQuery>) => {
   const { options } = useClientTypeOptions();
@@ -32,42 +39,92 @@ const ClientFilters = ({ query, updateQuery }: FiltersProps<ClientsQuery>) => {
 };
 
 const ClientsManagement = () => {
+  const [detail, setDetail] = useState<{ client: Client; clearSelection: () => void } | null>(null);
+  const [isClientRegisterOpen, setIsClientRegisterOpen] = useState(false);
+  
+  const { options } = useClientTypeOptions();
+
   const clientsConfig: EntityConfig<Client, ClientsQuery> = {
     title: 'Clientes',
-    queryKey: ['clients'],
+    queryKey: QUERY_KEYS.clients,
     queryFn: clientsService.getAll,
     idField: 'id_client',
     columns: [
       { key: 'clientName', label: 'Nombre' },
       { key: 'clientEmail', label: 'Email' },
       { key: 'clientPhone', label: 'Teléfono' },
+      {
+        key: 'dateOfRegistration',
+        label: 'Fecha de registro',
+        format: (value) =>
+          new Date(value as string | Date).toLocaleDateString('es-AR', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+          }),
+      },
       { key: 'cuit', label: 'CUIT' },
-      { key: 'status', label: 'Estado', render: (c) => (c.status === false ? 'Baja' : 'Activo') },
+      {
+        key: 'status', label: 'Estado', render: (c) => (c.status === false ? 'Baja' : 'Activo')
+      },
+      {
+        key: 'id_client_type',
+        label: 'Tipo de cliente',
+        format: (value) => options.find((o) => o.value === value)?.label ?? 'sin tipo',
+      },
     ],
     actions: [
-      { label: 'Crear', icon: Plus, variant: 'primary', onClick: () => console.log('crear') },
-      {
-        label: 'Modificar',
-        icon: Pencil,
-        requiresSelection: true,
-        onClick: (c) => console.log('modificar', c),
-      },
-      {
-        label: 'Eliminar',
-        icon: Trash2,
-        variant: 'danger',
-        requiresSelection: true,
-        disabled: (c) => c.status === false,   
-        onClick: (c) => console.log('eliminar', c),
-      },
+      { label: 'Crear', icon: UserRoundPlus, variant: 'primary', onClick: () => setIsClientRegisterOpen(true) },
+
     ],
     card: { titleField: 'clientName', descriptionField: 'clientEmail' },
     searchPlaceholder: 'Buscar por nombre...',
     filterKeys: ['id_client_type', 'dateFrom', 'dateTo'],
     initialQuery: { page: 1, limit: 10 },
+    onItemClick: (client, { clearSelection }) => setDetail({ client, clearSelection }),
   };
 
-  return <EntityManagement config={clientsConfig} Filters={ClientFilters} />;
+  return (
+    <>
+      <EntityManagement
+        config={clientsConfig}
+        Filters={ClientFilters}
+      />
+      {detail && (
+        <ClientDetailModal
+          client={detail.client}
+          open={true}
+          onClose={() => {
+            detail.clearSelection();
+            setDetail(null);
+          }}
+          entityEvent={EVENTS.clientChanged}
+        />
+      )}
+      {isClientRegisterOpen && (
+        <div
+          className={styles.modalOverlay}
+          onClick={() => setIsClientRegisterOpen(false)}
+        >
+          <div
+            className={styles.modalContent}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              type="button"
+              className={styles.closeModalButton}
+              onClick={() => setIsClientRegisterOpen(false)}
+              aria-label="Cerrar modal"
+              title="Cerrar"
+            >
+              <X size={20} aria-hidden="true" />
+            </button>
+            <ClientRegister onSuccess={() => setIsClientRegisterOpen(false)} />
+          </div>
+        </div>
+      )}
+    </>
+  );
 };
 
 export default ClientsManagement;

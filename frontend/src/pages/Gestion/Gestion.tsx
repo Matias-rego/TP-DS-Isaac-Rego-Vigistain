@@ -1,4 +1,3 @@
-import Nav from "../../components/layout/Nav/Nav";
 import styles from './Gestion.module.css';
 import { useEffect, useState, useCallback } from "react";
 import TarjetaGestion from "../../components/TarjetaGestion/TarjetaGestion";
@@ -16,7 +15,6 @@ import RegisterPaymentType from "../TipoPago/RegisterPaymentType";
 import DeletePaymentType from "../TipoPago/DeletePaymentType";
 import ModifyPaymentType from "../TipoPago/ModifyPaymentType";
 import { Wrench, Users, CreditCard, ArrowLeft } from "lucide-react";
-import Footer from "@/components/Footer/Footer";
 import { useAuth } from "@/lib/AuthContext";
 import type { Client_Type, Payment_Type, Failure_Type } from "@/types/types";
 import type { PaginatedResponse } from "@/types/types";
@@ -150,7 +148,6 @@ const Gestion = () => {
   return (
     <>
       <div className={styles.bodyContainer}>
-        <Nav />
         <div className={styles.container}>
           <div className={styles.header}>
             <h1 className={styles.titleHeader}>Gestión</h1>
@@ -221,7 +218,6 @@ const Gestion = () => {
             </div>
           )}
         </div>
-        <Footer />
       </div>
     </>
   );

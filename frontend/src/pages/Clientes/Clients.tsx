@@ -1,14 +1,14 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import SearchBar from '../../components/SearchBar/SearchBar';
 import type { FilterConfig } from '../../components/SearchBar/SearchBar';
-import ClientGrid from '@/components/ClientCard/ClientGrid/ClientGrid';
+import ClientGrid from '@/features/clients/components/ClientCard/ClientGrid/ClientGrid';
 import ActionButton from '../../components/Common/Buttons/ActionButton';
 import Nav from '../../components/layout/Nav/Nav';
 import Footer from '../../components/Footer/Footer';
 import styles from './Clients.module.css';
 import ClientRegister from './ClientRegister';
 import { eventBus, EVENTS } from '@/lib/eventBus';
-import ClientDetailModal from "@/components/ClientCard/ClientDetailModal/ClientDetailModal";
+import ClientDetailModal from "@/features/clients/components/ClientCard/ClientDetailModal/ClientDetailModal";
 import { BACKEND_URL } from '@/lib/config';
 import type { PaginatedResponse } from '@/types/types';
 import type { Client } from '@/types/types';

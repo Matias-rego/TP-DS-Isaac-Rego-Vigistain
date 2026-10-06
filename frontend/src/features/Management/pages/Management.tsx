@@ -45,22 +45,16 @@ const ClientsPage = () => {
       { key: 'status', label: 'Estado', render: (c) => (c.status === false ? 'Baja' : 'Activo') },
     ],
     actions: [
-      { label: 'Crear', icon: Plus, variant: 'primary', onClick: () => console.log('crear') },
-      {
-        label: 'Modificar',
-        icon: Pencil,
-        requiresSelection: true,
-        onClick: (c) => console.log('modificar', c),
-      },
-      {
-        label: 'Eliminar',
-        icon: Trash2,
-        variant: 'danger',
-        requiresSelection: true,
-        disabled: (c) => c.status === false,   // un cliente dado de baja no se vuelve a eliminar
-        onClick: (c) => console.log('eliminar', c),
-      },
+      // sin selection: siempre habilitado, ignora el argumento
+      { label: 'Crear', icon: Plus, variant: 'primary', onClick: () => console.log('crear')},
+
+      // selection: 1 → recibe un arreglo con un solo cliente
+      { label: 'Modificar', icon: Pencil, selection: 1, onClick: ([cliente]) => console.log('editar', cliente) },
+
+      // selection: 'multiple' → recibe todos los marcados
+      { label: 'Eliminar', icon: Trash2, variant: 'danger', selection: 'multiple', onClick: (clientes) => console.log('editar', clientes) },
     ],
+    onItemClick: (item) => console.log('onItemClick', item),
     card: { titleField: 'clientName', descriptionField: 'clientEmail' },
     searchPlaceholder: 'Buscar por nombre...',
     filterKeys: ['id_client_type', 'dateFrom', 'dateTo'],

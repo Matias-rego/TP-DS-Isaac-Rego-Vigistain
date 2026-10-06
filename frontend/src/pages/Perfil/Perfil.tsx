@@ -1,5 +1,5 @@
 // Perfil.tsx
-import Nav from '../../components/layout/Nav/Nav';
+
 import { capitalize } from '../App/App';
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
@@ -43,7 +43,7 @@ const Perfil = () => {
   return (
     <>{comienzaEdicion ? <Navigate to="/editor-perfil" /> :
       <div className={styles.page}>
-        <Nav />
+        
 
         <div className={styles.container}>
 

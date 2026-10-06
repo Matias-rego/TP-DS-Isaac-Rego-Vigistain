@@ -4,8 +4,8 @@ import styles from './EquipmentDetailModal.module.css';
 import { type Equipment } from '@/types/types';
 import { type Client } from '@/types/types';
 import { type Order, type Failure, type Status_History } from '@/types/types'
-import SmallClientCard from '@/components/ClientCard/SmallClientCard/SmallClientCard';
-import ClientDetailModal from '@/components/ClientCard/ClientDetailModal/ClientDetailModal';
+import SmallClientCard from '@/features/clients/components/ClientCard/SmallClientCard/SmallClientCard';
+import ClientDetailModal from '@/features/clients/components/ClientCard/ClientDetailModal/ClientDetailModal';
 import BACKEND_URL from '@/lib/config';
 import FailureMiniCard from '@/components/Failure/FailureMiniCard/FailureMiniCard';
 import OrderMiniCard from '@/components/OrderComponent/OrderMiniCard/OrderMiniCard';
@@ -166,8 +166,8 @@ const EquipmentDetailModal = ({
             ...order,
             failures: exists
               ? currentFailures.map((f) =>
-                  f.id_failure === changedFailure.id_failure ? changedFailure : f
-                )
+                f.id_failure === changedFailure.id_failure ? changedFailure : f
+              )
               : [...currentFailures, changedFailure],
           };
         });
@@ -189,10 +189,10 @@ const EquipmentDetailModal = ({
         return prev.map((order) =>
           order.id_order === newStatus.id_order
             ? {
-                ...order,
-                status: newStatus.status,
-                statusHistory: [...(order.statusHistory ?? []), newStatus],
-              }
+              ...order,
+              status: newStatus.status,
+              statusHistory: [...(order.statusHistory ?? []), newStatus],
+            }
             : order
         );
       });

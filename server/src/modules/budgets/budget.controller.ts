@@ -29,7 +29,7 @@ export class BudgetController {
                 discount: data.discount,
                 id_user: req.user.id,
             });
-        emitEvent("EVENTS.budgetChanged", budget);
+        emitEvent(EVENTS.budgetChanged, budget);
             return res.status(201).json(budget);
         } catch (error) {
             next(error);
@@ -83,7 +83,7 @@ export class BudgetController {
         const data = req.validated.body as ModifyBudgetDto;
         try {
             const budget = await this.service.update(id, data);
-            emitEvent("EVENTS.budgetChanged", budget);
+            emitEvent(EVENTS.budgetChanged, budget);
             return res.json(budget);
         } catch (error) {
             next(error);
@@ -95,7 +95,7 @@ export class BudgetController {
 
         try {
             const result = await this.service.delete(id);
-            emitEvent("EVENTS.budgetDeleted", { id });
+            emitEvent(EVENTS.budgetDeleted, { id });
             return res.json(result);
         } catch (error) {
             next(error);
@@ -151,7 +151,7 @@ export class BudgetController {
             status: DECISION_TO_STATUS[decision],
             client_suggestion: decision === 'suggestion' ? suggestion : null,
             });
-            emitEvent("EVENTS.budgetChanged", { id_budget: payload.id_budget, decision, client_suggestion: suggestion });
+            emitEvent(EVENTS.budgetChanged, { id_budget: payload.id_budget, decision, client_suggestion: suggestion });
             return res.json({ ok: true });
         }catch(error){
             next(error);

@@ -107,7 +107,7 @@ const Nav = () => {
             </button>
           </li>
           <li>
-            <button type="button" className={styles.navButton} onClick={() => navigate('/clientes')}>
+            <button type="button" className={styles.navButton} onClick={() => navigate('/clientManagement')}>
               Clientes
             </button>
           </li>

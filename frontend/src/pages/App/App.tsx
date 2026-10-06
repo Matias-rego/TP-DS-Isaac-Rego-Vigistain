@@ -8,10 +8,9 @@ import EditorPerfil from "../EditorPerfil/EditorPerfil";
 import ForgotPassword from "@/components/Password/ForgotPasswor";
 import ResetPassword from "@/components/Password/ResetPassword";
 import Gestion from "../Gestion/Gestion";
-import Clientes from "../Clientes/Clients";
 import WorkOrder from "../Orders/WorkOrderCreating/WorkOrder";
 import UserManagement from "../UserManagement/UserManagement";
-import { AuthProvider, useAuth } from "@/lib/AuthContext"; 
+import { AuthProvider, useAuth } from "@/lib/AuthContext";
 import Validation from "@/pages/Validation/Validation";
 import { WebSocketManager } from "@/lib/WebSocketManager";
 import OrderDirectory from "../Orders/OrderDirectory/OrderDirectory";
@@ -21,8 +20,9 @@ import AppLayout from "@/components/layout/AppLayout";
 import Management from "@/features/Management/pages/Management";
 import BudgetResponse from "@/pages/Budget/BudgetResponse/BudgetResponse";
 import UsersManagement from "@/features/users/pages/UserManagement";
+import ClientsManagement from "@/features/clients/pages/ClientsManagement";
 export const capitalize = (text: string): string => {
-  if (!text) return ""; 
+  if (!text) return "";
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
 };
 
@@ -31,7 +31,7 @@ const ContenedorConAuth = () => {
   return (
     <AuthProvider>
       <WebSocketManager />
-      <Outlet /> 
+      <Outlet />
     </AuthProvider>
   );
 };
@@ -59,7 +59,7 @@ const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        
+
         {/* No ejecutan el useEffect de /me, ni cargan el contexto        */}
 
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -71,25 +71,25 @@ const App = () => {
 
         <Route element={<ContenedorConAuth />}>
           <Route path="/" element={<RaizRedirect />} />
-          
+
           <Route path="/login" element={<RutaPublica><Login /></RutaPublica>} />
           <Route path="/register" element={<RutaPublica><Register /></RutaPublica>} />
 
           <Route path="/home" element={<RutaPrivada><Home /></RutaPrivada>} />
-          <Route path="/userManagement" element={<RutaPrivada><UserManagement /></RutaPrivada>} />
-          <Route path="/perfil" element={<RutaPrivada><Perfil /></RutaPrivada>} />
           <Route path="/editor-perfil" element={<RutaPrivada><EditorPerfil /></RutaPrivada>} />
-          <Route path="/gestion" element={<RutaPrivada><Gestion /></RutaPrivada>} />
-          <Route path="/clientes" element={<RutaPrivada><Clientes /></RutaPrivada>} />
           <Route path="/createOrder" element={<RutaPrivada><WorkOrder /></RutaPrivada>} />
-          <Route path="/manageOrder" element={<RutaPrivada><OrderDirectory/></RutaPrivada>} />
-          <Route path="/manageOrder" element={<RutaPrivada><OrderDirectory/></RutaPrivada>} />
-          <Route path="/manageOrder/:id_order" element = {<RutaPrivada><ManageOrder /></RutaPrivada>}/>
-          <Route path="/showBudget/:id_budget" element = {<RutaPrivada><BudgetPdfPreview/></RutaPrivada>} />
-          
+          <Route path="/manageOrder" element={<RutaPrivada><OrderDirectory /></RutaPrivada>} />
+          <Route path="/manageOrder" element={<RutaPrivada><OrderDirectory /></RutaPrivada>} />
+          <Route path="/manageOrder/:id_order" element={<RutaPrivada><ManageOrder /></RutaPrivada>} />
+          <Route path="/showBudget/:id_budget" element={<RutaPrivada><BudgetPdfPreview /></RutaPrivada>} />
+
           <Route element={<AppLayout />}>
-            <Route path="/user" element = {<RutaPrivada><UsersManagement /></RutaPrivada>}/>
-            <Route path="/management" element = {<RutaPrivada><Management /></RutaPrivada>}/>
+            <Route path="/userManagement" element={<RutaPrivada><UserManagement /></RutaPrivada>} />
+            <Route path="/gestion" element={<RutaPrivada><Gestion /></RutaPrivada>} />
+            <Route path="/perfil" element={<RutaPrivada><Perfil /></RutaPrivada>} />
+            <Route path="/user" element={<RutaPrivada><UsersManagement /></RutaPrivada>} />
+            <Route path="/management" element={<RutaPrivada><Management /></RutaPrivada>} />
+            <Route path="/clientManagement" element={<RutaPrivada><ClientsManagement /></RutaPrivada>} />
           </Route>
         </Route>
 

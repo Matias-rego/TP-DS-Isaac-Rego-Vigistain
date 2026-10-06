@@ -15,6 +15,6 @@ export const EVENTS = {
   statusChanged: 'status:changed',
   addedCostChanged: 'addedCost:changed',
   addedCostDeleted: 'addedCost:deleted',
-  budgetChanged: 'budgetChanged:changed',
-  budgetDeleted: 'budgetDeleted:deleted',
+  budgetChanged: 'budget:changed',
+  budgetDeleted: 'budget:deleted',
 } as const;

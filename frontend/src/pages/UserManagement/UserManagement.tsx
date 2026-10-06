@@ -1,5 +1,3 @@
-import Nav from "../../components/layout/Nav/Nav";
-import Footer from "@/components/Footer/Footer";
 import styles from "./UserManagement.module.css";
 import SearchBar from "@/components/SearchBar/SearchBar";
 import type { FilterConfig } from "@/components/SearchBar/SearchBar";
@@ -131,7 +129,6 @@ const UserManagement = () => {
 
   return (
     <div className={styles.page}>
-      <Nav />
       <div className={styles.content}>
 
         <div className={styles.header}>
@@ -179,7 +176,6 @@ const UserManagement = () => {
         </div>
 
       </div>
-      <Footer />
     </div>
   );
 };
