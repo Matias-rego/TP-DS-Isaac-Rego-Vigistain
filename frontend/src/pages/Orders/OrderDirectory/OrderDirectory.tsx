@@ -134,7 +134,9 @@ const OrderDirectory = () => {
   // 4. Mappings blindados con verificación de array
   const rows = useMemo(() => {
     if (!Array.isArray(orders)) return [];
-    return orders.map(toRow);
+    return [...orders]
+      .sort((a, b) => new Date(b.dateOfEntry).getTime() - new Date(a.dateOfEntry).getTime())
+      .map(toRow);
   }, [orders]);
 
   const activeRepairs = useMemo(
