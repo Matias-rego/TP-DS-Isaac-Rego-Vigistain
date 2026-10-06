@@ -114,9 +114,11 @@ const UpdateStatusModal = ({ open, order, onClose, onConfirm }: UpdateStatusModa
     }
   };
 
+  
+
   return (
     <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+        <div className={`${styles.modal} ${status === 'presupuestado' ? styles.modalWide : ''}`} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
           <h2 className={styles.title}>Actualizar Estado de Orden</h2>
           <button className={styles.closeBtn} onClick={onClose} aria-label="Cerrar modal">
@@ -149,11 +151,13 @@ const UpdateStatusModal = ({ open, order, onClose, onConfirm }: UpdateStatusModa
               <Diagnostic order={order} />
             </div>
           )}
+
           {status === 'presupuestado' && (
-            <div>
+            <div className={styles.budgetContainer}>
               <Budget order={order} />
             </div>
           )}
+
         </div>
 
         <div className={styles.field}>

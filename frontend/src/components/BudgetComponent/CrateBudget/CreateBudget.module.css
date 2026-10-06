@@ -3,10 +3,10 @@
    ===================================================== */
 
 .page {
-  min-height: 100vh;
+  min-height: 0;
   width: 100%;
-  background-color: #f8fafc;
-  padding: 1.5rem;
+  background-color: transparent;
+  padding: 0;
   box-sizing: border-box;
 }
 
@@ -31,7 +31,7 @@
 }
 
 .summarySticky {
-    position: sticky;
+    position: static;
     top: 24px;
 }
 
@@ -325,20 +325,18 @@
   .layout {
     grid-template-columns: minmax(0, 1fr) 380px;
   }
+  .summarySticky {
+      position: sticky;
+      top : 24px;
+  }
 }
+
 @media (max-width: 767px) {
   .page {
     padding: 18px;
   }
-
-  .sidebar {
-    order: -1; 
-  }
-
-  .summarySticky {
-    position: static;
-  }
 }
+
 @media (max-width: 576px) {
     .page {
         padding: 12px;

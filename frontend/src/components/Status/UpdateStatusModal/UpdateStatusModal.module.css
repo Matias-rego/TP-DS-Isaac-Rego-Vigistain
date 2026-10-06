@@ -18,11 +18,8 @@
   border-radius: var(--radius-md, 16px);
 
   width: 100%;
-  max-width: 600px;
+  max-width: 640px;
   min-width: 0;
-
-  container-type: inline-size;
-  container-name: field; 
 
   align-items: stretch;
   max-height: 90vh;
@@ -39,9 +36,14 @@
     0 8px 10px -6px rgba(0, 0, 0, 0.2);
 
   box-sizing: border-box;
-
-
 }
+
+@media (min-width: 768px) {
+  .modalWide {
+    max-width: 1040px;
+  }
+}
+
 .modal > * {
   min-width: 0;
   max-width: 100%;
@@ -86,6 +88,11 @@
   flex-direction: column;
   gap: 6px;
 
+}
+
+.budgetContainer {
+  container-type: inline-size;
+  container-name: field;
 }
 
 .label {

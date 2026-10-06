@@ -1,15 +1,15 @@
 .card {
   width: 100%;
   max-width: 420px;
-  background: #ffffff;
-  border: 1px solid #eef1f5;
+  background: var(--tf-card);
+  border: 1px solid var(--tf-border);
   border-radius: 22px;
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
   padding: 22px;
   display: flex;
   flex-direction: column;
   font-family: inherit;
-  color: #0f172a;
+  color: var(--tf-text);
 }
 
 /* ─── Header ─────────────────────────────────────────────── */
@@ -33,8 +33,8 @@
   width: 30px;
   height: 30px;
   border-radius: 8px;
-  background: #eef2ff;
-  color: #4338ca;
+  background: var(--tf-primary-soft);
+  color: var(--tf-primary);
   flex-shrink: 0;
 }
 
@@ -42,7 +42,7 @@
   margin: 0;
   font-size: 15px;
   font-weight: 700;
-  color: #1e2333;
+  color: var(--tf-text);
 }
 
 .badge {
@@ -54,37 +54,37 @@
 }
 
 .badge_live {
-  background: #e7f9ee;
-  color: #16a34a;
+  background: transparent;
+  color: var(--tf-succes);
 }
 
 .badge_approved {
-  background: #e7f0fe;
-  color: #2563eb;
+  background: var(--tf-bg);
+  color: var(--tf-primary);
 }
 
 .badge_rejected {
-  background: #fde8e8;
-  color: #dc2626;
+  background: transparent;
+  color: var(--tf-danger);
 }
 
 .badge_neutral {
-  background: #f1f5f9;
-  color: #475569;
+  background: transparent;
+  color: var(--tf-muted);
 }
 
 /* ─── Dividers ───────────────────────────────────────────── */
 
 .divider {
   height: 1px;
-  background: #eef1f5;
+  background: var(--tf-border);
   margin: 16px 0;
 }
 
 .errorText {
   margin: 0 0 12px;
   font-size: 12.5px;
-  color: #dc2626;
+  color: var(--tf-danger);
 }
 
 /* ─── Line-item rows ─────────────────────────────────────── */
@@ -107,34 +107,34 @@
   align-items: center;
   gap: 6px;
   font-size: 13.5px;
-  color: #475569;
+  color: var(--tf-muted);
 }
 
 .rowIcon {
   display: flex;
-  color: #64748b;
+  color: var(--tf-muted);
   flex-shrink: 0;
 }
 
 .rowValue {
   font-size: 14px;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--tf-text);
   white-space: nowrap;
 }
 
 .rowValueDiscount {
   font-size: 14px;
   font-weight: 700;
-  color: #dc2626;
+  color: var(--tf-danger);
   white-space: nowrap;
 }
 
 .promoTag {
   font-size: 10px;
   font-weight: 700;
-  color: #dc2626;
-  background: #fde8e8;
+  color: var(--tf-danger);
+  background: var(--tf-bg);
   border-radius: 999px;
   padding: 2px 8px;
   margin-left: 4px;
@@ -153,7 +153,7 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #94a3b8;
+  color: var(--tf-muted);
 }
 
 .totalRow {
@@ -165,20 +165,20 @@
 .totalLabel {
   font-size: 14px;
   font-weight: 700;
-  color: #1e2333;
+  color: var(--tf-text);
 }
 
 .totalValue {
   font-size: 26px;
   font-weight: 800;
-  color: #2563eb;
+  color: var(--tf-primary);
   letter-spacing: -0.01em;
 }
 
 .formula {
   margin: 0;
   font-size: 11px;
-  color: #94a3b8;
+  color: var(--tf-muted);
   line-height: 1.4;
 }
 
@@ -186,8 +186,8 @@
 
 .balanceBox {
   margin-top: 16px;
-  background: #eef6ff;
-  border: 1px solid #dbeafe;
+  background: transparent;
+  border: 1px solid var(--tf-border);
   border-radius: 14px;
   padding: 14px 16px;
   display: flex;
@@ -204,25 +204,25 @@
 
 .balanceLabel {
   font-size: 13px;
-  color: #475569;
+  color: var(--tf-muted);
 }
 
 .balanceLabelStrong {
   font-size: 13.5px;
   font-weight: 700;
-  color: #1e2333;
+  color: var(--tf-text);
 }
 
 .balancePaid {
   font-size: 14px;
   font-weight: 700;
-  color: #16a34a;
+  color: var(--tf-succes);
 }
 
 .balancePending {
   font-size: 16px;
   font-weight: 800;
-  color: #1e3a8a;
+  color: var(--tf-primary);
 }
 
 /* ─── Comunicación ───────────────────────────────────────── */
@@ -238,7 +238,7 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #94a3b8;
+  color: var(--tf-muted);
   margin-bottom: 2px;
 }
 
@@ -266,37 +266,37 @@
   width: 18px;
   height: 18px;
   border-radius: 5px;
-  border: 1.5px solid #cbd5e1;
-  color: #ffffff;
+  border: 1.5px solid var(--tf-border);
+  color: var(--tf-card);
   flex-shrink: 0;
   transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .checkboxGreen {
-  background: #16a34a;
-  border-color: #16a34a;
+  background: var(--tf-succes);
+  border-color: var(--tf-succes);
 }
 
 .checkboxBlue {
-  background: #2563eb;
-  border-color: #2563eb;
+  background: var(--tf-primary);
+  border-color: var(--tf-primary);
 }
 
 .commIcon {
   display: flex;
-  color: #2563eb;
+  color: var(--tf-primary);
   flex-shrink: 0;
 }
 
 .commText {
   font-size: 13.5px;
   font-weight: 600;
-  color: #2563eb;
+  color: var(--tf-primary);
 }
 
 .commMuted {
   font-weight: 500;
-  color: #64748b;
+  color: var(--tf-muted);
 }
 
 /* ─── Actions ────────────────────────────────────────────── */
