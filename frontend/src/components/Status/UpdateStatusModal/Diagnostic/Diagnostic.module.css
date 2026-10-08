@@ -57,7 +57,7 @@
   padding: 12px;
   border: 1px solid var(--tf-border, #e5e7eb);
   border-radius: 10px;
-  background: var(--tf-surface, #fafafa);
+  background: var(--tf-card);
 }
 
 .savingText {
