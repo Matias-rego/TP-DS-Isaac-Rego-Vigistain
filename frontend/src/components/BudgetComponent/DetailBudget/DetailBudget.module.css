@@ -55,7 +55,7 @@
 
 .badge_live {
   background: transparent;
-  color: var(--tf-succes);
+  color: var(--tf-success);
 }
 
 .badge_approved {
@@ -216,7 +216,7 @@
 .balancePaid {
   font-size: 14px;
   font-weight: 700;
-  color: var(--tf-succes);
+  color: var(--tf-success);
 }
 
 .balancePending {
@@ -273,8 +273,8 @@
 }
 
 .checkboxGreen {
-  background: var(--tf-succes);
-  border-color: var(--tf-succes);
+  background: var(--tf-success);
+  border-color: var(--tf-success);
 }
 
 .checkboxBlue {
