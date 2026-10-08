@@ -1,2 +1,2 @@
 -- AlterTable
-ALTER TABLE `order` ADD COLUMN `active` BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE `Order` ADD COLUMN `active` BOOLEAN NOT NULL DEFAULT true;
