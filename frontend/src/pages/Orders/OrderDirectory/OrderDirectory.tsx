@@ -16,6 +16,7 @@ import type { PaginatedResponse } from "@/types/types";
 import { formatDocumentNumber } from "@/lib/utils";
 import ActionButton from "@/components/Common/Buttons/ActionButton";
 import { useNavigate } from "react-router-dom";
+import ConfirmDialog from "@/components/Common/ConfirmDialog/ConfirmDialog";
 
 
 // Mismo tono que venimos usando en OrderCard / StatusMiniDescriptiveCard
@@ -88,6 +89,8 @@ const OrderDirectory = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [showModalActStatus, setShowModalActStatus] = useState(false);
+  const [showBajaConfirm, setShowBajaConfirm] = useState(false);
+  const [bajaLoading, setBajaLoading] = useState(false);
   const navigate = useNavigate();
   // 1. Envolver fetchOrders en useCallback y asegurar que la respuesta sea un Array
   const fetchOrders = useCallback(async () => {
@@ -125,6 +128,25 @@ const OrderDirectory = () => {
     const unsubscribe = eventBus.on(EVENTS.failureDeleted, () => fetchOrders());
     return unsubscribe;
   }, [fetchOrders]);
+
+  const handleBaja = async () => {
+    if (!selectedOrder) return;
+    setBajaLoading(true);
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/orders/${selectedOrder.id_order}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('No se pudo dar de baja la orden');
+      setShowBajaConfirm(false);
+      setSelectedOrder(null);
+      fetchOrders(); // refresca el listado (la baja ya no aparece)
+    } catch (e) {
+      console.error('Error al dar de baja la orden:', e);
+    } finally {
+      setBajaLoading(false);
+    }
+  };
 
   // 3. Carga inicial
   useEffect(() => {
@@ -232,6 +254,13 @@ const OrderDirectory = () => {
               {selectedOrder && (
                 <div className={styles.selectedOrderContent}>
                   <OrderDescription order={selectedOrder} onClose={() => setSelectedOrder(null)} onUpdateStatus={() => setShowModalActStatus(true)} />
+                  <ActionButton
+                    label="Dar de baja"
+                    icon={null}
+                    variant="danger"
+                    fullWidth
+                    onClick={() => setShowBajaConfirm(true)}
+                  />
                 </div>
               )}
             </div>
@@ -243,6 +272,18 @@ const OrderDirectory = () => {
           <UpdateStatusModal open={showModalActStatus} order={selectedOrder} onClose={() => setShowModalActStatus(false)} onConfirm={() => { }} />
         </div>
       )}
+
+      <ConfirmDialog
+        open={showBajaConfirm}
+        title="Dar de baja la orden"
+        message="¿Seguro que querés dar de baja esta orden? No se elimina: queda inactiva y sale del listado, pero se conserva su historial."
+        confirmLabel={bajaLoading ? "Dando de baja..." : "Dar de baja"}
+        cancelLabel="Cancelar"
+        danger
+        onConfirm={handleBaja}
+        onCancel={() => setShowBajaConfirm(false)}
+      />
+
       <Footer />
     </div>
   );

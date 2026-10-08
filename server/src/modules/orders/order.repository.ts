@@ -26,29 +26,32 @@ export class OrderRepository extends BaseRepository<Order, OrderQueryDto> {
         );
 
         const [data, total] = await Promise.all([
-            this.prisma.order.findMany({
-                skip,
-                take: limit,
-                where: {
-                    observations: {
-                        contains: query?.search,
-                    },
-                },
-                orderBy: (query?.sortBy && query?.sortOrder)
-                    ? {
-                        [query.sortBy]: query.sortOrder,
-                    }
-                    : undefined,
-                include: orderInclude,
-            }),
+          this.prisma.order.findMany({
+            skip,
+            take: limit,
+            where: {
+              active: true,
+              observations: {
+                contains: query?.search,
+              },
+            },
+            orderBy:
+              query?.sortBy && query?.sortOrder
+                ? {
+                    [query.sortBy]: query.sortOrder,
+                  }
+                : undefined,
+            include: orderInclude,
+          }),
 
-            this.prisma.order.count({
-                where: {
-                    observations: {
-                        contains: query?.search,
-                    },
-                },
-            }),
+          this.prisma.order.count({
+            where: {
+              active: true,
+              observations: {
+                contains: query?.search,
+              },
+            },
+          }),
         ]);
 
         return {
@@ -179,9 +182,12 @@ export class OrderRepository extends BaseRepository<Order, OrderQueryDto> {
     }
 
     public async delete(id: string): Promise<{ id: string } | undefined> {
-        const order = await this.prisma.order.delete({
+        const order = await this.prisma.order.update({
             where: {
                 id_order: id,
+            },
+            data: {
+                active : false,
             },
         });
 
