@@ -117,40 +117,47 @@ export class OrderRepository extends BaseRepository<Order, OrderQueryDto> {
         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
         const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
 
-        const [active, pendingBudget, inRepair, deliveredThisMonth] = await Promise.all([
+        const [active, pendingBudget, inRepair, deliveredThisMonth] =
+          await Promise.all([
             this.prisma.order.count({
-                where: {
-                    status: {
-                        notIn: [
-                            $Enums.EnumOrderStatus.entregado,
-                            $Enums.EnumOrderStatus.cancelado,
-                        ],
-                    },
+              where: {
+                active: true,
+                status: {
+                  notIn: [
+                    $Enums.EnumOrderStatus.entregado,
+                    $Enums.EnumOrderStatus.cancelado,
+                  ],
                 },
+              },
             }),
             this.prisma.order.count({
-                where: {
-                    status: {
-                        in: [
-                            $Enums.EnumOrderStatus.recibido,
-                            $Enums.EnumOrderStatus.diagnostico,
-                        ],
-                    },
+              where: {
+                active: true,
+                status: {
+                  in: [
+                    $Enums.EnumOrderStatus.recibido,
+                    $Enums.EnumOrderStatus.diagnostico,
+                  ],
                 },
+              },
             }),
             this.prisma.order.count({
-                where: { status: $Enums.EnumOrderStatus.reparacion },
+              where: {
+                active: true,
+                status: $Enums.EnumOrderStatus.reparacion,
+              },
             }),
             this.prisma.order.count({
-                where: {
-                    status: $Enums.EnumOrderStatus.entregado,
-                    deliveryDate: {
-                        gte: startOfMonth,
-                        lt: startOfNextMonth,
-                    },
+              where: {
+                active: true,
+                status: $Enums.EnumOrderStatus.entregado,
+                deliveryDate: {
+                  gte: startOfMonth,
+                  lt: startOfNextMonth,
                 },
+              },
             }),
-        ]);
+          ]);
 
         return {
             activas: active,

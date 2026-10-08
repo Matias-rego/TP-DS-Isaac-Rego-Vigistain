@@ -176,3 +176,25 @@
     margin: 0.5rem;
   }
 }
+
+.filterBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0.75rem 12px;
+  padding: 8px 14px;
+  background: var(--tf-primary-soft);
+  color: var(--tf-text);
+  border: 1px solid var(--tf-border);
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+.filterBanner button {
+  background: none;
+  border: none;
+  color: var(--tf-primary);
+  cursor: pointer;
+  font-weight: 700;
+}

@@ -196,25 +196,25 @@ const Home = () => {
 
         {esTecnico && (
           <section className={styles.quickGrid}>
-            <div className={styles.quickCard}>
+            <div className={styles.quickCard} onClick={() => navigate('/manageOrder?filtro=activas')}>
               <FileText className={styles.quickIcon} size={20} />
               <span className={styles.quickNumber}>{stats.activas}</span>
               <span className={styles.quickLabel}>Órdenes activas</span>
             </div>
 
-            <div className={styles.quickCard}>
+            <div className={styles.quickCard} onClick={() => navigate('/manageOrder?filtro=pendientes')}>
               <Clock className={styles.quickIcon} size={20} />
               <span className={styles.quickNumber}>{stats.pendientesPresupuesto}</span>
               <span className={styles.quickLabel}>Pendientes de presupuesto</span>
             </div>
 
-            <div className={styles.quickCard}>
+            <div className={styles.quickCard} onClick={() => navigate('/manageOrder?filtro=reparacion')}>
               <Wrench className={styles.quickIcon} size={20} />
               <span className={styles.quickNumber}>{stats.enReparacion}</span>
               <span className={styles.quickLabel}>En reparación</span>
             </div>
 
-            <div className={styles.quickCard}>
+            <div className={styles.quickCard} onClick={() => navigate('/manageOrder?filtro=entregado')}>
               <CircleCheck className={styles.quickIcon} size={20} />
               <span className={styles.quickNumber}>{stats.entregadasMes}</span>
               <span className={styles.quickLabel}>Entregadas este mes</span>

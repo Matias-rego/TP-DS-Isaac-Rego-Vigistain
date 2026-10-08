@@ -15,8 +15,9 @@ import { eventBus, EVENTS } from '@/lib/eventBus';
 import type { PaginatedResponse } from "@/types/types";
 import { formatDocumentNumber } from "@/lib/utils";
 import ActionButton from "@/components/Common/Buttons/ActionButton";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import ConfirmDialog from "@/components/Common/ConfirmDialog/ConfirmDialog";
+
 
 
 // Mismo tono que venimos usando en OrderCard / StatusMiniDescriptiveCard
@@ -29,6 +30,13 @@ const STATUS_META: Record<EnumOrderStatus, { label: string; tone: 'info' | 'warn
   listo: { label: 'Listo para retirar', tone: 'success' },
   entregado: { label: 'Entregado', tone: 'success' },
   cancelado: { label: 'Cancelado', tone: 'danger' },
+};
+
+const FILTER_LABELS: Record<string, string> = {
+  activas: 'Órdenes activas',
+  pendientes: 'Pendientes de presupuesto',
+  reparacion: 'En reparación',
+  entregado: 'Entregadas',
 };
 
 const STATUS_FILTER_OPTIONS = Object.entries(STATUS_META).map(([value, meta]) => ({
@@ -92,6 +100,8 @@ const OrderDirectory = () => {
   const [showBajaConfirm, setShowBajaConfirm] = useState(false);
   const [bajaLoading, setBajaLoading] = useState(false);
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const metricFilter = searchParams.get('filtro');
   // 1. Envolver fetchOrders en useCallback y asegurar que la respuesta sea un Array
   const fetchOrders = useCallback(async () => {
     setLoading(true);
@@ -179,6 +189,16 @@ const OrderDirectory = () => {
       .reduce((sum, o) => sum + (o.totalCharged ?? 0), 0);
   }, [orders]);
 
+    const filteredRows = useMemo(() => {
+    switch (metricFilter) {
+      case 'activas':       return rows.filter(r => r.status !== 'entregado' && r.status !== 'cancelado');
+      case 'pendientes':    return rows.filter(r => r.status === 'recibido' || r.status === 'diagnostico');
+      case 'reparacion':    return rows.filter(r => r.status === 'reparacion');
+      case 'entregado':     return rows.filter(r => r.status === 'entregado');
+      default:              return rows;
+    }
+  }, [rows, metricFilter]);
+
   const formattedRevenue = new Intl.NumberFormat('es-AR', {
     style: 'currency',
     currency: 'ARS',
@@ -219,8 +239,12 @@ const OrderDirectory = () => {
         <h1 className={styles.title}>Gestión de Órdenes</h1>
 
         <div className={styles.cardSector}>
-          <DescriptiveMiniCard label="Reparaciones Activas" value={activeRepairs} icon={Wrench} tone="neutral" />
-          <DescriptiveMiniCard label="Presupuestos Pendientes" value={pendingBudgets} icon={FileText} tone="success" />
+                    <DescriptiveMiniCard
+            label="Reparaciones Activas" value={activeRepairs} icon={Wrench} tone="neutral"
+          />
+          <DescriptiveMiniCard
+            label="Presupuestos Pendientes" value={pendingBudgets} icon={FileText} tone="success"
+          />
           {/* Sin fuente de datos propia todavía: no hay modelo de stock/inventario en el schema actual */}
           <DescriptiveMiniCard label="Alertas de Stock" value={0} icon={AlertTriangle} tone="danger" />
           <DescriptiveMiniCard label="Ingresos del Día" value={formattedRevenue} icon={Banknote} tone="neutral" />
@@ -239,9 +263,15 @@ const OrderDirectory = () => {
 
           <div className={styles.dataOrderSection}>
             <div className={styles.tableOrderSection}>
+              {metricFilter && (
+              <div className={styles.filterBanner}>
+                <span>Filtrando por: <strong>{FILTER_LABELS[metricFilter] ?? metricFilter}</strong></span>
+                <button type="button" onClick={() => setSearchParams({})}>✕ Quitar filtro</button>
+              </div>
+            )}
               {loading && <p className={styles.loadingText}>Cargando órdenes...</p>}
               <DataTable<OrderRow>
-                data={rows}
+                data={filteredRows}
                 idField="id_order"
                 columns={columns}
                 onRowClick={(row) => setSelectedOrder(row.raw)}
@@ -269,7 +299,7 @@ const OrderDirectory = () => {
       </main>
       {showModalActStatus && selectedOrder && (
         <div>
-          <UpdateStatusModal open={showModalActStatus} order={selectedOrder} onClose={() => setShowModalActStatus(false)} onConfirm={() => { }} />
+          <UpdateStatusModal open={showModalActStatus} order={selectedOrder} onClose={() => setShowModalActStatus(false)} onConfirm={() => { fetchOrders(); setSelectedOrder(null); }}  />
         </div>
       )}
 
