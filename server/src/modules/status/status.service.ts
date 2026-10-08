@@ -56,7 +56,10 @@ export class StatusService {
         } as StatusHistory);
 
 
-        await this.orderRepo.update(input.id_order, { status: input.status });
+        await this.orderRepo.update(input.id_order, {
+          status: input.status,
+          deliveryDate: input.status === 'entregado' ? new Date() : undefined,
+        });
 
         if (order.budget?.id_budget && input.status==='aprobado') {
         await this.budgetRepo.update(

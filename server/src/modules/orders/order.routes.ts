@@ -31,4 +31,6 @@ router.get('/:id', validate({ params: idSchema }), ctrl.getOneOrder);
 
 router.post('/', validate({ body: registerOrderSchema }), ctrl.registerOrder);
 
+router.delete('/:id', validate({ params: idSchema }), ctrl.deleteOrder);
+
 export default router;
