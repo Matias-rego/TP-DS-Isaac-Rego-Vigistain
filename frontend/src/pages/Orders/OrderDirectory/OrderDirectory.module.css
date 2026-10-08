@@ -66,6 +66,15 @@
   overflow-x: auto; /* solo caja de scroll; el marco/card lo pone la propia tabla (si no, quedaba doble borde) */
 }
 
+/* La tabla de órdenes mantiene un ancho mínimo cómodo para sus 6 columnas (~800px).
+   En desktop la tabla ocupa todo el ancho (width:100%); cuando la pantalla es más
+   angosta que ~800px, la tabla desborda su caja y aparece la barra de scroll
+   horizontal (azul, abajo de la tabla) para deslizar y llegar a Gestión.
+   Así el scroll se ACTIVA justo cuando la tabla deja de entrar, sin aplastar columnas. */
+.tableOrderSection table {
+  min-width: 800px;
+}
+
 .loadingText {
   margin: 0;
   padding: 10px 14px;
@@ -132,16 +141,29 @@
   color: var(--tf-danger);
 }
 
-/* --- Responsive: tablet/mobile --- */
-@media (max-width: 900px) {
+/* --- Responsive: el panel de detalle baja ABAJO de la tabla hasta que hay lugar
+   cómodo para los dos (≥1280px). Antes se ponía al lado desde 900px y dejaba la
+   tabla apretada; ahora, por debajo de 1280, el panel va abajo y la tabla queda
+   a ancho completo. --- */
+@media (max-width: 1280px) {
   .dataOrderSection {
     flex-direction: column;
+    /* En columna, estirar los hijos al ANCHO disponible (no al ancho del contenido).
+       Sin esto, align-items:flex-start dejaba la tabla clavada en su min-width (800px):
+       no crecía con la pantalla y, al no desbordar su caja, nunca salía la barra de scroll.
+       Con stretch, la caja mide lo que la pantalla → la tabla de 800px desborda y aparece la barra. */
+    align-items: stretch;
   }
   .selectedOrderOption:has(> *) {
     flex-basis: auto;
     width: 100%;
   }
 }
+
+/* --- Tabla responsive en mobile (sin tarjetas) ---
+   Mantenemos la tabla. En pantallas angostas conserva TODAS sus columnas
+   (min-width viene del DataTable) y se desliza horizontalmente dentro de su caja
+   (overflow-x en .tableContainer). En celular real se scrollea con el dedo. */
 
 @media (max-width: 480px) {
   .page {
@@ -153,7 +175,26 @@
   .orderSection {
     margin: 0.5rem;
   }
-  .tableOrderSection table {
-    min-width: 560px; /* fuerza el scroll horizontal en vez de aplastar columnas */
-  }
+}
+
+.filterBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0.75rem 12px;
+  padding: 8px 14px;
+  background: var(--tf-primary-soft);
+  color: var(--tf-text);
+  border: 1px solid var(--tf-border);
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+.filterBanner button {
+  background: none;
+  border: none;
+  color: var(--tf-primary);
+  cursor: pointer;
+  font-weight: 700;
 }

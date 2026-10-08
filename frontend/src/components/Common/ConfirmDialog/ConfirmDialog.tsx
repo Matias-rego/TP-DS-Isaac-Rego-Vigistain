@@ -60,7 +60,7 @@ const ConfirmDialog = ({
           <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>{title}</h3>
         </div>
 
-        <p style={{ margin: "0 0 20px", color: "var(--tf-text-soft, #64748b)", lineHeight: 1.5 }}>
+        <p style={{ margin: "0 0 20px", color: "var(--tf-muted)", lineHeight: 1.5 }}>
           {message}
         </p>
 

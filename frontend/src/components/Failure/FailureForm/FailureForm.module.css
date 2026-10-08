@@ -142,7 +142,7 @@
 
 .modalContent {
   position: relative;
-  background: #fff;
+  background: var(--tf-card);
   border-radius: 8px;
   padding: 24px;
   max-width: 600px;

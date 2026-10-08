@@ -1,7 +1,7 @@
 import BACKEND_URL from "@/lib/config";
 import type { EnumOrderStatus, Order } from "@/types/types";
 import { useCallback, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Nav from "@/components/layout/Nav/Nav";
 import OrderDetailNav from "@/components/OrderComponent/OrderDetailNav/OrderDetailNav";
 import StatusPipeline from "@/components/Status/StatusPipeline/StatusPipeline";
@@ -17,6 +17,7 @@ type Transition = { target: EnumOrderStatus; direction: "advance" | "retreat" };
 
 const ManageOrder = () => {
   const { id_order } = useParams<{ id_order: string }>();
+  const navigate = useNavigate()
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -151,6 +152,9 @@ const ManageOrder = () => {
   return (
     <div className={styles.page}>
       <Nav />
+      <button type= 'button' className= {styles.backButton} onClick={() => navigate('/manageOrder')}>
+         ← volver a ordenes
+      </button>
       {renderContent()}
       <Footer />
     </div>

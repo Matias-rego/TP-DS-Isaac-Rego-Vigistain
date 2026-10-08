@@ -176,7 +176,7 @@
 }
 
 .cancelBtn:hover:not(:disabled) {
-  background: var(--tf-surface, #f3f4f6);
+  background: var(--tf-card);
 }
 
 .cancelBtn:disabled {
@@ -230,7 +230,7 @@
 }
 
 .cancelBtn:hover:not(:disabled) {
-  background: var(--tf-surface, #f3f4f6);
+  background: var(--tf-card);
 }
 
 .cancelBtn:disabled {

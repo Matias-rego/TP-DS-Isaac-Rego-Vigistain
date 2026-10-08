@@ -122,12 +122,14 @@ eventBus.on(EVENTS.failureDeleted, handleFailureDeleted);
 
           {successMessage && <p className={styles.successMessage}>{successMessage}</p>}
 
-          <ActionButton
+          <div>
+            <ActionButton
             label="Agregar falla"
             icon={null}
             variant="neutral"
             onClick={() => setAddingFailure(true)}
           />
+          </div>
         </>
       ) : (
         <div className={styles.formWrapper}>

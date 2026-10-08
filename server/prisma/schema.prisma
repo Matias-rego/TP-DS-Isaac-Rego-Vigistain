@@ -162,6 +162,7 @@ model Order {
   statusHistory           Status_History[]
   budget                  Budget?
   failures                Failure[]
+  active                  Boolean               @default(true)
 
   @@map("Order")
 }
