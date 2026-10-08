@@ -8,7 +8,7 @@ import DeviceIcon from "@/assets/DeviceIcon.svg"
 import SearchBar from "@/components/SearchBar/SearchBar";
 import ClientDetailModal from '@/features/clients/components/ClientCard/ClientDetailModal/ClientDetailModal';
 import ActionButton from '@/components/Common/Buttons/ActionButton';
-import ClientRegister from '../../Clientes/ClientRegister';
+import ClientRegister from '../../../features/clients/components/ClientRegister/ClientRegister';
 import DeviceForm, { type DeviceFormValues } from "@/components/DeviceForm/DeviceForm";
 import CautionIcon from "@/assets/caution.svg";
 import ClipboardCheck from "@/assets/clipboardCheck.svg";

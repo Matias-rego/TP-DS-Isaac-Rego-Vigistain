@@ -1,7 +1,7 @@
 import { DateFilter, SelectFilter } from '@/components/Filters';
 import { useClientTypeOptions } from '@/features/clientTypes/useClientTypeOptions';
 import { UserRoundPlus, X } from 'lucide-react';
-import ClientRegister from '@/pages/Clientes/ClientRegister';
+import ClientRegister from '@/features/clients/components/ClientRegister/ClientRegister';
 import type { ClientsQuery } from '../../clients/types';
 import { clientsService } from '../../clients/clients.service';
 import type { Client } from '../../clients/types';
@@ -41,7 +41,7 @@ const ClientFilters = ({ query, updateQuery }: FiltersProps<ClientsQuery>) => {
 const ClientsManagement = () => {
   const [detail, setDetail] = useState<{ client: Client; clearSelection: () => void } | null>(null);
   const [isClientRegisterOpen, setIsClientRegisterOpen] = useState(false);
-  
+
   const { options } = useClientTypeOptions();
 
   const clientsConfig: EntityConfig<Client, ClientsQuery> = {
