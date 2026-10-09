@@ -6,7 +6,6 @@ interface User {
   id_user:       number;
   userName:      string;
   email:         string;
-  password_hash: string;
   rol:           string;
   status:        boolean;
   urlPicture:    string;

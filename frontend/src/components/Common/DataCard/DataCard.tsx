@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import IconCheck from '@/assets/check.svg';
 import styles from './DataCard.module.css';
 
 import {
@@ -23,12 +24,15 @@ interface DataCardProps<T extends object> {
   idField: keyof T;
   titleField?: keyof T;
   descriptionField?: keyof T;
+  imageField?: keyof T;
   fields: CardFieldConfig<T>[];
   renderAction?: (item: T) => ReactNode;
   renderFooter?: (item: T) => ReactNode;
   caption?: string;
   onCardClick?: (item: T) => void;
+  onSelectItem?: (item: T) => void;
   selectedId?: T[keyof T];
+  selectedIds?: T[keyof T][];
 }
 
 const getValue = <T extends object>(item: T, key: CardFieldConfig<T>['key'],): unknown => {
@@ -40,12 +44,15 @@ function DataCard<T extends object>({
   idField,
   titleField,
   descriptionField,
+  imageField,
   fields,
   renderAction,
   renderFooter,
   caption,
   onCardClick,
+  onSelectItem,
   selectedId,
+  selectedIds = [],
 }: DataCardProps<T>) {
   return (
     <div className={styles.container}>
@@ -59,8 +66,8 @@ function DataCard<T extends object>({
         <div className={styles.grid}>
           {data.map((item) => {
             const id = item[idField];
-            const isSelected =
-              selectedId !== undefined && id === selectedId;
+            const isSelected = selectedId !== undefined && id === selectedId;
+            const isMultiSelected = selectedIds.includes(id);
 
             const titleValue =
               titleField !== undefined ? item[titleField] : undefined;
@@ -69,6 +76,8 @@ function DataCard<T extends object>({
               descriptionField !== undefined
                 ? item[descriptionField]
                 : undefined;
+            const imageValue = imageField !== undefined ? item[imageField] : undefined;
+            const imageUrl = typeof imageValue === 'string' ? imageValue.trim() : '';
 
             return (
               <Card
@@ -76,25 +85,47 @@ function DataCard<T extends object>({
                 className={[
                   styles.card,
                   onCardClick ? styles.clickable : '',
-                  isSelected ? styles.selected : '',
+                  isMultiSelected ? styles.selected : isSelected ? styles.individuallySelected : '',
                 ]
                   .filter(Boolean)
                   .join(' ')}
                 onClick={() => onCardClick?.(item)}
               >
+                {onSelectItem && (
+                  <button
+                    type="button"
+                    className={styles.selectionCheckbox}
+                    aria-pressed={isMultiSelected}
+                    aria-label={`Seleccionar elemento ${String(id)}`}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onSelectItem(item);
+                    }}
+                  >
+                    {isMultiSelected && <img src={IconCheck} alt="" />}
+                  </button>
+                )}
                 {(titleField || descriptionField || renderAction) && (
                   <CardHeader>
-                    {titleField && (
-                      <CardTitle>
-                        {String(titleValue ?? '')}
-                      </CardTitle>
+                    {imageUrl && (
+                      <span className={styles.headerImageSlot}>
+                        <img src={imageUrl} alt="" />
+                      </span>
                     )}
 
-                    {descriptionField && (
-                      <CardDescription>
-                        {String(descriptionValue ?? '')}
-                      </CardDescription>
-                    )}
+                    <div className={styles.heading}>
+                      {titleField && (
+                        <CardTitle>
+                          {String(titleValue ?? '')}
+                        </CardTitle>
+                      )}
+
+                      {descriptionField && (
+                        <CardDescription>
+                          {String(descriptionValue ?? '')}
+                        </CardDescription>
+                      )}
+                    </div>
 
                     {renderAction && (
                       <CardAction

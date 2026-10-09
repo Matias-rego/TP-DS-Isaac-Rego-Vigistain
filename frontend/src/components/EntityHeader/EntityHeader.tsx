@@ -83,12 +83,12 @@ export const EntityHeader = ({
     <Wrapper>
       <h1 className={styles.title}>{title}</h1>
 
-      {children && (
-        <div
-          ref={actionsRef}
-          className={`${styles.actionGroup} ${useActionsMenu ? styles.actionMenuMode : ''}`}
-        >
-          <button
+      <div
+        ref={actionsRef}
+        className={`${styles.actionGroup} ${useActionsMenu ? styles.actionMenuMode : ''}`}
+      >
+        {children && (
+          <><button
             type="button"
             className={styles.mobileActionsTrigger}
             aria-label="Acciones disponibles"
@@ -101,10 +101,8 @@ export const EntityHeader = ({
             <ChevronDown
               size={15}
               aria-hidden="true"
-              className={actionsOpen ? styles.actionsChevronOpen : styles.actionsChevron}
-            />
-          </button>
-          <div
+              className={actionsOpen ? styles.actionsChevronOpen : styles.actionsChevron} />
+          </button><div
             ref={actionListRef}
             id={actionsOpen && useActionsMenu ? 'entity-actions-panel' : undefined}
             className={`${styles.actions} ${actionsOpen ? styles.actionsMenuOpen : ''}`}
@@ -116,10 +114,11 @@ export const EntityHeader = ({
               }
             }}
           >
-            {children}
-          </div>
-        </div>
-      )}
+              {children}
+            </div></>
+        )}
+      </div>
+
 
       {view && onViewChange && <ViewToggle value={view} onChange={onViewChange} />}
     </Wrapper>

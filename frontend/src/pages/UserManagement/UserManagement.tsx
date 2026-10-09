@@ -1,5 +1,3 @@
-import Nav from "../../components/layout/Nav/Nav";
-import Footer from "@/components/Footer/Footer";
 import styles from "./UserManagement.module.css";
 import SearchBar from "@/components/SearchBar/SearchBar";
 import type { FilterConfig } from "@/components/SearchBar/SearchBar";
@@ -8,7 +6,8 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { BACKEND_URL } from "@/lib/config";
 import { eventBus, EVENTS } from "@/lib/eventBus";
 import UserDetailModal from "@/components/UserCard/UserDetailModel";
-import type { PaginatedResponse, User } from "@/types/types";
+import type { PaginatedResponse } from "@/types/types";
+import type { User } from '@/features/users/types';
 {/*
 type User = UserBase & {
   onClick?: (id: string) => void;
@@ -131,7 +130,6 @@ const UserManagement = () => {
 
   return (
     <div className={styles.page}>
-      <Nav />
       <div className={styles.content}>
 
         <div className={styles.header}>
@@ -179,7 +177,6 @@ const UserManagement = () => {
         </div>
 
       </div>
-      <Footer />
     </div>
   );
 };

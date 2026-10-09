@@ -6,7 +6,7 @@ import { eventBus } from "@/lib/eventBus";
 import { BACKEND_URL } from "@/lib/config";
 import ActionButton from "../Common/Buttons/ActionButton";
 import ConfirmDialog from "../Common/ConfirmDialog/ConfirmDialog";
-import type { User as UserBase } from "@/types/types";
+import type { User as UserBase } from '@/features/users/types';
 
 interface User extends UserBase {
   onClick?: (id: string) => void;
@@ -67,7 +67,7 @@ const UserDetailModal = ({
   const handleEdit = async (updatedUser: User): Promise<boolean> => {
     try {
       // Excluimos las propiedades que el esquema del backend prohíbe explícitamente
-      const { id_user, password_hash, status, ...payload } = updatedUser;
+      const { id_user, status, ...payload } = updatedUser;
 
       const response = await fetch(
         `${BACKEND_URL}/api/users/${id_user}`,

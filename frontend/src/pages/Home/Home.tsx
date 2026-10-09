@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import Nav from "@/components/layout/Nav/Nav";
 import styles from "./Home.module.css";
-import type { User, Order } from "@/types/types";
+import type { Order } from "@/types/types";
+import type { User } from '@/features/users/types';
 import Footer from "@/components/Footer/Footer";
 import OrderMiniCard from "@/components/OrderComponent/OrderMiniCard/OrderMiniCard";
 import { BACKEND_URL } from '@/lib/config';

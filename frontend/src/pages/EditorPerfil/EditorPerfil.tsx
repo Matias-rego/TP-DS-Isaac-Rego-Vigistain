@@ -1,7 +1,7 @@
 import styles from "./EditorPerfil.module.css";
 import { useEffect, useState } from "react";
 import Nav from "../../components/layout/Nav/Nav";
-import type { User } from "../../types/types";
+import type { User } from '@/features/users/types';
 import { Dialog, DialogContent, DialogHeader, DialogDescription, DialogTitle, DialogPortal } from "@/components/ui/dialog";
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Button } from "@/components/ui/button";

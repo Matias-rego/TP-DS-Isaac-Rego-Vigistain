@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import IconCheck from '@/assets/check.svg';
 import styles from './DataTable.module.css';
 
 
@@ -28,7 +29,9 @@ interface DataTableProps<T extends object> {
   caption?: string;
   showTotal?: boolean;
   onRowClick?: (item: T) => void;
+  onSelectItem?: (item: T) => void;
   selectedId?: T[keyof T];
+  selectedIds?: T[keyof T][];
 }
 
 // 'actions' no es un dato del item: para esa columna no hay valor que leer
@@ -42,13 +45,26 @@ function DataTable<T extends object>({
   caption,
   showTotal = false,
   onRowClick,
+  onSelectItem,
   selectedId,
+  selectedIds = [],
 }: DataTableProps<T>) {
   const totalColumn = columns.find((c) => c.isTotalField);
   const total =
     showTotal && totalColumn
       ? data.reduce((acc, item) => acc + Number(getValue(item, totalColumn.key) ?? 0), 0)
       : 0;
+  const selectedCount = data.filter((item) => selectedIds.includes(item[idField])).length;
+  const allSelected = data.length > 0 && selectedCount === data.length;
+  const partiallySelected = selectedCount > 0 && !allSelected;
+
+  const toggleVisibleSelection = () => {
+    if (!onSelectItem) return;
+
+    data
+      .filter((item) => selectedIds.includes(item[idField]) === allSelected)
+      .forEach(onSelectItem);
+  };
 
   return (
     <div className={styles.tableContainer}>
@@ -57,6 +73,22 @@ function DataTable<T extends object>({
 
         <TableHeader className={styles.header}>
           <TableRow className={styles.headerRow}>
+            {onSelectItem && (
+              <TableHead className={`${styles.head} ${styles.selectionHead}`}>
+                <button
+                  type="button"
+                  className={styles.selectionCheckbox}
+                  aria-label={allSelected ? 'Deseleccionar todas las filas visibles' : 'Seleccionar todas las filas visibles'}
+                  aria-checked={partiallySelected ? 'mixed' : allSelected}
+                  aria-pressed={allSelected || partiallySelected}
+                  role="checkbox"
+                  onClick={toggleVisibleSelection}
+                >
+                  {allSelected && <img src={IconCheck} alt="" />}
+                  {partiallySelected && <span className={styles.selectionIndeterminate} />}
+                </button>
+              </TableHead>
+            )}
             {columns.map((col) => (
               <TableHead key={String(col.key)} className={styles.head}>
                 {col.label}
@@ -69,7 +101,7 @@ function DataTable<T extends object>({
           {data.length === 0 ? (
             <TableRow>
               <TableCell
-                colSpan={columns.length}
+                colSpan={columns.length + (onSelectItem ? 1 : 0)}
                 className={styles.cell}
                 style={{ textAlign: 'center' }}
               >
@@ -79,12 +111,29 @@ function DataTable<T extends object>({
           ) : (
             data.map((item) => {
               const isSelected = selectedId !== undefined && item[idField] === selectedId;
+              const isMultiSelected = selectedIds.includes(item[idField]);
               return (
                 <TableRow
                   key={String(item[idField])}
-                  className={`${styles.bodyRow} ${onRowClick ? styles.clickableRow : ''} ${isSelected ? styles.selectedRow : ''}`}
+                  className={`${styles.bodyRow} ${onRowClick ? styles.clickableRow : ''} ${isMultiSelected ? styles.selectedRow : isSelected ? styles.individuallySelectedRow : ''}`}
                   onClick={() => onRowClick?.(item)}
                 >
+                  {onSelectItem && (
+                    <TableCell className={`${styles.cell} ${styles.selectionCell}`}>
+                      <button
+                        type="button"
+                        className={styles.selectionCheckbox}
+                        aria-pressed={isMultiSelected}
+                        aria-label={`Seleccionar fila ${String(item[idField])}`}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          onSelectItem(item);
+                        }}
+                      >
+                        {isMultiSelected && <img src={IconCheck} alt="" />}
+                      </button>
+                    </TableCell>
+                  )}
                   {columns.map((col) => {
                     const value = getValue(item, col.key);
                     return (
@@ -105,7 +154,7 @@ function DataTable<T extends object>({
         {showTotal && totalColumn && (
           <TableFooter className={styles.footer}>
             <TableRow className={styles.footerRow}>
-              <TableCell colSpan={columns.length - 1} className={styles.footerCell}>
+              <TableCell colSpan={columns.length - (onSelectItem ? 0 : 1)} className={styles.footerCell}>
                 Total
               </TableCell>
               <TableCell className={`${styles.footerCell} ${styles.total}`}>
