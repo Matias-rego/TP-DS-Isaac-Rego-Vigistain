@@ -12,6 +12,7 @@ export class UserRepository extends BaseRepository<User, UserQueryDto> {
             query?.page,
             query?.limit
         );
+        console.log("UserRepository.findAll query:", query?.ofValidationStatus);
         const where: Prisma.UserWhereInput = {
             ...(query?.search
                 ? {
@@ -34,6 +35,11 @@ export class UserRepository extends BaseRepository<User, UserQueryDto> {
             ...(query?.ofRol
                 ? {
                     rol: query.ofRol,
+                }
+                : {}),
+            ...(query?.ofValidationStatus
+                ? {
+                    validationStatus: query.ofValidationStatus,
                 }
                 : {}),
         };

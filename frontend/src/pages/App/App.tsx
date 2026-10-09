@@ -9,7 +9,6 @@ import ForgotPassword from "@/components/Password/ForgotPasswor";
 import ResetPassword from "@/components/Password/ResetPassword";
 import Gestion from "../Gestion/Gestion";
 import WorkOrder from "../Orders/WorkOrderCreating/WorkOrder";
-import UserManagement from "../UserManagement/UserManagement";
 import { AuthProvider, useAuth } from "@/lib/AuthContext";
 import Validation from "@/pages/Validation/Validation";
 import { WebSocketManager } from "@/lib/WebSocketManager";
@@ -17,7 +16,6 @@ import OrderDirectory from "../Orders/OrderDirectory/OrderDirectory";
 import ManageOrder from "@/pages/Orders/ManageOrder/ManageOrder";
 import BudgetPdfPreview from "@/components/PDF/BudgetPdfPreview";
 import AppLayout from "@/components/layout/AppLayout";
-import Management from "@/features/Management/pages/Management";
 import BudgetResponse from "@/pages/Budget/BudgetResponse/BudgetResponse";
 import UsersManagement from "@/features/users/pages/UserManagement";
 import ClientsManagement from "@/features/clients/pages/ClientsManagement";
@@ -84,11 +82,9 @@ const App = () => {
           <Route path="/showBudget/:id_budget" element={<RutaPrivada><BudgetPdfPreview /></RutaPrivada>} />
 
           <Route element={<AppLayout />}>
-            <Route path="/userManagement" element={<RutaPrivada><UserManagement /></RutaPrivada>} />
+            <Route path="/userManagement" element={<RutaPrivada><UsersManagement /></RutaPrivada>} />
             <Route path="/gestion" element={<RutaPrivada><Gestion /></RutaPrivada>} />
             <Route path="/perfil" element={<RutaPrivada><Perfil /></RutaPrivada>} />
-            <Route path="/user" element={<RutaPrivada><UsersManagement /></RutaPrivada>} />
-            <Route path="/management" element={<RutaPrivada><Management /></RutaPrivada>} />
             <Route path="/clientManagement" element={<RutaPrivada><ClientsManagement /></RutaPrivada>} />
           </Route>
         </Route>

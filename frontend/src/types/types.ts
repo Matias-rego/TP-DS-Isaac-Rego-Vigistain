@@ -1,6 +1,9 @@
+import type { User } from '@/features/users/types';
+
 // ==========================================
 // ENUMS
 // ==========================================
+
 
 export const EnumRol = {
   admin: "admin",
@@ -74,18 +77,7 @@ export type EnumTypeAddedCost = (typeof EnumTypeAddedCost)[keyof typeof EnumType
 // MODELS (DOMINIO/ENTIDADES)
 // ==========================================
 
-export interface User {
-  id_user: string;
-  userName: string;
-  email: string;
-  password_hash: string;
-  rol: EnumRol;
-  status: boolean;
-  validationStatus: boolean;
-  urlPicture: string;
-  orders?: Order[];
-  statusHistory?: Status_History[];
-}
+
 
 export interface Client_Type {
   id_client_type: string;

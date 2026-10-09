@@ -6,7 +6,8 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { BACKEND_URL } from "@/lib/config";
 import { eventBus, EVENTS } from "@/lib/eventBus";
 import UserDetailModal from "@/components/UserCard/UserDetailModel";
-import type { PaginatedResponse, User } from "@/types/types";
+import type { PaginatedResponse } from "@/types/types";
+import type { User } from '@/features/users/types';
 {/*
 type User = UserBase & {
   onClick?: (id: string) => void;

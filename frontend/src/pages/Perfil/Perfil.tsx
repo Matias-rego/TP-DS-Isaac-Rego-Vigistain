@@ -6,7 +6,7 @@ import { Navigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { BACKEND_URL } from '@/lib/config';
 import styles from './Perfil.module.css';
-import type { User } from "../../types/types";
+import type { User } from '@/features/users/types';
 
 const Perfil = () => {
   const [usuario, setUsuario] = useState<User | null>(null);
