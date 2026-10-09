@@ -335,11 +335,12 @@
   }
 }
 
-/* Una columna: el resumen va primero */
+/* Una columna: el resumen va ultimo */
 @container field (max-width: 899px) {
   .sidebar {
-    order: -1;
+    order: 0;
   }
+
 
   .summarySticky {
     position: static;

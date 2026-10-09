@@ -2,7 +2,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #F5F7FA;
+  background-color: var(--tf-bg);
 }
 
 .main {
@@ -121,6 +121,22 @@
 .modal > * {
   min-width: 0;
   max-width: 100%;
+}
+
+.backButton {
+  margin: 12px;
+  padding: 8px 10px;
+  background: var(--tf-card);
+  color: var(--tf-text);
+  border: 1px solid var(--tf-border);
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  align-self: flex-start;
+}
+
+.backButton:hover {
+  background: var(--tf-primary-soft);
 }
 
 /* ================================

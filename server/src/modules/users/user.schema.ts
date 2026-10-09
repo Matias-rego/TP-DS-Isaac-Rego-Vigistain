@@ -1,4 +1,4 @@
-import { username, password, email, EnumRol, isActive, url, enumSchema } from "@/utils/fields.js";
+import { username, password, email, EnumRol, isActive, url, enumSchema, isActiveQuery } from "@/utils/fields.js";
 import { QuerySchema } from '@/shared/common.schema.js'
 import { z } from "zod";
 
@@ -27,6 +27,8 @@ export const userQuerySchema = QuerySchema.extend({
         "rol",
         "id_user"
     ], "sortBy").default("userName"),
+    ofRol: EnumRol.optional(),
+    ofValidationStatus: isActiveQuery.optional(),
 }).strict();
 
 export type UserQueryDto = z.infer<typeof userQuerySchema>;

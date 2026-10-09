@@ -21,6 +21,14 @@ export function enumSchema( values: readonly string[] | EnumLike,label: string):
   });
 }
 
+export const toBoolean = (name: string) =>
+    z.stringbool({
+        truthy: ["1"],
+        falsy: ["0"],
+        case: "sensitive",
+        error: `${name} must be "1" or "0"`,
+    });
+
 
 export const paymentMethod = enumSchema($Enums.EnumPaymentMethod, "Payment method");
 
@@ -78,6 +86,8 @@ export const name = z
     .trim()
     .min(3, "Name must be at least 3 characters long")
     .max(100, "Name cannot be longer than 100 characters");
+
+export const isActiveQuery = toBoolean("Is active");
 
 export const cuit = z
     .string({

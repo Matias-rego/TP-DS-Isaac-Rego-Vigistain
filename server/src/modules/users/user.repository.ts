@@ -12,22 +12,38 @@ export class UserRepository extends BaseRepository<User, UserQueryDto> {
             query?.page,
             query?.limit
         );
-        const where: Prisma.UserWhereInput = query?.search
-            ? {
-                OR: [
-                    {
-                        email: {
-                            contains: query.search,
+        console.log("UserRepository.findAll query:", query?.ofValidationStatus);
+        const where: Prisma.UserWhereInput = {
+            ...(query?.search
+                ? {
+                    OR: [
+                        {
+                            email: {
+                                contains: query.search,
+
+                            },
                         },
-                    },
-                    {
-                        userName: {
-                            contains: query.search,
+                        {
+                            userName: {
+                                contains: query.search,
+
+                            },
                         },
-                    },
-                ],
-            }
-            : {};
+                    ],
+                }
+                : {}),
+            ...(query?.ofRol
+                ? {
+                    rol: query.ofRol,
+                }
+                : {}),
+            ...(query?.ofValidationStatus
+                ? {
+                    validationStatus: query.ofValidationStatus,
+                }
+                : {}),
+        };
+
 
         const [data, total] = await Promise.all([
             this.prisma.user.findMany({

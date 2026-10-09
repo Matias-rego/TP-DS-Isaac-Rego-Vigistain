@@ -6,9 +6,6 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
 
   return {
-    // tailwindcss() es OBLIGATORIO en Tailwind v4: sin este plugin, el
-    // @import "tailwindcss" y las directivas @theme/@apply/@source de index.css
-    // no se procesan y el build no compila.
     plugins: [react()],
 
     resolve: {

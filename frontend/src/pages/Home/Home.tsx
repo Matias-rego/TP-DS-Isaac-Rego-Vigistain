@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import Nav from "@/components/layout/Nav/Nav";
 import styles from "./Home.module.css";
-import type { User, Order } from "@/types/types";
+import type { Order } from "@/types/types";
+import type { User } from '@/features/users/types';
 import Footer from "@/components/Footer/Footer";
 import OrderMiniCard from "@/components/OrderComponent/OrderMiniCard/OrderMiniCard";
 import { BACKEND_URL } from '@/lib/config';
@@ -160,37 +161,6 @@ const Home = () => {
                     este panel mostrará tus equipos, presupuestos e historial de reparaciones.
                   </span>
                 </div>
-
-                {/*
-                  TODO CLIENTE:
-                  Reactivar este bloque cuando exista el rol "cliente" en backend.
-                
-                  <div className={styles.clientActions}>
-                    <button type="button" className={styles.clientAction}>
-                      <span className={styles.clientActionIcon}>📱</span>
-                      <span>
-                        <strong>Mis equipos</strong>
-                        <small>Celulares, computadoras y dispositivos registrados</small>
-                      </span>
-                    </button>
-                
-                    <button type="button" className={styles.clientAction}>
-                      <span className={styles.clientActionIcon}>🧾</span>
-                      <span>
-                        <strong>Mis presupuestos</strong>
-                        <small>Consultá importes, estados y aprobaciones pendientes</small>
-                      </span>
-                    </button>
-                
-                    <button type="button" className={styles.clientAction}>
-                      <span className={styles.clientActionIcon}>🛠️</span>
-                      <span>
-                        <strong>Historial de arreglos</strong>
-                        <small>Revisá qué reparaciones se realizaron sobre tus equipos</small>
-                      </span>
-                    </button>
-                  </div>
-                */}
               </>
             )}
           </div>
@@ -216,7 +186,7 @@ const Home = () => {
                   <strong>Crear nueva orden</strong>
                 </button>
 
-                <button type="button" className={styles.quickPanelItem}>
+                <button type="button" className={styles.quickPanelItem} onClick={() => navigate('/manageOrder')}>
                   <span><Wallet size={18} /></span>
                   <strong>Ver presupuestos</strong>
                 </button>
@@ -227,25 +197,25 @@ const Home = () => {
 
         {esTecnico && (
           <section className={styles.quickGrid}>
-            <div className={styles.quickCard}>
+            <div className={styles.quickCard} onClick={() => navigate('/manageOrder?filtro=activas')}>
               <FileText className={styles.quickIcon} size={20} />
               <span className={styles.quickNumber}>{stats.activas}</span>
               <span className={styles.quickLabel}>Órdenes activas</span>
             </div>
 
-            <div className={styles.quickCard}>
+            <div className={styles.quickCard} onClick={() => navigate('/manageOrder?filtro=pendientes')}>
               <Clock className={styles.quickIcon} size={20} />
               <span className={styles.quickNumber}>{stats.pendientesPresupuesto}</span>
               <span className={styles.quickLabel}>Pendientes de presupuesto</span>
             </div>
 
-            <div className={styles.quickCard}>
+            <div className={styles.quickCard} onClick={() => navigate('/manageOrder?filtro=reparacion')}>
               <Wrench className={styles.quickIcon} size={20} />
               <span className={styles.quickNumber}>{stats.enReparacion}</span>
               <span className={styles.quickLabel}>En reparación</span>
             </div>
 
-            <div className={styles.quickCard}>
+            <div className={styles.quickCard} onClick={() => navigate('/manageOrder?filtro=entregado')}>
               <CircleCheck className={styles.quickIcon} size={20} />
               <span className={styles.quickNumber}>{stats.entregadasMes}</span>
               <span className={styles.quickLabel}>Entregadas este mes</span>
@@ -268,53 +238,6 @@ const Home = () => {
             </div>
           </section>
         )}
-
-        {/*
-          TODO CLIENTE:
-          Reactivar esta sección cuando el backend tenga:
-          - rol "cliente"
-          - órdenes asociadas al cliente
-          - equipos asociados al cliente
-          - presupuestos asociados al cliente
-          - historial de reparaciones
-
-          {esCliente && (
-            <section className={styles.clientDashboard}>
-              <div className={styles.clientSummaryCard}>
-                <div>
-                  <p className={styles.clientKicker}>Panel de cliente</p>
-                  <h2 className={styles.clientTitle}>Seguimiento de tus reparaciones</h2>
-                  <p className={styles.clientText}>
-                    Esta sección está preparada para mostrar tus órdenes, presupuestos, equipos registrados
-                    y reparaciones realizadas cuando el backend tenga esos datos disponibles.
-                  </p>
-                </div>
-
-                <span className={styles.clientStatusPill}>Cliente estándar</span>
-              </div>
-
-              <div className={styles.clientGrid}>
-                <div className={styles.clientInfoCard}>
-                  <span className={styles.clientInfoIcon}>📦</span>
-                  <strong>Órdenes en curso</strong>
-                  <p>Acá se mostrarán las reparaciones que todavía están activas.</p>
-                </div>
-
-                <div className={styles.clientInfoCard}>
-                  <span className={styles.clientInfoIcon}>💬</span>
-                  <strong>Presupuestos por responder</strong>
-                  <p>Acá aparecerán los presupuestos pendientes de aceptación o rechazo.</p>
-                </div>
-
-                <div className={styles.clientInfoCard}>
-                  <span className={styles.clientInfoIcon}>✅</span>
-                  <strong>Arreglos realizados</strong>
-                  <p>Acá vas a poder revisar qué trabajos técnicos se hicieron sobre cada equipo.</p>
-                </div>
-              </div>
-            </section>
-          )}
-        */}
 
       </main>
       <Footer />

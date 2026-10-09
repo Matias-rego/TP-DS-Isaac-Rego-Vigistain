@@ -15,7 +15,9 @@ import { eventBus, EVENTS } from '@/lib/eventBus';
 import type { PaginatedResponse } from "@/types/types";
 import { formatDocumentNumber } from "@/lib/utils";
 import ActionButton from "@/components/Common/Buttons/ActionButton";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import ConfirmDialog from "@/components/Common/ConfirmDialog/ConfirmDialog";
+
 
 
 // Mismo tono que venimos usando en OrderCard / StatusMiniDescriptiveCard
@@ -28,6 +30,13 @@ const STATUS_META: Record<EnumOrderStatus, { label: string; tone: 'info' | 'warn
   listo: { label: 'Listo para retirar', tone: 'success' },
   entregado: { label: 'Entregado', tone: 'success' },
   cancelado: { label: 'Cancelado', tone: 'danger' },
+};
+
+const FILTER_LABELS: Record<string, string> = {
+  activas: 'Órdenes activas',
+  pendientes: 'Pendientes de presupuesto',
+  reparacion: 'En reparación',
+  entregado: 'Entregadas',
 };
 
 const STATUS_FILTER_OPTIONS = Object.entries(STATUS_META).map(([value, meta]) => ({
@@ -88,7 +97,11 @@ const OrderDirectory = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [showModalActStatus, setShowModalActStatus] = useState(false);
+  const [showBajaConfirm, setShowBajaConfirm] = useState(false);
+  const [bajaLoading, setBajaLoading] = useState(false);
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const metricFilter = searchParams.get('filtro');
   // 1. Envolver fetchOrders en useCallback y asegurar que la respuesta sea un Array
   const fetchOrders = useCallback(async () => {
     setLoading(true);
@@ -126,6 +139,25 @@ const OrderDirectory = () => {
     return unsubscribe;
   }, [fetchOrders]);
 
+  const handleBaja = async () => {
+    if (!selectedOrder) return;
+    setBajaLoading(true);
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/orders/${selectedOrder.id_order}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('No se pudo dar de baja la orden');
+      setShowBajaConfirm(false);
+      setSelectedOrder(null);
+      fetchOrders(); // refresca el listado (la baja ya no aparece)
+    } catch (e) {
+      console.error('Error al dar de baja la orden:', e);
+    } finally {
+      setBajaLoading(false);
+    }
+  };
+
   // 3. Carga inicial
   useEffect(() => {
     fetchOrders();
@@ -134,7 +166,9 @@ const OrderDirectory = () => {
   // 4. Mappings blindados con verificación de array
   const rows = useMemo(() => {
     if (!Array.isArray(orders)) return [];
-    return orders.map(toRow);
+    return [...orders]
+      .sort((a, b) => new Date(b.dateOfEntry).getTime() - new Date(a.dateOfEntry).getTime())
+      .map(toRow);
   }, [orders]);
 
   const activeRepairs = useMemo(
@@ -154,6 +188,16 @@ const OrderDirectory = () => {
       .filter(o => o.deliveryDate && new Date(o.deliveryDate).toDateString() === today)
       .reduce((sum, o) => sum + (o.totalCharged ?? 0), 0);
   }, [orders]);
+
+    const filteredRows = useMemo(() => {
+    switch (metricFilter) {
+      case 'activas':       return rows.filter(r => r.status !== 'entregado' && r.status !== 'cancelado');
+      case 'pendientes':    return rows.filter(r => r.status === 'recibido' || r.status === 'diagnostico');
+      case 'reparacion':    return rows.filter(r => r.status === 'reparacion');
+      case 'entregado':     return rows.filter(r => r.status === 'entregado');
+      default:              return rows;
+    }
+  }, [rows, metricFilter]);
 
   const formattedRevenue = new Intl.NumberFormat('es-AR', {
     style: 'currency',
@@ -195,8 +239,12 @@ const OrderDirectory = () => {
         <h1 className={styles.title}>Gestión de Órdenes</h1>
 
         <div className={styles.cardSector}>
-          <DescriptiveMiniCard label="Reparaciones Activas" value={activeRepairs} icon={Wrench} tone="neutral" />
-          <DescriptiveMiniCard label="Presupuestos Pendientes" value={pendingBudgets} icon={FileText} tone="success" />
+                    <DescriptiveMiniCard
+            label="Reparaciones Activas" value={activeRepairs} icon={Wrench} tone="neutral"
+          />
+          <DescriptiveMiniCard
+            label="Presupuestos Pendientes" value={pendingBudgets} icon={FileText} tone="success"
+          />
           {/* Sin fuente de datos propia todavía: no hay modelo de stock/inventario en el schema actual */}
           <DescriptiveMiniCard label="Alertas de Stock" value={0} icon={AlertTriangle} tone="danger" />
           <DescriptiveMiniCard label="Ingresos del Día" value={formattedRevenue} icon={Banknote} tone="neutral" />
@@ -215,9 +263,15 @@ const OrderDirectory = () => {
 
           <div className={styles.dataOrderSection}>
             <div className={styles.tableOrderSection}>
+              {metricFilter && (
+              <div className={styles.filterBanner}>
+                <span>Filtrando por: <strong>{FILTER_LABELS[metricFilter] ?? metricFilter}</strong></span>
+                <button type="button" onClick={() => setSearchParams({})}>✕ Quitar filtro</button>
+              </div>
+            )}
               {loading && <p className={styles.loadingText}>Cargando órdenes...</p>}
               <DataTable<OrderRow>
-                data={rows}
+                data={filteredRows}
                 idField="id_order"
                 columns={columns}
                 onRowClick={(row) => setSelectedOrder(row.raw)}
@@ -230,6 +284,13 @@ const OrderDirectory = () => {
               {selectedOrder && (
                 <div className={styles.selectedOrderContent}>
                   <OrderDescription order={selectedOrder} onClose={() => setSelectedOrder(null)} onUpdateStatus={() => setShowModalActStatus(true)} />
+                  <ActionButton
+                    label="Dar de baja"
+                    icon={null}
+                    variant="danger"
+                    fullWidth
+                    onClick={() => setShowBajaConfirm(true)}
+                  />
                 </div>
               )}
             </div>
@@ -238,9 +299,21 @@ const OrderDirectory = () => {
       </main>
       {showModalActStatus && selectedOrder && (
         <div>
-          <UpdateStatusModal open={showModalActStatus} order={selectedOrder} onClose={() => setShowModalActStatus(false)} onConfirm={() => { }} />
+          <UpdateStatusModal open={showModalActStatus} order={selectedOrder} onClose={() => setShowModalActStatus(false)} onConfirm={() => { fetchOrders(); setSelectedOrder(null); }}  />
         </div>
       )}
+
+      <ConfirmDialog
+        open={showBajaConfirm}
+        title="Dar de baja la orden"
+        message="¿Seguro que querés dar de baja esta orden? No se elimina: queda inactiva y sale del listado, pero se conserva su historial."
+        confirmLabel={bajaLoading ? "Dando de baja..." : "Dar de baja"}
+        cancelLabel="Cancelar"
+        danger
+        onConfirm={handleBaja}
+        onCancel={() => setShowBajaConfirm(false)}
+      />
+
       <Footer />
     </div>
   );

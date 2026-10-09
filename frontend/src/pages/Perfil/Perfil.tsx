@@ -1,12 +1,12 @@
 // Perfil.tsx
-import Nav from '../../components/layout/Nav/Nav';
+
 import { capitalize } from '../App/App';
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { BACKEND_URL } from '@/lib/config';
 import styles from './Perfil.module.css';
-import type { User } from "../../types/types";
+import type { User } from '@/features/users/types';
 
 const Perfil = () => {
   const [usuario, setUsuario] = useState<User | null>(null);
@@ -43,7 +43,7 @@ const Perfil = () => {
   return (
     <>{comienzaEdicion ? <Navigate to="/editor-perfil" /> :
       <div className={styles.page}>
-        <Nav />
+        
 
         <div className={styles.container}>
 

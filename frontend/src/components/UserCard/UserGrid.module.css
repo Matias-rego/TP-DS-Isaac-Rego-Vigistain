@@ -33,7 +33,6 @@
   align-items: center;
   gap: 6px;
   font-size: 13px;
-  color: var(--filter-text);
   cursor: pointer;
   user-select: none;
 }

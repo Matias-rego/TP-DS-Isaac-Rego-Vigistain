@@ -2,7 +2,7 @@ import styles from './Nav.module.css';
 import { useNavigate } from 'react-router-dom';
 //import { parseJwt } from '../App/App';
 import { useEffect, useState } from 'react';
-import type { User } from '../../../types/types';
+import type { User } from '@/features/users/types';
 import { BACKEND_URL } from '@/lib/config';
 import { LogOut, X, Home, ClipboardList, Users, User as UserIcon, UserRoundCog } from 'lucide-react';
 import ThemeToggle from '../../Toggle/ThemeToggle/ThemeToggle';
@@ -107,7 +107,7 @@ const Nav = () => {
             </button>
           </li>
           <li>
-            <button type="button" className={styles.navButton} onClick={() => navigate('/clientes')}>
+            <button type="button" className={styles.navButton} onClick={() => navigate('/clientManagement')}>
               Clientes
             </button>
           </li>

@@ -37,7 +37,6 @@ body {
   --tf-danger: #E53935;         /* antes: --color-danger */
   --tf-neutral: #9E9E9E;        /* antes: --color-neutral */
 
-  /* Estos no chocan, los podés dejar igual */
   --radius-sm: 8px;
   --radius-md: 14px;
   --radius-lg: 22px;
