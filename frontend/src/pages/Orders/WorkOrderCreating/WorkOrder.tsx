@@ -646,6 +646,7 @@ const WorkOrder = () => {
                     <div className={styles.formFieldArea} style={{ maxWidth: '300px' }}>
                       <input
                         type="date"
+                        min={new Date().toISOString().split("T")[0]}
                         value={estimatedDeliveryDate}
                         onChange={(e) => setEstimatedDeliveryDate(e.target.value)}
                         className={styles.customDateInput}
