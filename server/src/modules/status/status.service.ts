@@ -91,4 +91,13 @@ export class StatusService {
         const lastStatus = await this.repo.findLastByOrderIdAndStatus(id_order, status);
         return lastStatus?.id_user ?? null;
     };
+    async getCurrentStatus(id_order: string): Promise<$Enums.EnumOrderStatus | undefined> {
+        const history = await this.repo.findByOrderId(id_order);
+        if (history.length === 0) return undefined;
+
+        const time = (h: StatusHistory) => new Date(h.dateOfChange ?? 0).getTime();
+
+        const latest = history.reduce((a, b) => (time(b) > time(a) ? b : a));
+        return latest.status;
+    }
 }

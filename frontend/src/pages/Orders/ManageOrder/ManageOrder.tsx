@@ -12,6 +12,7 @@ import CreateBudget from "@/components/BudgetComponent/CrateBudget/CreateBudget"
 import UpdateStatusModal from "@/components/Status/UpdateStatusModal/UpdateStatusModal";
 import styles from "./ManageOrder.module.css";
 import Diagnostic from "@/components/Status/UpdateStatusModal/Diagnostic/Diagnostic";
+import { EVENTS, eventBus } from "@/lib/eventBus";
 
 type Transition = { target: EnumOrderStatus; direction: "advance" | "retreat" };
 
@@ -75,7 +76,21 @@ const ManageOrder = () => {
     fetchOrder(false, controller.signal);
     return () => controller.abort();
   }, [id_order, fetchOrder]);
+  useEffect(() => {
+    const refresh = () => {
+      fetchOrder(true);
+    };
 
+    const offBudget = eventBus.on(EVENTS.budgetChanged, refresh);
+    const offAddedCost = eventBus.on(EVENTS.addedCostChanged, refresh);
+    const offStatus = eventBus.on(EVENTS.statusChanged, refresh);
+
+    return () => {
+      offBudget();
+      offAddedCost();
+      offStatus();
+    };
+  }, [fetchOrder]);
   // Reglas mínimas para poder AVANZAR. Retroceder no se bloquea.
   // Son solo ayuda visual: la validación real tiene que estar en el backend.
 

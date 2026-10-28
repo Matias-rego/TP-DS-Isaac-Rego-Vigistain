@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { type Order, type EnumOrderStatus, type Status_History } from '@/types/types';
 import ActionButton from '@/components/Common/Buttons/ActionButton';
@@ -75,15 +75,32 @@ const UpdateStatusModal = ({ open, order, onClose, onConfirm, targetStatus, dire
   const isRetreat = direction === 'retreat';
   // Fijo desde afuera, o el que eligió el técnico en el select
   const status = targetStatus ?? selectedStatus;
-  const blockReason = status ? getBlockReason(order, status) : null;
-  const canSubmit = status !== undefined && !submitting && !blockReason;
-  const commentLabel = status ? (COMMENT_LABELS[status] ?? 'Comentarios') : 'Comentarios';
-
+  
   const title = !isFixed
     ? 'Actualizar Estado de Orden'
     : isRetreat
       ? `Volver a "${STATUS_LABELS[targetStatus]}"`
       : `Avanzar a "${STATUS_LABELS[targetStatus]}"`;
+  const [liveOrder, setLiveOrder] = useState<Order>(order);
+  const blockReason = status ? getBlockReason(liveOrder, status) : null;
+  const canSubmit = status !== undefined && !submitting && !blockReason;
+  const commentLabel = status ? (COMMENT_LABELS[status] ?? 'Comentarios') : 'Comentarios';
+  useEffect(() => {
+    setLiveOrder(order);
+  }, [order]);
+
+  useEffect(() => {
+  const handleBudgetChanged = (payload: unknown) => {
+    const changed = payload as Order['budget'] & { id_order?: string };
+    if (!changed) return;
+    if (changed.id_order && changed.id_order !== order.id_order) return;
+
+    setLiveOrder((prev) => ({ ...prev, budget: changed }));
+  };
+
+  const unsubscribe = eventBus.on(EVENTS.budgetChanged, handleBudgetChanged);
+  return unsubscribe;
+}, [order.id_order]);
   const handleConfirm = async () => {
     if (!canSubmit || !status) return;
 
@@ -167,8 +184,8 @@ const UpdateStatusModal = ({ open, order, onClose, onConfirm, targetStatus, dire
 
         {!isRetreat && (
           <div className={styles.field}>
-            {status === 'diagnostico' && <Diagnostic order={order} />}
-            {status === 'presupuestado' && <Budget order={order} />}
+            {status === 'diagnostico' && <Diagnostic order={liveOrder} />}
+            {status === 'presupuestado' && <Budget order={liveOrder} />}
           </div>
         )}
 

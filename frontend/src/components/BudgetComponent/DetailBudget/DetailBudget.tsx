@@ -180,7 +180,7 @@ export default function DetailBudget({
       {budget.clientSuggestion !== null && (
         <div className={styles.suggSection}>
           <span className={styles.suggTitle}>Sugerencia del Cliente</span>
-          <p className={styles.suggText}>{budget.clientSuggestion}</p>
+          <p className={styles.suggText}>{budget.clientSuggestion || 'No hay sugerencias del cliente.'}</p>
         </div>
       )}
 
@@ -195,7 +195,13 @@ export default function DetailBudget({
           fullWidth
           loading={loading}
           onClick={() => onIssue?.({ sendEmail })}
+          disabled={budget.status !== 'pendiente' || loading}
         />
+        {budget.status !== 'pendiente' && (
+          <span className={styles.commText}>
+            Este presupuesto ya fue respondido por el cliente, en caso de modificacion volvera a estado pendiente.
+          </span>
+        )}
         {/* <div className={styles.actionsRow}>
           <ActionButton
             label="Cancelar"
