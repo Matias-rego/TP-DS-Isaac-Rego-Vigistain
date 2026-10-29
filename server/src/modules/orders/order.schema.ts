@@ -1,6 +1,7 @@
 import { id, observations, url, date, enumSchema } from "@/utils/fields.js";
 import { QuerySchema } from "@/shared/common.schema.js";
 import { z } from "zod";
+import { ORDER_FILTERS } from "./order.filters.js";
 
 const existingEquipmentSchema = z.object({
     id_equipment: id,
@@ -40,6 +41,14 @@ export const orderQuerySchema = QuerySchema.extend({
         "dateOfEntry", "estimatedDate", "deliveryDate",
         "totalCharged", "observations", "id_equipment",
     ], "sortBy").default("dateOfEntry"),
+    filtro: z.enum(ORDER_FILTERS).optional(),
+    status: z.enum([
+        "recibido", "diagnostico", "presupuestado", "aprobado",
+        "reparacion", "listo", "entregado", "cancelado",
+    ]).optional(),
+    dateOfEntry: z.string().optional(),
+    estimatedDate: z.string().optional(),
 });
 
 export type OrderQueryDto = z.infer<typeof orderQuerySchema>
+

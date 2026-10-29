@@ -1,7 +1,7 @@
 import Nav from "@/components/layout/Nav/Nav";
 import Footer from "@/components/Footer/Footer";
 import styles from "./OrderDirectory.module.css";
-import '../../../index.css';
+import '@/index.css';
 import { useEffect, useMemo, useState, useCallback } from "react";
 import type { Order, EnumOrderStatus, Status_History } from "@/types/types";
 import { Wrench, FileText, AlertTriangle, Banknote } from "lucide-react";
@@ -51,6 +51,7 @@ interface OrderRow {
   customer: string;
   device: string;
   status: EnumOrderStatus;
+  estimatedDate: Date | null | string | undefined;
   elapsed: string;
   raw: Order;
 }
@@ -88,6 +89,7 @@ const toRow = (order: Order): OrderRow => {
       : `Equipo #${order.id_equipment}`,
     status: (currentStatus?.status ?? 'recibido') as EnumOrderStatus,
     elapsed: formatElapsed(order.dateOfEntry),
+    estimatedDate: order.estimatedDate ,
     raw: order,
   };
 };
@@ -102,20 +104,20 @@ const OrderDirectory = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const metricFilter = searchParams.get('filtro');
-  // 1. Envolver fetchOrders en useCallback y asegurar que la respuesta sea un Array
+
   const fetchOrders = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${BACKEND_URL}/api/orders/`, {
+      const qs = new URLSearchParams();
+      if (metricFilter) qs.set('filtro', metricFilter);
+
+      const res = await fetch(`${BACKEND_URL}/api/orders/?${qs}`, {
         method: 'GET',
         credentials: 'include',
       });
       if (!res.ok) throw new Error('Error al obtener las órdenes');
 
-      // Tipamos la respuesta con tu interfaz
       const responseData: PaginatedResponse<Order> = await res.json();
-
-      // Guardamos la propiedad .data
       setOrders(responseData.data ?? []);
     } catch (e) {
       console.error('Error fetching orders:', e);
@@ -123,9 +125,8 @@ const OrderDirectory = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [metricFilter]);
 
-  // 2. Suscripción limpia al eventBus
   useEffect(() => {
     const unsubscribe = eventBus.on(EVENTS.statusChanged, () => fetchOrders());
     return unsubscribe;
@@ -181,33 +182,25 @@ const OrderDirectory = () => {
     [rows]
   );
 
-  const dailyRevenue = useMemo(() => {
-    if (!Array.isArray(orders)) return 0;
-    const today = new Date().toDateString();
-    return orders
-      .filter(o => o.deliveryDate && new Date(o.deliveryDate).toDateString() === today)
-      .reduce((sum, o) => sum + (o.totalCharged ?? 0), 0);
-  }, [orders]);
+  const forNexTwoWeek = useMemo(() => {
+    const now = new Date();
+    const twoWeeksFromNow = new Date();
+    twoWeeksFromNow.setDate(now.getDate() + 14);
 
-    const filteredRows = useMemo(() => {
-    switch (metricFilter) {
-      case 'activas':       return rows.filter(r => r.status !== 'entregado' && r.status !== 'cancelado');
-      case 'pendientes':    return rows.filter(r => r.status === 'recibido' || r.status === 'diagnostico');
-      case 'reparacion':    return rows.filter(r => r.status === 'reparacion');
-      case 'entregado':     return rows.filter(r => r.status === 'entregado');
-      default:              return rows;
-    }
-  }, [rows, metricFilter]);
+    return rows.filter(r => {
+      if (!r.estimatedDate) return false; 
 
-  const formattedRevenue = new Intl.NumberFormat('es-AR', {
-    style: 'currency',
-    currency: 'ARS',
-    maximumFractionDigits: 0,
-  }).format(dailyRevenue);
+      const orderDate = new Date(r.estimatedDate); 
+      return orderDate >= now && orderDate <= twoWeeksFromNow;
+    }).length;
+  }, [rows]);
+
 
   const filters: FilterConfig[] = [
     { key: 'status', label: 'Estado', type: 'select', placeholder: 'Todos los estados', options: STATUS_FILTER_OPTIONS },
     { key: 'dateOfEntry', label: 'Fecha de ingreso', type: 'date' },
+    { key: 'estimatedDate', label: 'Fecha Estimada de Finalizacion', type: 'date' },
+
   ];
 
   const columns: ColumnConfig<OrderRow>[] = [
@@ -243,11 +236,9 @@ const OrderDirectory = () => {
             label="Reparaciones Activas" value={activeRepairs} icon={Wrench} tone="neutral"
           />
           <DescriptiveMiniCard
-            label="Presupuestos Pendientes" value={pendingBudgets} icon={FileText} tone="success"
+            label="Presupuestos Pendientes de Aprobacion" value={pendingBudgets} icon={FileText} tone="success"
           />
-          {/* Sin fuente de datos propia todavía: no hay modelo de stock/inventario en el schema actual */}
-          <DescriptiveMiniCard label="Alertas de Stock" value={0} icon={AlertTriangle} tone="danger" />
-          <DescriptiveMiniCard label="Ingresos del Día" value={formattedRevenue} icon={Banknote} tone="neutral" />
+          <DescriptiveMiniCard label="Entregas estimadas dentro de la proxima semana" value={forNexTwoWeek} icon={AlertTriangle} tone="danger" />
         </div>
 
         <div className={styles.orderSection}>
@@ -271,7 +262,7 @@ const OrderDirectory = () => {
             )}
               {loading && <p className={styles.loadingText}>Cargando órdenes...</p>}
               <DataTable<OrderRow>
-                data={filteredRows}
+                data={rows}
                 idField="id_order"
                 columns={columns}
                 onRowClick={(row) => setSelectedOrder(row.raw)}

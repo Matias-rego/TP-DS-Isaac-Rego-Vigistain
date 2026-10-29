@@ -45,7 +45,6 @@ export interface CreateOrderDto {
 
 export interface CreateOrderResponse { message: string; order: Order }
 
-// La forma exacta depende de OrderRepository.getStats (no la pasaste)
 export type OrderStats = Record<string, number>;
 
 export interface OrdersQuery extends BaseQuery {

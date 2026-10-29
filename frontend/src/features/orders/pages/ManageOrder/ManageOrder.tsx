@@ -138,12 +138,12 @@ const ManageOrder = () => {
           )}
         </section>
 
-        {["recibido", "diagnostico"].includes(getCurrentStatus(order)) && (
+        {["recibido", "diagnostico", "reparacion"].includes(getCurrentStatus(order)) && (
           <section className={styles.budgetSection}>
             <Diagnostic order={order} />
           </section>
         )}
-        {["presupuestado", "aprobado", "reparacion", "listo", "entregado", "cancelado"].includes(getCurrentStatus(order)) && (
+        {["presupuestado", "aprobado", "listo", "entregado", "cancelado"].includes(getCurrentStatus(order)) && (
           <section className={styles.budgetSection}>
             <CreateBudget order={order} />
           </section>
