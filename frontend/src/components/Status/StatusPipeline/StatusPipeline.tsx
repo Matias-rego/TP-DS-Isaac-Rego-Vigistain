@@ -23,7 +23,7 @@ const PIPELINE_STEPS: { status: EnumOrderStatus; label: string; icon: ElementTyp
   { status: "presupuestado", label: "Presupuestado", icon: FileText },
   { status: "aprobado", label: "Aprobado", icon: ThumbsUp },
   { status: "reparacion", label: "En Reparación", icon: Wrench },
-  { status: "listo", label: "Listo / QA", icon: ClipboardCheck },
+  { status: "listo", label: "Listo", icon: ClipboardCheck },
   { status: "entregado", label: "Entregado", icon: PackageCheck },
 ];
 

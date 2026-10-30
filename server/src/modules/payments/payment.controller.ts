@@ -1,67 +1,48 @@
-import type { NextFunction, Request, Response } from "express";
+import type { Request, Response } from "express";
 import type { IdDto } from "@/shared/common.schema.js";
 import type { RegisterPaymentDto, PaymentQueryDto } from "./payment.schema.js";
 import type { PaymentService } from "./payment.service.js";
+import { NotFoundError } from "@/shared/http-errors.js";
 
 export class PaymentController {
     constructor(private service: PaymentService) { }
 
-    public registerPayment = async (req: Request, res: Response, next: NextFunction) => {
+    public registerPayment = async (req: Request, res: Response) => {
         const data = req.validated.body as RegisterPaymentDto;
 
-        try {
-            const payment = await this.service.create(data);
-            return res.status(201).json(payment);
-        } catch (error) {
-            next(error);
-        }
+        const payment = await this.service.create(data);
+        return res.status(201).json(payment);
     };
 
-    public getAllPayments = async (req: Request, res: Response, next: NextFunction) => {
+    public getAllPayments = async (req: Request, res: Response) => {
         const query = req.validated.query as PaymentQueryDto;
 
-        try {
-            res.json(await this.service.findAll(query));
-        } catch (error) {
-            next(error);
-        }
+        res.json(await this.service.findAll(query));
     };
 
-    public getOnePayment = async (req: Request, res: Response, next: NextFunction) => {
+    public getOnePayment = async (req: Request, res: Response) => {
         const { id } = req.validated.params as IdDto;
 
-        try {
-            const payment = await this.service.findById(id);
+        const payment = await this.service.findById(id);
 
-            if (!payment) {
-                return res.status(404).json({ message: "Pago no encontrado" });
-            }
-
-            return res.json(payment);
-        } catch (error) {
-            next(error);
+        if (!payment) {
+            throw new NotFoundError("Pago no encontrado");
         }
+
+        return res.json(payment);
     };
 
-    public getPaymentsOfBudget = async (req: Request, res: Response, next: NextFunction) => {
+    public getPaymentsOfBudget = async (req: Request, res: Response) => {
         const { id } = req.validated.params as IdDto;
 
-        try {
-            const payments = await this.service.findByBudgetId(id);
-            return res.json(payments);
-        } catch (error) {
-            next(error);
-        }
+        const payments = await this.service.findByBudgetId(id);
+        return res.json(payments);
     };
 
-    public deletePayment = async (req: Request, res: Response, next: NextFunction) => {
+    public deletePayment = async (req: Request, res: Response) => {
         const { id } = req.validated.params as IdDto;
 
-        try {
-            const result = await this.service.delete(id);
-            return res.json(result);
-        } catch (error) {
-            next(error);
-        }
+        const result = await this.service.delete(id);
+        return res.json(result);
     };
 }

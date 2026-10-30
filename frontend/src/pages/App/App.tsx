@@ -8,17 +8,18 @@ import EditorPerfil from "../EditorPerfil/EditorPerfil";
 import ForgotPassword from "@/components/Password/ForgotPasswor";
 import ResetPassword from "@/components/Password/ResetPassword";
 import Gestion from "../Gestion/Gestion";
-import WorkOrder from "../Orders/WorkOrderCreating/WorkOrder";
+import WorkOrder from "../../features/orders/pages/WorkOrderCreating/WorkOrder";
 import { AuthProvider, useAuth } from "@/lib/AuthContext";
 import Validation from "@/pages/Validation/Validation";
 import { WebSocketManager } from "@/lib/WebSocketManager";
-import OrderDirectory from "../Orders/OrderDirectory/OrderDirectory";
-import ManageOrder from "@/pages/Orders/ManageOrder/ManageOrder";
+import OrderDirectory from "../../features/orders/pages/OrderDirectory/OrderDirectory";
+import ManageOrder from "@/features/orders/pages/ManageOrder/ManageOrder";
 import BudgetPdfPreview from "@/components/PDF/BudgetPdfPreview";
 import AppLayout from "@/components/layout/AppLayout";
 import BudgetResponse from "@/pages/Budget/BudgetResponse/BudgetResponse";
 import UsersManagement from "@/features/users/pages/UserManagement";
 import ClientsManagement from "@/features/clients/pages/ClientsManagement";
+import { NotificationProvider } from "@/notifications/NotificationProvider";
 export const capitalize = (text: string): string => {
   if (!text) return "";
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
@@ -27,10 +28,12 @@ export const capitalize = (text: string): string => {
 // 🛡️ 1. Creamos un Layout que inyecta el AuthProvider SOLO a sus rutas hijas
 const ContenedorConAuth = () => {
   return (
-    <AuthProvider>
-      <WebSocketManager />
-      <Outlet />
-    </AuthProvider>
+    <NotificationProvider>
+      <AuthProvider>
+        <WebSocketManager />
+        <Outlet />
+      </AuthProvider>
+    </NotificationProvider>
   );
 };
 

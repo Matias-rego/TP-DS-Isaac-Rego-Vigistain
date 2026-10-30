@@ -1,40 +1,28 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  container-type: inline-size;
+}
+
 .titleWithIcon {
   display: flex;
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
 }
-.cardIconImg { width: 32px; height: 32px; flex-shrink: 0; }
-.eyeIconImg { width: 18px; height: 18px; }
-.buttonIcons { width: 20px; height: 20px; }
-
-.cardTitleText {
-  color: var(--tf-text) !important;
-  font-size: 18px !important;
-  font-weight: 600 !important;
-  letter-spacing: -0.5px;
-}
-.container {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.titleWithIcon {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
 
 .cardIconImg {
-  width: 20px;
-  height: 20px;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
 }
 
 .cardTitleText {
-  font-weight: 600;
-  font-size: 0.95rem;
   color: var(--tf-text, #1f2937);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
   margin: 0;
 }
 
@@ -45,9 +33,13 @@
 }
 
 .list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 10px;
+}
+
+.list > * {
+  min-width: 0;
 }
 
 .formWrapper {
@@ -69,7 +61,7 @@
 .errorMessage {
   font-size: 0.85rem;
   color: var(--tf-danger, #dc2626);
-  background: color-mix(in srgb, var(--tf-success) 15%, var(--tf-card));
+  background: color-mix(in srgb, var(--tf-danger, #dc2626) 15%, var(--tf-card));
   border-radius: 6px;
   padding: 6px 10px;
   margin: 0;
@@ -78,7 +70,7 @@
 .successMessage {
   font-size: 0.85rem;
   color: var(--tf-success, #16a34a);
-  background: color-mix(in srgb, var(--tf-success) 15%, var(--tf-card));
+  background: color-mix(in srgb, var(--tf-success, #16a34a) 15%, var(--tf-card));
   border-radius: 6px;
   padding: 6px 10px;
   margin: 0;

@@ -15,6 +15,27 @@
 .timeline {
   display: flex;
   flex-direction: column;
+  max-height: 320px;      /* Altura máxima antes de activar el scroll (ajústala a tu gusto) */
+  overflow-y: auto;       /* Activa el scroll vertical automático */
+  padding-right: 6px;     /* Espacio para que la barra de scroll no se pegue a las cards */
+}
+
+/* --- Scrollbar personalizado (opcional pero queda muy pro) --- */
+.timeline::-webkit-scrollbar {
+  width: 6px;
+}
+
+.timeline::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.timeline::-webkit-scrollbar-thumb {
+  background: var(--tf-border);
+  border-radius: 3px;
+}
+
+.timeline::-webkit-scrollbar-thumb:hover {
+  background: var(--tf-muted);
 }
 
 .item {
@@ -66,7 +87,7 @@
 
 .cardSlot .card,
 .cardSlot > * {
-  max-width: none; /* dentro del timeline la card ocupa todo el ancho disponible */
+  max-width: none;
 }
 
 .emptyText {

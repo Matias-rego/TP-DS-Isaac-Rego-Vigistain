@@ -6,6 +6,8 @@ import { v7 as uuidv7 } from "uuid";
 import { Order } from "./order.entity.js";
 import { $Enums } from "@/database/prisma.js";
 import { toBudgetDomain } from "@/modules/budgets/budget.repository.js";
+import { orderFilterWhere } from "@/modules/orders/order.filters.js";
+
 
 const orderInclude = {
     equipment: { include: { client: true } },
@@ -19,51 +21,59 @@ type OrderWithRelations = Order_P & Prisma.OrderGetPayload<{ include: typeof ord
 export class OrderRepository extends BaseRepository<Order, OrderQueryDto> {
 
     public async findAll(query?: OrderQueryDto): Promise<PaginatedResult<Order>> {
-
-        const { page, limit, skip } = this.getPagination(
-            query?.page,
-            query?.limit,
-        );
-
-        const [data, total] = await Promise.all([
-          this.prisma.order.findMany({
-            skip,
-            take: limit,
-            where: {
-              active: true,
-              observations: {
-                contains: query?.search,
-              },
-            },
-            orderBy:
-              query?.sortBy && query?.sortOrder
-                ? {
-                    [query.sortBy]: query.sortOrder,
+      const { page, limit, skip } = this.getPagination(query?.page, query?.limit);
+      const search = query?.search?.trim();
+      const dayRange = (value: string) => {
+          const start = new Date(`${value}T00:00:00`);
+          if (isNaN(start.getTime())) return undefined;
+          const end = new Date(start);
+          end.setDate(end.getDate() + 1);
+          return { gte: start, lt: end };
+      };
+      const entryRange = query?.dateOfEntry ? dayRange(query.dateOfEntry) : undefined;
+      const estimatedRange = query?.estimatedDate ? dayRange(query.estimatedDate) : undefined;
+      const where: Prisma.OrderWhereInput = {
+          AND: [
+              { active: true },
+              search
+                  ? {
+                      OR: [
+                          { observations: { contains: search} },
+                          { equipment: { brand: { contains: search} } },
+                          { equipment: { model: { contains: search} } },
+                          { equipment: { client: { clientName: { contains: search} } } },
+                          ...(Number.isInteger(Number(search))
+                              ? [{ nroOrder: Number(search) }]
+                              : []),
+                      ],
                   }
-                : undefined,
-            include: orderInclude,
-          }),
+                  : {},
+              query?.filtro ? orderFilterWhere(query.filtro) : {},
+              query?.status ? { status: query.status } : {},
+              entryRange ? { dateOfEntry: entryRange } : {},
+              estimatedRange ? { estimatedDate: estimatedRange } : {},
+          ],
+      };
 
-          this.prisma.order.count({
-            where: {
-              active: true,
-              observations: {
-                contains: query?.search,
-              },
-            },
+      const [data, total] = await Promise.all([
+          this.prisma.order.findMany({
+              skip,
+              take: limit,
+              where,
+              orderBy:
+                  query?.sortBy && query?.sortOrder
+                      ? { [query.sortBy]: query.sortOrder }
+                      : undefined,
+              include: orderInclude,
           }),
-        ]);
+          this.prisma.order.count({ where }),
+      ]);
 
-        return {
-            data: data.map((order) => this.toDomain(order)),
-            metadata: {
-                page,
-                limit,
-                total,
-                totalPages: Math.ceil(total / limit),
-            },
-        };
-    }
+      return {
+          data: data.map((order) => this.toDomain(order)),
+          metadata: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      };
+  }
 
     public async findById(id: string): Promise<Order | undefined> {
         const order = await this.prisma.order.findUnique({
