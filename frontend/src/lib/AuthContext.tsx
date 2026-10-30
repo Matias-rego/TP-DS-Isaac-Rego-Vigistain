@@ -1,6 +1,8 @@
 // AuthContext.tsx
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import BACKEND_URL from "@/lib/config";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { api } from '@/api/client';
+import { queryClient } from "@/lib/queryClient";
+import { notifier } from "@/notifications/notifier";
 
 interface User {
   id_user:       number;
@@ -23,21 +25,14 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const userRef = useRef<User | null>(null);
+  userRef.current = user;
 
   const getMe = async () => {
     try {
-      const response = await fetch(`${BACKEND_URL}/api/auth/me`, {
-        method: "GET",
-        credentials: "include",
-      });
-      if (!response.ok) {
-        setUser(null);
-        return;
-      }
-      const data = await response.json();
+      const data = await api<User>("/api/auth/me", { silent: true, authRedirect: false });
       setUser(data);
-    } catch (error) {
-      console.error("Error al obtener el usuario:", error);
+    } catch {
       setUser(null);
     } finally {
       setLoading(false);
@@ -46,6 +41,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     getMe();
+
+    const onUnauthorized = () => {
+      if (!userRef.current) return; // varios 401 simultáneos: avisar una sola vez
+      setUser(null);
+      queryClient.clear();
+      notifier.warning("Tu sesión expiró. Iniciá sesión nuevamente");
+    };
+    window.addEventListener("auth:unauthorized", onUnauthorized);
+    return () => window.removeEventListener("auth:unauthorized", onUnauthorized);
   }, []);
 
   return (

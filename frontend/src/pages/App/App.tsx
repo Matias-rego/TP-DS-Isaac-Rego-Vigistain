@@ -19,6 +19,7 @@ import AppLayout from "@/components/layout/AppLayout";
 import BudgetResponse from "@/pages/Budget/BudgetResponse/BudgetResponse";
 import UsersManagement from "@/features/users/pages/UserManagement";
 import ClientsManagement from "@/features/clients/pages/ClientsManagement";
+import { NotificationProvider } from "@/notifications/NotificationProvider";
 export const capitalize = (text: string): string => {
   if (!text) return "";
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
@@ -27,10 +28,12 @@ export const capitalize = (text: string): string => {
 // 🛡️ 1. Creamos un Layout que inyecta el AuthProvider SOLO a sus rutas hijas
 const ContenedorConAuth = () => {
   return (
-    <AuthProvider>
-      <WebSocketManager />
-      <Outlet />
-    </AuthProvider>
+    <NotificationProvider>
+      <AuthProvider>
+        <WebSocketManager />
+        <Outlet />
+      </AuthProvider>
+    </NotificationProvider>
   );
 };
 

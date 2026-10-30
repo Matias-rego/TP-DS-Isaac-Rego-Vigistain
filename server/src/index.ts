@@ -6,6 +6,8 @@ import cookieParser from 'cookie-parser';
 import { createServer } from 'http';
 import { initWebSocket } from './websocket.js';
 import { errorHandler } from './middlewares/errorHandler.middleware.js';
+import { requestId } from './middlewares/requestId.middleware.js'; 
+import { NotFoundError } from './shared/http-errors.js';
 
 const app = express();
 const httpServer = createServer(app);
@@ -13,6 +15,7 @@ const httpServer = createServer(app);
 initWebSocket(httpServer);
 
 app.disable("x-powered-by");
+app.use(requestId);
 app.use(cors(
     {
         origin: config.FRONTEND_URL,
@@ -27,9 +30,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/', routes);
 
-app.use(( _, res: express.Response) => {
-    res.status(404).json({ message: 'Resource not found' });
-});
+app.use((_req, _res, next) => next(new NotFoundError('Ruta no encontrada')));
 
 app.use(errorHandler);
 
@@ -54,5 +55,11 @@ function shutdown(signal: string) {
     }, 10000).unref();
 }
 
-process.on('SIGTERM', () => shutdown('SIGTERM'));
-process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('unhandledRejection', (reason) => {
+    console.error('Unhandled rejection:', reason);
+});
+
+process.on('uncaughtException', (err) => {
+    console.error('Uncaught exception:', err);
+    shutdown('uncaughtException');
+});

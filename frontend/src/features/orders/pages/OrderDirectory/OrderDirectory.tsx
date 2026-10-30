@@ -4,7 +4,7 @@ import styles from "./OrderDirectory.module.css";
 import '@/index.css';
 import { useEffect, useMemo, useState, useCallback } from "react";
 import type { Order, EnumOrderStatus, Status_History } from "@/types/types";
-import { Wrench, FileText, AlertTriangle, Banknote } from "lucide-react";
+import { Wrench, FileText, AlertTriangle} from "lucide-react";
 import DescriptiveMiniCard from "@/components/Common/Cards/DescriptiveMiniCard/DescriptiveMiniCard";
 import SearchBar, { type FilterConfig } from "@/components/SearchBar/SearchBar";
 import DataTable, { type ColumnConfig } from "@/components/Common/DataTable/DataTable";
