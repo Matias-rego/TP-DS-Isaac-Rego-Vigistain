@@ -1,6 +1,7 @@
 import  {type AddedCostRow} from "@/components/AddedCost/AddedCostBudgetTable/AddedCostBudgetTable";
 import DetailBudget from "@/components/BudgetComponent/DetailBudget/DetailBudget";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { useAuth } from "@/lib/AuthContext";
 import { useNavigate } from "react-router-dom";
 import type { Budget, Order } from "@/types/types";
 import styles from "./CreateBudget.module.css";
@@ -9,7 +10,8 @@ import BACKEND_URL from "@/lib/config";
 import { EVENTS, eventBus } from "@/lib/eventBus";
 import AddedCostsCard from "../AddedCostCard/AddedCostsCard";
 import LaborCostCard from "../LaborCostCard/LaborCostCard";
-
+import AlertSuccess from '@/components/Alert/AlertSuccess';
+import AlertError from '@/components/Alert/AlertError';
 interface CreateBudgetProps {
     order: Order;
     onClick?: () => void;
@@ -19,11 +21,25 @@ const CreateBudget = ({ order }: CreateBudgetProps) => {
     const [budget, setBudget] = useState<Budget | null>(order.budget ?? null);
     const [addedCosts, setAddedCosts] = useState<AddedCostRow[]>([]);
     const [addedCostsError, setAddedCostsError] = useState<string | null>(null);
-
     const [newAddedCost, setNewAddedCost] = useState(false);
-
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [failureMessage, setFailureMessage] = useState<string | null>(null);
+    useEffect(() => {
+        if (!successMessage) return;
+        const t = setTimeout(() => setSuccessMessage(null), 3000);
+        return () => clearTimeout(t);
+    }, [successMessage]);
+    useEffect(() => {
+        if (!failureMessage) return;
+        const t = setTimeout(() => setFailureMessage(null), 3000);
+        return () => clearTimeout(t);
+    }, [failureMessage]);
+    const { user } = useAuth();
+    const budgetRef = useRef<Budget | null>(budget);
+    useEffect(() => {
+        budgetRef.current = budget;
+    }, [budget]);
     const navigate = useNavigate();
-
 
     const fetchAddedCosts = async (id_budget: string) => {
         try {
@@ -77,23 +93,13 @@ const CreateBudget = ({ order }: CreateBudgetProps) => {
         }
     }, [budget?.id_budget]);
 
-    useEffect(() => {
-        const unsubscribe = eventBus.on(EVENTS.budgetChanged, () => {
-            if (budget?.id_budget) {
-                fetchAddedCosts(budget.id_budget);
-                refreshBudget(budget.id_budget);
-            }
-        });
-        return unsubscribe;
-    }, [budget?.id_budget]);
-
     const handleSaveLaborCost = async (laborCost: number) => {
         const method = budget ? 'PUT' : 'POST';
         const url = budget
             ? `${BACKEND_URL}/api/budgets/modifyBudget/${budget.id_budget}`
             : `${BACKEND_URL}/api/budgets`;
 
-        const payload = budget ? { laborCost } : { id_order: order.id_order, laborCost };
+        const payload = budget ? { laborCost } : { id_order: order.id_order, laborCost, status: 'pendiente' };
 
         const response = await fetch(url, {
             method,
@@ -106,9 +112,13 @@ const CreateBudget = ({ order }: CreateBudgetProps) => {
             const errorBody = await response.json().catch(() => ({}));
             throw new Error(errorBody.message || `Error ${response.status} al guardar el presupuesto`);
         }
-
         const updatedBudget: Budget = await response.json();
-        setBudget(updatedBudget);
+
+        if (budget) {
+            await refreshBudget(updatedBudget.id_budget);
+        } else {
+            setBudget(updatedBudget);
+        }
         eventBus.emit(EVENTS.budgetChanged, updatedBudget);
         };
 
@@ -152,7 +162,10 @@ const CreateBudget = ({ order }: CreateBudgetProps) => {
                     })
                 )
             );
-
+            if (budget) {
+                await refreshBudget(budget.id_budget);
+                eventBus.emit(EVENTS.budgetChanged, budget);
+            }
             if (budget?.id_budget) {
                 await refreshBudget(budget.id_budget);
                 eventBus.emit(EVENTS.budgetChanged, budget);
@@ -170,14 +183,21 @@ const CreateBudget = ({ order }: CreateBudgetProps) => {
 
         try {
             if (sendEmail) {
-                await fetch(`${BACKEND_URL}/api/budgets/${budget.id_budget}/send-email`, {
+                const res = await fetch(`${BACKEND_URL}/api/budgets/${budget.id_budget}/send-email`, {
                     method: 'POST',
                     credentials: 'include',
                 });
+                if(!res.ok){
+                    const errorBody = await res.json().catch(() => null);
+                    throw new Error(errorBody?.message ?? `Error ${res.status} al enviar el presupuesto por email`);
+                }
             }
-
+            setSuccessMessage('Presupuesto emitido con éxito.');
         } catch (e) {
             console.error('Error al emitir el presupuesto:', e);
+            setFailureMessage(
+                e instanceof Error ? e.message : 'No se pudo emitir el presupuesto. Intentá de nuevo.'
+            );
         }
     };
 
@@ -190,18 +210,26 @@ const CreateBudget = ({ order }: CreateBudgetProps) => {
     };
     useEffect(() => {
         const refresh = () => {
-            if (budget?.id_budget) {
-                fetchAddedCosts(budget.id_budget);
-                refreshBudget(budget.id_budget);
+            const current = budgetRef.current;
+            if (current?.id_budget) {
+                fetchAddedCosts(current.id_budget);
+                refreshBudget(current.id_budget);
             }
         };
+
+        const onAddedCostChanged = async () => {
+            const current = budgetRef.current;
+            if (!current) return;
+            refresh();
+        };
+
         const offBudget = eventBus.on(EVENTS.budgetChanged, refresh);
-        const offAddedCost = eventBus.on(EVENTS.addedCostChanged, refresh);
+        const offAddedCost = eventBus.on(EVENTS.addedCostChanged, onAddedCostChanged);
         return () => {
             offBudget();
             offAddedCost();
         };
-    }, [budget?.id_budget]);
+    }, [budget?.id_budget, user?.id_user]);
 
 return (
     <div className={styles.page}>
@@ -232,6 +260,8 @@ return (
                             onCancel={() => navigate(-1)}
                         />
                     </div>
+                    {successMessage && <AlertSuccess message={successMessage} />}
+                    {failureMessage && <AlertError message={failureMessage} />}
                 </aside>
             )}
         </div>

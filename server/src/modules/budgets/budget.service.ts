@@ -5,7 +5,7 @@ import type { BudgetRepository } from "./budget.repository.js";
 import type { AddedCostRepository } from "@/modules/addedCosts/addedcost.repository.js";
 import type { StatusService } from "@/modules/status/status.service.js";
 import type { Budget } from "./budget.entity.js";
-import { string } from "zod";
+import { NotFoundError, ConflictError } from "@/shared/http-errors.js";
 
 interface CreateBudgetInput {
     id_order: string;
@@ -65,15 +65,12 @@ export class BudgetService {
         return this.repo.update(id, input);
     }
 
-    async modifyBudget(id: string, input: Partial<Budget>): Promise<Budget | undefined> {
+    async modifyBudget(id: string, input: Partial<Budget>, id_user?: string): Promise<Budget | undefined> {
         const budget = await this.repo.findById(id);
-        if (!budget) throw new Error('Presupuesto no encontrado');
+        if (!budget) throw new NotFoundError('Presupuesto no encontrado');
 
-        return this.update(id, {
-            status: 'pendiente',
-            ...input,
-            
-        });
+        await this.reopenBudget(id, id_user);
+        return this.update(id, input);
     }
 
 
@@ -106,32 +103,68 @@ export class BudgetService {
         const result = this.repo.sumFailureCosts(id_order);
         return result;
     };
-    async respondToBudget(id_budget: string, data: { status: $Enums.EnumBudgetStatus; client_suggestion?: string | null }): Promise<Budget | undefined> {
+    async respondToBudget(
+        id_budget: string,
+        data: { status: $Enums.EnumBudgetStatus; client_suggestion?: string | null }
+    ): Promise<Budget | undefined> {
         const budget = await this.repo.findById(id_budget);
-        if(!budget){
-            throw new Error(`Presupuesto con id ${id_budget} no encontrado`);
-        };
-        if (budget.status !== 'pendiente') {
-            throw new Error('El presupuesto ya fue respondido');
-        };
+        if (!budget) throw new NotFoundError(`Presupuesto con id ${id_budget} no encontrado`);
+        if (budget.status !== 'pendiente') throw new ConflictError('El presupuesto ya fue respondido');
+
+        const orderStatus = await this.statusService.getCurrentStatus(budget.id_order);
+        const history = await this.statusService.findByOrderId(budget.id_order);
+        console.log('HISTORIAL', history.map(h => [h.status, h.dateOfChange]));
+        console.log('ACTUAL', orderStatus);
+        if (orderStatus !== 'presupuestado') {
+            throw new ConflictError('El presupuesto ya no está disponible para responder');
+        }
+
+        let idUser: string | null = null;
+        if (data.status === 'aprobado') {
+            idUser = await this.statusService.findLastUserByStatus(budget.id_order, 'presupuestado');
+            if (!idUser) throw new Error('No se pudo encontrar el id del usuario que presupuestó');
+        }
+
         const result = await this.repo.update(id_budget, {
             status: data.status,
-            clientSuggestion: String(data.client_suggestion) ?? null,
+            clientSuggestion: data.client_suggestion ?? undefined,
         });
-        if(data.status === 'aprobado'){
-            const idUser = await this.statusService.findLastUserByStatus(
-                budget.id_order,
-                'presupuestado'
-            );
-            if(!idUser){
-                throw new Error('No se pudo encontrar el id del usuario que presupuesto');
-            }
+
+        if (data.status === 'aprobado' && idUser) {
             await this.statusService.createStatus({
                 id_order: budget.id_order,
-                id_user: String(idUser),
+                id_user: idUser,
                 status: $Enums.EnumOrderStatus.aprobado,
             });
         }
+
         return result;
+    }
+    async reopenBudget(id_budget: string, id_user?: string): Promise<void> {
+        const budget = await this.repo.findById(id_budget);
+        if (!budget) throw new NotFoundError(`Presupuesto con id ${id_budget} no encontrado`);
+
+        const orderStatus = await this.statusService.getCurrentStatus(budget.id_order);
+
+        if (orderStatus && orderStatus !== 'presupuestado' && orderStatus !== 'aprobado') {
+            throw new ConflictError('El presupuesto ya no se puede modificar en el estado actual de la orden');
+        }
+
+        if (budget.status !== 'pendiente') {
+            await this.repo.update(id_budget, { status: 'pendiente' });
+        }
+
+        if (orderStatus === 'aprobado') {
+            const userId =
+                id_user ?? (await this.statusService.findLastUserByStatus(budget.id_order, 'presupuestado'));
+            if (!userId) throw new Error('No se pudo determinar el usuario para registrar el estado');
+
+            await this.statusService.createStatus({
+                id_order: budget.id_order,
+                id_user: userId,
+                status: $Enums.EnumOrderStatus.presupuestado,
+                comment: 'Presupuesto modificado: pendiente de nueva aprobación.',
+            });
+        }
     }
 }

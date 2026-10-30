@@ -28,7 +28,6 @@ export interface FailureMiniCardProps {
 }
 
 const failureFields: DetailFieldConfig<FailureExt>[] = [
-  { name: 'id_failure', label: 'ID de la falla' },
   { name: 'failureType.failureDescription', label: 'Tipo de falla', getValue: (failure) => failure.failureType?.failureDescription ?? 'Sin especificar' },
   { name: 'description', label: 'Descripción de la falla' },
   { name: 'status', label: 'Estado de la falla' },

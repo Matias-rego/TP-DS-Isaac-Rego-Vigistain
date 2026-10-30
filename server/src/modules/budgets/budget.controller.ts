@@ -1,4 +1,4 @@
-import type { NextFunction, Request, Response } from "express";
+import type { Request, Response } from "express";
 import type { IdDto } from "@/shared/common.schema.js";
 import type { RegisterBudgetDto, ModifyBudgetDto, BudgetQueryDto } from "./budget.schema.js";
 import type { BudgetService } from "./budget.service.js";
@@ -10,176 +10,138 @@ import { verifyBudgetToken, type BudgetTokenPayload } from "@/utils/budgetToken.
 import { DECISION_TO_STATUS, isDecision } from "./budget.schema.js";
 import { emitEvent } from "@/websocket.js";
 import { EVENTS } from "@/shared/events.js";
+import { BadRequestError, NotFoundError, UnauthorizedError } from "@/shared/http-errors.js";
 
 
 export class BudgetController {
     constructor(private service: BudgetService) { }
 
-    public registerBudget = async (req: Request, res: Response, next: NextFunction) => {
+    public registerBudget = async (req: Request, res: Response) => {
         const data = req.validated.body as RegisterBudgetDto;
 
         if (!req.user) {
-            return res.status(401).json({ message: "No autenticado" });
+            throw new UnauthorizedError("No autenticado");
         }
 
-        try {
-            const budget = await this.service.create({
-                id_order: data.id_order,
-                laborCost: data.laborCost,
-                discount: data.discount,
-                id_user: req.user.id,
-            });
+        const budget = await this.service.create({
+            id_order: data.id_order,
+            laborCost: data.laborCost,
+            discount: data.discount,
+            id_user: req.user.id,
+        });
         emitEvent(EVENTS.budgetChanged, budget);
-            return res.status(201).json(budget);
-        } catch (error) {
-            next(error);
-        }
+        return res.status(201).json(budget);
     };
 
-    public getAllBudgets = async (req: Request, res: Response, next: NextFunction) => {
+    public getAllBudgets = async (req: Request, res: Response) => {
         const query = req.validated.query as BudgetQueryDto;
 
-        try {
-            res.json(await this.service.findAll(query));
-        } catch (error) {
-            next(error);
-        }
+        res.json(await this.service.findAll(query));
     };
 
-    public getOneBudget = async (req: Request, res: Response, next: NextFunction) => {
+    public getOneBudget = async (req: Request, res: Response) => {
         const { id } = req.validated.params as IdDto;
 
-        try {
-            const budget = await this.service.findById(id);
+        const budget = await this.service.findById(id);
 
-            if (!budget) {
-                return res.status(404).json({ message: "Presupuesto no encontrado" });
-            }
-
-            return res.json(budget);
-        } catch (error) {
-            next(error);
+        if (!budget) {
+            throw new NotFoundError("Presupuesto no encontrado");
         }
+
+        return res.json(budget);
     };
 
-    public getBudgetOfOrder = async (req: Request, res: Response, next: NextFunction) => {
+    public getBudgetOfOrder = async (req: Request, res: Response) => {
         const { id } = req.validated.params as IdDto;
 
-        try {
-            const budget = await this.service.findByOrderId(id);
+        const budget = await this.service.findByOrderId(id);
 
-            if (!budget) {
-                return res.status(404).json({ message: "Esta orden no tiene presupuesto" });
-            }
-
-            return res.json(budget);
-        } catch (error) {
-            next(error);
+        if (!budget) {
+            throw new NotFoundError("Esta orden no tiene presupuesto");
         }
+
+        return res.json(budget);
     };
 
-    public modifyBudget = async (req: Request, res: Response, next: NextFunction) => {
+    public modifyBudget = async (req: Request, res: Response) => {
         const { id } = req.validated.params as IdDto;
         const data = req.validated.body as ModifyBudgetDto;
-        try {
-            const budget = await this.service.update(id, data);
-            emitEvent(EVENTS.budgetChanged, budget);
-            return res.json(budget);
-        } catch (error) {
-            next(error);
-        }
+        const budget = await this.service.update(id, data);
+        emitEvent(EVENTS.budgetChanged, budget);
+        return res.json(budget);
     };
 
-    public deleteBudget = async (req: Request, res: Response, next: NextFunction) => {
+    public deleteBudget = async (req: Request, res: Response) => {
         const { id } = req.validated.params as IdDto;
 
-        try {
-            const result = await this.service.delete(id);
-            emitEvent(EVENTS.budgetDeleted, { id });
-            return res.json(result);
-        } catch (error) {
-            next(error);
-        }
+        const result = await this.service.delete(id);
+        emitEvent(EVENTS.budgetDeleted, { id });
+        return res.json(result);
     };
-    public sendBudgetEmail = async (req: Request, res: Response, next: NextFunction) => {
+    public sendBudgetEmail = async (req: Request, res: Response) => {
         const { id } = req.validated.params as IdDto;
 
-        try {
-            const budget = await this.service.findById(id);
+        const budget = await this.service.findById(id);
 
-            if (!budget) {
-                return res.status(404).json({ message: "Presupuesto no encontrado." });
-            }
-
-            assertBudgetWithRelations(budget); 
-
-            const tokenVerificacionPres = jwt.sign(
-                { nroBudget: budget.nroBudget, id_budget: budget.id_budget },
-                config.JWT_SECRET,
-                { expiresIn: '48h' }
-            );
-
-            await enviarPdfPorMail(budget, tokenVerificacionPres);
-
-            return res.status(200).json({ message: "Presupuesto enviado por mail correctamente." });
-        } catch (error) {
-            next(error);
+        if (!budget) {
+            throw new NotFoundError("Presupuesto no encontrado.");
         }
+
+        assertBudgetWithRelations(budget);
+
+        const tokenVerificacionPres = jwt.sign(
+            { nroBudget: budget.nroBudget, id_budget: budget.id_budget },
+            config.JWT_SECRET,
+            { expiresIn: '48h' }
+        );
+
+        await enviarPdfPorMail(budget, tokenVerificacionPres);
+
+        return res.status(200).json({ message: "Presupuesto enviado por mail correctamente." });
     };
-    public handleResponse = async (req: Request, res: Response, next: NextFunction) => {
+    public handleResponse = async (req: Request, res: Response) => {
         const {token} = req.params;
         const { decision, client_suggestion } = req.body;
         if (typeof token !== 'string') {
-            return res.status(400).json({ error: 'Token no proporcionado o inválido' });
+            throw new BadRequestError('Token no proporcionado o inválido');
         }
         if (!isDecision(decision)) {
-            return res.status(400).json({ error: 'Decisión inválida' });
+            throw new BadRequestError('Decisión inválida');
         }
         const suggestion = typeof client_suggestion === 'string' ? client_suggestion.trim() : '';
         if (decision === 'suggestion' && !suggestion) {
-        return res.status(400).json({ error: 'Falta la sugerencia' });
+            throw new BadRequestError('Falta la sugerencia');
         };
         let payload: BudgetTokenPayload;
         try {
             payload = verifyBudgetToken(token);
         } catch {
-            return res.status(401).json({ error: 'Token inválido o expirado' });
+            throw new UnauthorizedError('Token inválido o expirado');
         }
-        
-        try{
-            await this.service.respondToBudget(payload.id_budget, {
+
+        await this.service.respondToBudget(payload.id_budget, {
             status: DECISION_TO_STATUS[decision],
             client_suggestion: decision === 'suggestion' ? suggestion : null,
-            });
-            emitEvent(EVENTS.budgetChanged, { id_budget: payload.id_budget, decision, client_suggestion: suggestion });
-            return res.json({ ok: true });
-        }catch(error){
-            next(error);
-        };
+        });
+        emitEvent(EVENTS.budgetChanged, { id_budget: payload.id_budget, decision, client_suggestion: suggestion });
+        return res.json({ ok: true });
     };
-    public getBudgetByToken = async (req: Request, res: Response, next: NextFunction) => {
+    public getBudgetByToken = async (req: Request, res: Response) => {
+        let payload: BudgetTokenPayload;
         try {
-            let payload: BudgetTokenPayload;
-            try {
             payload = verifyBudgetToken(String(req.params.token));
-            } catch {
-            return res.status(401).json({ error: 'Token inválido o expirado' });
-            }
-            const budget = await this.service.findById(payload.id_budget);
-            return res.json(budget);
-        } catch (error) {
-            next(error);
+        } catch {
+            throw new UnauthorizedError('Token inválido o expirado');
         }
+
+        const budget = await this.service.findById(payload.id_budget);
+        return res.json(budget);
     };
-    public modifyBudgetTech = async (req: Request, res: Response, next: NextFunction) => {
+    public modifyBudgetTech = async (req: Request, res: Response) => {
         const { id } = req.validated.params as IdDto;
         const data = req.validated.body as ModifyBudgetDto;
 
-        try{
-            const budget = await this.service.modifyBudget(id, data);
-            return res.json(budget);
-        }catch(error){
-            next(error);
-        }
+        const budget = await this.service.modifyBudget(id, data);
+        return res.json(budget);
     };
 }

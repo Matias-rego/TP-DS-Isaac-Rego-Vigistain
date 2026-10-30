@@ -197,6 +197,7 @@ const Login = () => {
                       
                     />
                   </div>
+                
                   {fieldErrors.password && (
                     <span className={styles.errorText}>{fieldErrors.password}</span>
                   )}

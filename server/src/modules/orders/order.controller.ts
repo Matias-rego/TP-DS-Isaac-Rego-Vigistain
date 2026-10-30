@@ -1,4 +1,4 @@
-import type { NextFunction, Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import { $Enums } from "@/database/prisma.js";
 import type { IdDto } from "@/shared/common.schema.js";
 import type { RegisterOrderDto, OrderQueryDto } from './order.schema.js';
@@ -10,41 +10,31 @@ export class OrderController {
   public registerOrder = async (
     req: Request,
     res: Response,
-    next: NextFunction,
   ) => {
     const data = req.validated.body as RegisterOrderDto;
 
-    try {
-      const newOrder = await this.service.create({
-        ...data,
-        status: $Enums.EnumOrderStatus.recibido,
-        dateOfEntry: new Date(),
-        estimatedDate: data.estimatedDate
-          ? new Date(data.estimatedDate)
-          : undefined,
-        equipmentPhotoUrl: data.equipmentPhotoUrl ?? undefined,
-      });
-      return res.status(201).json({
-        message: 'Orden registrada con éxito',
-        order: newOrder,
-      });
-    } catch (error) {
-      next(error);
-    }
+    const newOrder = await this.service.create({
+      ...data,
+      status: $Enums.EnumOrderStatus.recibido,
+      dateOfEntry: new Date(),
+      estimatedDate: data.estimatedDate
+        ? new Date(data.estimatedDate)
+        : undefined,
+      equipmentPhotoUrl: data.equipmentPhotoUrl ?? undefined,
+    });
+    return res.status(201).json({
+      message: 'Orden registrada con éxito',
+      order: newOrder,
+    });
   };
 
   public getOneOrder = async (
     req: Request,
     res: Response,
-    next: NextFunction,
   ) => {
     const { id } = req.validated.params as IdDto;
 
-    try {
-      res.json(await this.service.findById(id));
-    } catch (error) {
-      next(error);
-    }
+    res.json(await this.service.findById(id));
   };
 
   // Cubre tanto el listado general como la búsqueda parcial: OrderQueryDto
@@ -54,30 +44,20 @@ export class OrderController {
   public getAllOrders = async (
     req: Request,
     res: Response,
-    next: NextFunction,
   ) => {
     const query = req.validated.query as OrderQueryDto;
 
-    try {
-      res.json(await this.service.findAll(query));
-    } catch (error) {
-      next(error);
-    }
+    res.json(await this.service.findAll(query));
   };
 
   public getOrderOfEquipment = async (
     req: Request,
     res: Response,
-    next: NextFunction,
   ) => {
     const { id } = req.validated.params as IdDto;
 
-    try {
-      const orders = await this.service.findByEquipmentId(id);
-      return res.status(200).json(orders);
-    } catch (error) {
-      next(error);
-    }
+    const orders = await this.service.findByEquipmentId(id);
+    return res.status(200).json(orders);
   };
 
   // Métricas para las tarjetas del Home: cuenta órdenes por estado.
@@ -86,30 +66,20 @@ export class OrderController {
   public getStats = async (
     _req: Request,
     res: Response,
-    next: NextFunction,
   ) => {
-    try {
-      res.status(200).json(await this.service.getStats());
-    } catch (error) {
-      next(error);
-    }
+    res.status(200).json(await this.service.getStats());
   };
 
   public deleteOrder = async (
     req: Request,
     res: Response,
-    next: NextFunction,
   ) => {
     const { id } = req.validated.params as IdDto;
 
-    try {
-      const result = await this.service.delete(id);
-      return res.status(200).json({
-        message: 'Orden dada de baja con éxito',
-        ...result,
-      });
-    } catch (error) {
-      next(error);
-    }
+    const result = await this.service.delete(id);
+    return res.status(200).json({
+      message: 'Orden dada de baja con éxito',
+      ...result,
+    });
   };
 }

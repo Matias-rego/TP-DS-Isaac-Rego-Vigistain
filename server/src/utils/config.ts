@@ -35,8 +35,6 @@ const envSchema = z.object({
     CLOUDINARY_API_KEY: z.string().min(1, 'CLOUDINARY_API_KEY is required'),
     CLOUDINARY_API_SECRET: z.string().min(1, 'CLOUDINARY_API_SECRET is required'),
 
-    RESEND_API_KEY: z.string().min(1, 'RESEND_API_KEY is required'),
-
 });
 
 export const config = envSchema.parse(process.env);

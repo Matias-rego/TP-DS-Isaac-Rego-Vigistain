@@ -8,7 +8,7 @@ import DeviceIcon from "@/assets/DeviceIcon.svg"
 import SearchBar from "@/components/SearchBar/SearchBar";
 import ClientDetailModal from '@/features/clients/components/ClientCard/ClientDetailModal/ClientDetailModal';
 import ActionButton from '@/components/Common/Buttons/ActionButton';
-import ClientRegister from '../../../features/clients/components/ClientRegister/ClientRegister';
+import ClientRegister from '../../../clients/components/ClientRegister/ClientRegister';
 import DeviceForm, { type DeviceFormValues } from "@/components/DeviceForm/DeviceForm";
 import CautionIcon from "@/assets/caution.svg";
 import ClipboardCheck from "@/assets/clipboardCheck.svg";
@@ -646,6 +646,7 @@ const WorkOrder = () => {
                     <div className={styles.formFieldArea} style={{ maxWidth: '300px' }}>
                       <input
                         type="date"
+                        min={new Date().toISOString().split("T")[0]}
                         value={estimatedDeliveryDate}
                         onChange={(e) => setEstimatedDeliveryDate(e.target.value)}
                         className={styles.customDateInput}

@@ -1,8 +1,9 @@
-import type { NextFunction, Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import type { ModifyUserDto, UserQueryDto } from './user.schema.js';
 import type { UserService } from './user.service.js';
 import type { User } from './user.entity.js';
 import type { IdDto } from '@/shared/common.schema.js';
+import { NotFoundError } from '@/shared/http-errors.js';
 
 export interface UserResponseDto {
     userName: string,
@@ -17,73 +18,54 @@ export interface UserResponseDto {
 export class UserController {
     constructor(private service: UserService) { }
 
-    public getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
+    public getAllUsers = async (req: Request, res: Response) => {
         const query = req.validated.query as UserQueryDto;
 
-        try {
-            const users = await this.service.findAll(query);
+        const users = await this.service.findAll(query);
 
-            return res.json({
-                ...users,
-                data: users.data.map(this.toResponse),
-            });
-        } catch (error) {
-            next(error);
-        }
-        };
+        return res.json({
+            ...users,
+            data: users.data.map(this.toResponse),
+        });
+    };
 
     public async createUser(_req: Request, _res: Response) { }
 
-    public deleteUser = async (req: Request, res: Response, next: NextFunction) => {
+    public deleteUser = async (req: Request, res: Response) => {
         const { id } = req.validated.params as IdDto;
 
-        try {
-            const user = await this.service.update(id, { status: false });
+        const user = await this.service.update(id, { status: false });
 
-            if (!user) {
-                return res.status(404).json({ message: "User not found" });
-            }
-
-            return res.json(this.toResponse(user));
-        } catch (error) {
-            next(error);
+        if (!user) {
+            throw new NotFoundError("Usuario no encontrado");
         }
+
+        return res.json(this.toResponse(user));
     };
 
-    public getOneUser =  async(req: Request, res: Response, next: NextFunction) => {
+    public getOneUser = async (req: Request, res: Response) => {
         const params = req.validated.params as IdDto;
 
-        try {
-            const user = await this.service.findById(params.id)
+        const user = await this.service.findById(params.id)
 
-            if (!user) {
-                return res.status(404).json({
-                    message: "User not found",
-                });
-            }
-
-            res.json(this.toResponse(user));
-        } catch (error) {
-            next(error);
+        if (!user) {
+            throw new NotFoundError("Usuario no encontrado");
         }
+
+        res.json(this.toResponse(user));
     };
 
-    public modifyUser =  async (req: Request, res: Response, next: NextFunction) => {
+    public modifyUser = async (req: Request, res: Response) => {
         const data = req.validated.body as ModifyUserDto;
         const params = req.validated.params as IdDto
 
-        try {
-            const user = await this.service.update(params.id, data)
+        const user = await this.service.update(params.id, data)
 
-            if (!user) {
-                return res.status(404).json({
-                    message: "User not found",
-                });
-            }
-            res.json(this.toResponse(user));
-        } catch (error) {
-            next(error);
+        if (!user) {
+            throw new NotFoundError("Usuario no encontrado");
         }
+
+        res.json(this.toResponse(user));
     };
 
     private toResponse(User: User): UserResponseDto {

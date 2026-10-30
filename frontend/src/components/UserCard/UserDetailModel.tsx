@@ -7,6 +7,7 @@ import { BACKEND_URL } from "@/lib/config";
 import ActionButton from "../Common/Buttons/ActionButton";
 import ConfirmDialog from "../Common/ConfirmDialog/ConfirmDialog";
 import type { User as UserBase } from '@/features/users/types';
+import AlertSuccess from '@/components/Alert/AlertSuccess';
 
 interface User extends UserBase {
   onClick?: (id: string) => void;
@@ -54,6 +55,13 @@ const UserDetailModal = ({
   const [isUpgrading, setIsUpgrading] = useState(false);
   const [formValidate, setFormValidate] = useState<User>(user);
   const [confirmBaja, setConfirmBaja] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!successMessage) return;
+    const t = setTimeout(() => setSuccessMessage(null), 3000);
+    return () => clearTimeout(t);
+  }, [successMessage]);
 
   useEffect(() => {
     setFormValidate(user);
@@ -61,6 +69,7 @@ const UserDetailModal = ({
   useEffect(() => {
     if (!open) {
       setIsUpgrading(false);
+      setSuccessMessage(null);
     }
   }, [open]);
 
@@ -99,13 +108,15 @@ const UserDetailModal = ({
   };
 
   const handleValidate = async () => {
-    await handleEdit({ ...user, validationStatus: true });
+    const exito = await handleEdit({ ...user, validationStatus: true });
+    if (exito) setSuccessMessage("Usuario validado con éxito.");
   };
 
   const handleConfirmUpgrade = async () => {
     const exito = await handleEdit({ ...formValidate, rol: 'admin' });
     if (exito) {
       setIsUpgrading(false);
+      setSuccessMessage("Usuario ascendido a administrador con éxito.");
     }
   };
 
@@ -173,6 +184,7 @@ const UserDetailModal = ({
               : [])
       }
     >
+      {successMessage && <AlertSuccess message={successMessage} />}
       {user.validationStatus === false && !isUpgrading && (
         <ActionButton
         label="Validar Usuario"
