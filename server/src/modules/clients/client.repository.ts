@@ -134,6 +134,12 @@ export class ClientRepository extends BaseRepository<Client, ClientQueryDto> {
             id: client.id_client,
         };
     }
+    public async findByEmail(email: string) {
+        return this.prisma.client.findFirst({ where: { clientEmail: email } });
+    }
+    public async findByCuit(cuit: string) {
+        return this.prisma.client.findFirst({ where: { cuit: cuit } });
+    }
 
     private toDomain(client: Client_P): Client {
         return new Client(

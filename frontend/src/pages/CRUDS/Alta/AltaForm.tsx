@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { eventBus } from './../../../lib/eventBus';
 import { BACKEND_URL } from '@/lib/config';
 import styles from './AltaForm.module.css';
+import { api, ApiError } from '@/api/client';
+import { notifier } from '@/notifications/notifier';
 
 
 // ─── Field config ────────────────────────────────────────────────────────────
@@ -117,7 +119,13 @@ function runValidations(
 
   return errors;
 }
-
+function getFieldErrors(err: unknown): Record<string, string> {
+  if (!(err instanceof ApiError) || err.code !== 'VALIDATION_ERROR') return {};
+  const body = (err.details as { body?: Record<string, string[]> } | undefined)?.body ?? {};
+  return Object.fromEntries(
+    Object.entries(body).map(([field, msgs]) => [field, msgs[0]]),
+  );
+}
 function buildPayload(
   fields: FieldConfig[],
   formData: Record<string, string>
@@ -162,7 +170,7 @@ export default function AltaForm({
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+ const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const validationErrors = runValidations(fields, formData);
@@ -175,29 +183,13 @@ export default function AltaForm({
     setErrors({});
 
     try {
-      const baseUrl = BACKEND_URL;
-
-      const response = await fetch(`${baseUrl}${endpoint}`, {
+      // silent: el formulario decide cómo mostrar cada tipo de error
+      const responseData = await api<unknown>(endpoint, {
         method,
-        headers: {
-          'Content-Type': 'application/json'
-        },
         body: JSON.stringify(buildPayload(fields, formData)),
-        credentials: 'include',
+        silent: true,
+        authRedirect: false, // un 401 acá lo maneja el catch, no la redirección global
       });
-
-      // 409 → conflicto de duplicado en el primer campo por convención
-      if (response.status === 409) {
-        setErrors({ [fields[0].name]: `Ya existe un registro con ese ${fields[0].label.toLowerCase()}.` });
-        return;
-      }
-
-      if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
-        throw new Error(data?.message || `Error del servidor: ${response.status}`);
-      }
-
-      const responseData = await response.json().catch(() => undefined);
 
       setSuccess(true);
       if (resetOnSuccess) setFormData(buildInitialState(fields));
@@ -205,7 +197,27 @@ export default function AltaForm({
       onSuccess?.(responseData);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
-      setErrors({ _general: err instanceof Error ? err.message : 'Error desconocido.' });
+      const fieldErrors = getFieldErrors(err);
+      if (Object.keys(fieldErrors).length > 0) {
+        setErrors(fieldErrors);
+        return;
+      }
+
+      if (err instanceof ApiError && err.status === 409) {
+        const field = (err.details as { field?: string } | null)?.field;
+        if (field && fields.some((f) => f.name === field)) {
+          setErrors({ [field]: err.message });   
+        } else {
+          notifier.error(err.message);           
+        }
+        return;
+      }
+
+      if (err instanceof ApiError) {
+        notifier.error(err.message);
+      } else {
+        notifier.error('Error desconocido.');
+      }
     } finally {
       setLoading(false);
     }

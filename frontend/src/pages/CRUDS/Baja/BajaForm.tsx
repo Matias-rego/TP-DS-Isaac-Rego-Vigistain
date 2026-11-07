@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import useDebounce from '@/hooks/useDebounce';
 import { eventBus } from '@/lib/eventBus';
-import { BACKEND_URL } from '@/lib/config';
+import { api, ApiError, notifyIfNeeded } from '@/api/client';
 import styles from './BajaForm.module.css';
 import type { PaginatedResponse } from "@/types/types";
 
@@ -26,7 +26,7 @@ export interface BajaFormProps<T extends object> {
   previewField?: keyof T;
   previewFormat?: (item: T) => string;
   detailFields: DetailFieldConfig[];
-  requiresAuth?: boolean;
+  requiresAuth?: boolean; // se mantiene por compatibilidad: api() siempre envía la cookie
   entityEvent?: string;
   successMessage?: string;
   onSuccess?: () => void;
@@ -53,7 +53,6 @@ export default function BajaForm<T extends object>({
   previewField,
   previewFormat,
   detailFields,
-  requiresAuth = true,
   entityEvent,
   successMessage = 'Eliminado correctamente.',
   onSuccess,
@@ -64,9 +63,6 @@ export default function BajaForm<T extends object>({
   const [results, setResults] = useState<T[]>([]);
   const [selected, setSelected] = useState<T | null>(null);
   const [deleted, setDeleted] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const baseUrl = BACKEND_URL;
 
   useEffect(() => {
     if (!debouncedQuery) {
@@ -74,65 +70,60 @@ export default function BajaForm<T extends object>({
       return;
     }
 
-    const fetchResults = async () => {
+    // Evita que una respuesta vieja pise a una más reciente
+    let cancelled = false;
 
+    const fetchResults = async () => {
       try {
         // La búsqueda va como query string (?search=...), no como segmento
         // de ruta: el backend la valida con req.validated.query, no con
         // req.validated.params.
         const searchParams = new URLSearchParams({ search: debouncedQuery });
-        const result = await fetch(
-          `${baseUrl}${searchEndpoint}?${searchParams.toString()}`,
-          { method: 'GET', credentials: 'include' });
-        if (result.status === 404) {
+        const data = await api<PaginatedResponse<T> | T[]>(
+          `${searchEndpoint}?${searchParams.toString()}`,
+          { silent: true },
+        );
+        // findAll devuelve { data, metadata }; soportamos también un array
+        // plano por si algún endpoint todavía no está paginado.
+        if (!cancelled) setResults(Array.isArray(data) ? data : data.data);
+      } catch (e) {
+        if (cancelled) return;
+        // Sin coincidencias: no es un error para el usuario
+        if (e instanceof ApiError && e.status === 404) {
           setResults([]);
           return;
         }
-
-        const data: PaginatedResponse<T> | T[] = await result.json();
-        // findAll devuelve { data, metadata }; soportamos también un array
-        // plano por si algún endpoint todavía no está paginado.
-        setResults(Array.isArray(data) ? data : data.data);
-      } catch (e) {
-        console.error(e);
-        setError('Error al buscar.');
+        notifyIfNeeded(e, 'Error al buscar.');
       }
     };
 
     fetchResults();
-  }, [debouncedQuery, baseUrl, searchEndpoint, requiresAuth]);
+    return () => {
+      cancelled = true;
+    };
+  }, [debouncedQuery, searchEndpoint]);
 
   const handleSelect = (item: T) => {
     setSelected(item);
     setDeleted(false);
-    setError(null);
   };
 
   const handleDelete = async () => {
     if (!selected) return;
     try {
-
       const id = selected[idField];
 
-      const result = await fetch(`${baseUrl}${deleteEndpoint}/${id}`, {
-        method: 'DELETE',
-        credentials: 'include',
-      });
-
-      if (!result.ok) {
-        const data = await result.json().catch(() => ({}));
-        throw new Error(data?.message || 'Error al eliminar.');
-      }
+      // api() ya muestra el toast si falla (ej: 409 por registros relacionados)
+      await api(`${deleteEndpoint}/${id}`, { method: 'DELETE' });
 
       setResults(prev => prev.filter(r => r[idField] !== id));
       setSelected(null);
       setDeleted(true);
-      setError(null);
 
       if (entityEvent) eventBus.emit(entityEvent);
       onSuccess?.();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Error desconocido.');
+      notifyIfNeeded(e, 'Error al eliminar.');
     }
   };
 
@@ -148,8 +139,6 @@ export default function BajaForm<T extends object>({
           </div>
         </div>
       )}
-
-      {error && <p className={styles.errorMsg}>{error}</p>}
 
       {/* Input de búsqueda */}
       <div className={styles.searchWrapper} style={{ width: '100%' }}>
@@ -171,7 +160,6 @@ export default function BajaForm<T extends object>({
             setQuery(e.target.value);
             setSelected(null);
             setDeleted(false);
-            setError(null);
           }}
         />
       </div>

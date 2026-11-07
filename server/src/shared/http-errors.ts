@@ -46,8 +46,8 @@ export class NotFoundError extends HttpError {
 }
 
 export class ConflictError extends HttpError {
-    constructor(message = 'El recurso ya existe') {
-        super(message, 409, 'CONFLICT');
+    constructor(message = 'El recurso ya existe', details?: unknown) {
+        super(message, 409, 'CONFLICT', details);
     }
 }
 export class BadRequestError extends HttpError {

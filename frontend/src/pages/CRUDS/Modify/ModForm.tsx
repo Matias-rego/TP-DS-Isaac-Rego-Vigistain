@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import useDebounce from '@/hooks/useDebounce';
 import { eventBus } from '@/lib/eventBus';
-import { BACKEND_URL } from '@/lib/config';
+import { api, ApiError, getFieldErrors, notifyIfNeeded } from '@/api/client';
+import { notifier } from '@/notifications/notifier';
 import type { FieldConfig } from './../Alta/AltaForm';
 import type { PaginatedResponse } from "@/types/types";
 import styles from './ModForm.module.css';
@@ -49,9 +50,7 @@ export default function ModForm<T extends object>({
   const [selected, setSelected] = useState<T | null>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const baseUrl = BACKEND_URL;
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!debouncedQuery) {
@@ -59,38 +58,43 @@ export default function ModForm<T extends object>({
       return;
     }
 
-    const fetchResults = async () => {
+    // Evita que una respuesta vieja pise a una más reciente
+    let cancelled = false;
 
+    const fetchResults = async () => {
       try {
         // La búsqueda va como query string (?search=...), no como segmento
         // de ruta: el backend la valida con req.validated.query, no con
         // req.validated.params.
         const searchParams = new URLSearchParams({ search: debouncedQuery });
-        const result = await fetch(
-          `${baseUrl}${searchEndpoint}?${searchParams.toString()}`,
-          { method: 'GET', credentials: 'include' });
-        if (result.status === 404) {
+        const data = await api<PaginatedResponse<T> | T[]>(
+          `${searchEndpoint}?${searchParams.toString()}`,
+          { silent: true },
+        );
+        // findAll devuelve { data, metadata }; soportamos también un array
+        // plano por si algún endpoint todavía no está paginado.
+        if (!cancelled) setResults(Array.isArray(data) ? data : data.data);
+      } catch (e) {
+        if (cancelled) return;
+        // Sin coincidencias: no es un error para el usuario
+        if (e instanceof ApiError && e.status === 404) {
           setResults([]);
           return;
         }
-
-        const data: PaginatedResponse<T> | T[] = await result.json();
-        // findAll devuelve { data, metadata }; soportamos también un array
-        // plano por si algún endpoint todavía no está paginado.
-        setResults(Array.isArray(data) ? data : data.data);
-      } catch (e) {
-        console.error(e);
-        setError('Error al buscar.');
+        notifyIfNeeded(e, 'Error al buscar.');
       }
     };
 
     fetchResults();
-  }, [debouncedQuery, baseUrl, searchEndpoint]);
+    return () => {
+      cancelled = true;
+    };
+  }, [debouncedQuery, searchEndpoint]);
 
   const handleSelect = (item: T) => {
     setSelected(item);
     setSaved(false);
-    setError(null);
+    setFieldErrors({});
   };
 
   const handleFieldChange = (field: FieldConfig, value: string) => {
@@ -99,15 +103,21 @@ export default function ModForm<T extends object>({
       ...selected,
       [field.name]: field.type === 'number' ? Number(value) : value,
     });
+    if (fieldErrors[field.name]) {
+      setFieldErrors(prev => {
+        const next = { ...prev };
+        delete next[field.name];
+        return next;
+      });
+    }
   };
 
   const handleSave = async () => {
     if (!selected) return;
     setSaving(true);
-    setError(null);
+    setFieldErrors({});
 
     try {
-
       const id = selected[idField];
 
       // Arma el payload solo con los campos editables definidos
@@ -116,19 +126,12 @@ export default function ModForm<T extends object>({
         payload[field.name] = (selected as Record<string, unknown>)[field.name];
       }
 
-      const result = await fetch(`${baseUrl}${modifyEndpoint}/${id}`, {
+      // silent: los errores de validación se muestran bajo cada campo
+      await api(`${modifyEndpoint}/${id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(payload),
-        credentials: 'include',
+        silent: true,
       });
-
-      if (!result.ok) {
-        const data = await result.json().catch(() => ({}));
-        throw new Error(data?.message || 'Error al modificar.');
-      }
 
       setSaved(true);
       setSelected(null);
@@ -138,7 +141,19 @@ export default function ModForm<T extends object>({
       if (entityEvent) eventBus.emit(entityEvent);
       onSuccess?.();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Error desconocido.');
+      const errs = getFieldErrors(e);
+      if (Object.keys(errs).length > 0) {
+        setFieldErrors(errs);
+        // Errores de campos que este formulario no muestra: van a un toast
+        const unmatched = Object.entries(errs).filter(
+          ([name]) => !fields.some(f => f.name === name),
+        );
+        if (unmatched.length > 0) {
+          notifier.error(unmatched.map(([, msg]) => msg).join('. '));
+        }
+        return;
+      }
+      notifyIfNeeded(e, 'Error al modificar.');
     } finally {
       setSaving(false);
     }
@@ -156,8 +171,6 @@ export default function ModForm<T extends object>({
           </div>
         </div>
       )}
-
-      {error && <p className={styles.errorMsg}>{error}</p>}
 
       {/* Búsqueda */}
       <div className={styles.searchWrapper}>
@@ -179,7 +192,7 @@ export default function ModForm<T extends object>({
             setQuery(e.target.value);
             setSelected(null);
             setSaved(false);
-            setError(null);
+            setFieldErrors({});
           }}
         />
       </div>
@@ -250,6 +263,10 @@ export default function ModForm<T extends object>({
                   onChange={e => handleFieldChange(field, e.target.value)}
                   disabled={saving}
                 />
+              )}
+
+              {fieldErrors[field.name] && (
+                <p className={styles.errorMsg}>{fieldErrors[field.name]}</p>
               )}
             </div>
           ))}

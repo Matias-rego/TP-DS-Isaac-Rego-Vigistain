@@ -6,11 +6,12 @@ import { type Client } from '@/types/types';
 import { type Order, type Failure, type Status_History } from '@/types/types'
 import SmallClientCard from '@/features/clients/components/ClientCard/SmallClientCard/SmallClientCard';
 import ClientDetailModal from '@/features/clients/components/ClientCard/ClientDetailModal/ClientDetailModal';
-import BACKEND_URL from '@/lib/config';
 import FailureMiniCard from '@/components/Failure/FailureMiniCard/FailureMiniCard';
 import OrderMiniCard from '@/components/OrderComponent/OrderMiniCard/OrderMiniCard';
 import { EVENTS, eventBus } from '@/lib/eventBus';
 import ConfirmDialog from '@/components/Common/ConfirmDialog/ConfirmDialog';
+import { api, getFieldErrors, notifyIfNeeded } from '@/api/client';
+import {notifier} from '@/notifications/notifier';
 
 export interface EquipmentDetailModalProps {
   open: boolean;
@@ -55,10 +56,8 @@ const EquipmentDetailModal = ({
 
   const guardarEquipo = async () => {
     try {
-      const response = await fetch(`${BACKEND_URL}/api/equipments/${equipment.id_equipment}`, {
+      const updated = await api<Equipment>(`/api/equipments/${equipment.id_equipment}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({
           tipo_equipment: form.tipo_equipment,
           brand: form.brand,
@@ -66,31 +65,30 @@ const EquipmentDetailModal = ({
           ...(form.observations.trim() ? { observations: form.observations } : {}),
         }),
       });
-      if (!response.ok) throw new Error('No se pudo guardar el equipo');
-      const updated: Equipment = await response.json();
       setSaved(updated);
       setIsEditing(false);
       onEquipmentChanged?.();
     } catch (e) {
-      alert(e instanceof Error ? e.message : 'Error inesperado');
+      const fields = getFieldErrors(e);
+      if (Object.keys(fields).length > 0) {
+        notifier.error(Object.values(fields).join('. '));
+      } else {
+        notifyIfNeeded(e, 'No se pudo guardar el equipo');
+      }
     }
   };
 
   const eliminarEquipo = async () => {
     setConfirmDelete(false);
     try {
-      const response = await fetch(`${BACKEND_URL}/api/equipments/${equipment.id_equipment}`, {
+      await api(`/api/equipments/${equipment.id_equipment}`, {
         method: 'DELETE',
-        credentials: 'include',
       });
-      if (!response.ok) {
-        const err = await response.json().catch(() => ({}));
-        throw new Error(err.message || 'No se pudo eliminar el equipo');
-      }
       onEquipmentChanged?.();
       onClose();
     } catch (e) {
-      alert(e instanceof Error ? e.message : 'Error inesperado');
+      notifyIfNeeded(e, "No se pudo eliminar el equipo");
+
     }
   };
 
@@ -111,40 +109,34 @@ const EquipmentDetailModal = ({
   }, [dataOrders]);
 
   useEffect(() => {
-    const fetchClient = async () => {
+    const getClient = async () => {
       try {
         const { id_client } = equipment;
-        const client = await fetch(`${BACKEND_URL}/api/clients/${id_client}`, {
+        const client = await api<Client>(`/api/clients/${id_client}`, {
           method: "GET",
-          credentials: 'include',
         });
-        const dataClient: Client = await client.json();
-        setDataClient(dataClient);
+        setDataClient(client);
       } catch (e) {
         setDataClient(null);
       }
     }
-    const fetchOrders = async () => {
+    const getOrders = async () => {
       try {
         const id_equipment = equipment?.id_equipment;
         if (!id_equipment) return;
-        const orders = await fetch(`${BACKEND_URL}/api/orders/ofEquipment/${id_equipment}`,
+        const orders = await api<Order[]>(`/api/orders/ofEquipment/${id_equipment}`,
           {
             method: "GET",
-            credentials: 'include',
           }
         );
-        if (!orders.ok) {
-          throw new Error('Error al obtener las órdenes');
-        };
-        const dataOrders = await orders.json();
+        const dataOrders = orders;
         setDataOrders(dataOrders);
       } catch (e) {
         setDataOrders([]);
       }
     }
-    fetchClient();
-    fetchOrders();
+    getClient();
+    getOrders();
   }, [equipment])
 
 

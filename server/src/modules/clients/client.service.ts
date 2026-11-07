@@ -2,6 +2,7 @@ import type { PaginatedResult } from "@/shared/base.repository.js";
 import type { ClientQueryDto } from "./client.schema.js";
 import type { ClientRepository } from "./client.repository.js";
 import type { Client } from "./client.entity.js";
+import { ConflictError } from "@/shared/http-errors.js";
 
 export class ClientService {
     constructor(private repo: ClientRepository) { }
@@ -19,7 +20,17 @@ export class ClientService {
         if (!category) {
             throw new Error("No hay una categoría de cliente configurada para asignar");
         }
-
+        const mailClient = await this.repo.findByEmail(input.clientEmail);
+        if(!mailClient){
+            throw new ConflictError("El correo ingresado ya pertenece a otro cliente",{field:"clientEmail"},)
+        }
+        const cuitClient = await this.repo.findByCuit(input.cuit);
+        if(!cuitClient){
+            throw new ConflictError(
+                "El CUIT ingresado ya pertenece a otro cliente",
+                {field: 'cuit'},
+            )
+        }
         return this.repo.create({
             ...input,
             id_client_type: category.id_client_type,
