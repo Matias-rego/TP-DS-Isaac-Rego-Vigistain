@@ -22,7 +22,7 @@ const clientFields: DetailFieldConfig<Client>[] = [
   { name: 'clientName', label: 'Nombre Completo' },
   { name: 'clientEmail', label: 'Email' },
   { name: 'cuit', label: 'CUIT' },
-  { name: 'clientTypeName', label: 'Categoría' },
+  { name: 'client_type.clientTypeName', label: 'Categoría' },
   { name: 'clientPhone', label: 'Teléfono' },
   {
     name: 'dateOfRegistration',

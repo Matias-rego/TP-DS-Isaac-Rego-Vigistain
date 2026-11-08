@@ -9,14 +9,14 @@ import DescriptiveMiniCard from "@/components/Common/Cards/DescriptiveMiniCard/D
 import SearchBar, { type FilterConfig } from "@/components/SearchBar/SearchBar";
 import DataTable, { type ColumnConfig } from "@/components/Common/DataTable/DataTable";
 import OrderDescription from "@/components/OrderComponent/OrderDescription/OrderDescription";
-import { BACKEND_URL } from "@/lib/config";
 import UpdateStatusModal from "@/components/Status/UpdateStatusModal/UpdateStatusModal";
 import { eventBus, EVENTS } from '@/lib/eventBus';
-import type { PaginatedResponse } from "@/types/types";
 import { formatDocumentNumber } from "@/lib/utils";
 import ActionButton from "@/components/Common/Buttons/ActionButton";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import ConfirmDialog from "@/components/Common/ConfirmDialog/ConfirmDialog";
+import { api,  notifyIfNeeded } from "@/api/client";
+import type { PaginatedResponse } from '@/types/types'
 
 
 
@@ -111,16 +111,12 @@ const OrderDirectory = () => {
       const qs = new URLSearchParams();
       if (metricFilter) qs.set('filtro', metricFilter);
 
-      const res = await fetch(`${BACKEND_URL}/api/orders/?${qs}`, {
+      const res = await api<PaginatedResponse<Order>>(`/api/orders/?${qs}`, {
         method: 'GET',
-        credentials: 'include',
       });
-      if (!res.ok) throw new Error('Error al obtener las órdenes');
-
-      const responseData: PaginatedResponse<Order> = await res.json();
-      setOrders(responseData.data ?? []);
+      setOrders(res.data);
     } catch (e) {
-      console.error('Error fetching orders:', e);
+      notifyIfNeeded(e, "No se pudo cargar las ordenes");
       setOrders([]);
     } finally {
       setLoading(false);
@@ -144,16 +140,14 @@ const OrderDirectory = () => {
     if (!selectedOrder) return;
     setBajaLoading(true);
     try {
-      const res = await fetch(`${BACKEND_URL}/api/orders/${selectedOrder.id_order}`, {
+      await api<Order>(`/api/orders/${selectedOrder.id_order}`, {
         method: 'DELETE',
-        credentials: 'include',
       });
-      if (!res.ok) throw new Error('No se pudo dar de baja la orden');
       setShowBajaConfirm(false);
       setSelectedOrder(null);
       fetchOrders(); // refresca el listado (la baja ya no aparece)
     } catch (e) {
-      console.error('Error al dar de baja la orden:', e);
+      notifyIfNeeded(e, "No se pudo dar de baja la orden");
     } finally {
       setBajaLoading(false);
     }
@@ -232,7 +226,7 @@ const OrderDirectory = () => {
         <h1 className={styles.title}>Gestión de Órdenes</h1>
 
         <div className={styles.cardSector}>
-                    <DescriptiveMiniCard
+          <DescriptiveMiniCard
             label="Reparaciones Activas" value={activeRepairs} icon={Wrench} tone="neutral"
           />
           <DescriptiveMiniCard
