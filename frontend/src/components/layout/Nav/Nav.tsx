@@ -226,7 +226,7 @@ const Nav = () => {
           <button
             type="button"
             className={styles.drawerLink}
-            onClick={() => handleNavClick('/clientes')}
+            onClick={() => handleNavClick('/clientManagement')}
           >
             <span className={styles.drawerLinkIcon}><Users size={20} /></span>
             Clientes

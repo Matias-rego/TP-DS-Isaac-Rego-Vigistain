@@ -74,3 +74,18 @@ export async function api<T>(
   }
   throw err;
 }
+/** Convierte un VALIDATION_ERROR en { campo: 'primer mensaje' } */
+export function getFieldErrors(err: unknown): Record<string, string> {
+  if (!(err instanceof ApiError) || err.code !== 'VALIDATION_ERROR') return {};
+  const body = (err.details as { body?: Record<string, string[]> } | undefined)?.body ?? {};
+  return Object.fromEntries(Object.entries(body).map(([field, msgs]) => [field, msgs[0]]));
+}
+
+/** Muestra un toast solo si api() no lo mostró ya (evita duplicados) */
+export function notifyIfNeeded(err: unknown, fallback = 'Ocurrió un error inesperado') {
+  if (err instanceof ApiError) {
+    if (!err.notified) notifier.error(err.message);
+    return;
+  }
+  notifier.error(fallback);
+}

@@ -1,4 +1,4 @@
-import BACKEND_URL from "@/lib/config";
+import { api, notifyIfNeeded } from "@/api/client";
 import type { EnumOrderStatus, Order } from "@/types/types";
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -41,23 +41,14 @@ const ManageOrder = () => {
       }
 
       try {
-        const response = await fetch(`${BACKEND_URL}/api/orders/${id_order}`, {
-          credentials: "include",
+        const order = await api<Order>(`/api/orders/${id_order}`, {
           method: "GET",
-          signal,
         });
 
-        if (response.status === 404) throw new Error("La orden no existe.");
-        if (!response.ok) throw new Error(`Error en la petición: ${response.status}`);
-
-        setOrder(await response.json());
+        setOrder(order);
       } catch (e) {
-        if ((e as Error).name === "AbortError") return;
-        console.error("Error al obtener la orden", e);
-        if (!silent) {
-          setError(e instanceof Error ? e.message : "No se pudo cargar la orden.");
-          setOrder(null);
-        }
+        notifyIfNeeded(e, "No se pudo cargar la orden");
+        setError("No se pudo cargar la orden");
       } finally {
         if (!silent && !signal?.aborted) setLoading(false);
       }

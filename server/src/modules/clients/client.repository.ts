@@ -1,9 +1,11 @@
-import type { Client as Client_P } from "@/generated/prisma/client.js";
+import type { Client as Client_P, Client_Type, Prisma } from "@/generated/prisma/client.js";
 import type { PaginatedResult } from "@/shared/base.repository.js";
 import type { ClientQueryDto } from "./client.schema.js";
 import { BaseRepository } from "@/shared/base.repository.js";
 import { Client } from "./client.entity.js";
 import { v7 as uuidv7 } from "uuid";
+
+type ClientRow = Client_P & { client_type?: Client_Type | null };
 
 export class ClientRepository extends BaseRepository<Client, ClientQueryDto> {
 
@@ -44,6 +46,9 @@ export class ClientRepository extends BaseRepository<Client, ClientQueryDto> {
                         [query.sortBy]: query.sortOrder,
                     }
                     : undefined,
+                include:{
+                    client_type: true
+                }
             }),
 
             this.prisma.client.count({ where }),
@@ -72,11 +77,8 @@ export class ClientRepository extends BaseRepository<Client, ClientQueryDto> {
             : undefined;
     }
 
-    // Reemplaza a getCategoryClientByOrders del viejo controller. Ordena
-    // por umbral descendente para quedarnos con la categoría más alta que
-    // el cliente ya alcanza, no con cualquiera que matchee `lte`.
-    public async findDefaultCategoryForOrderCount(orderCount: number): Promise<{ id_client_type: string } | undefined> {
-        const category = await this.prisma.client_Type.findFirst({
+    public async findDefaultCategoryForOrderCount(orderCount: number, tx: Prisma.TransactionClient = this.prisma): Promise<{ id_client_type: string } | undefined> {
+        const category = await tx.client_Type.findFirst({
             where: {
                 amountForCategoryUp: {
                     lte: orderCount,
@@ -93,6 +95,22 @@ export class ClientRepository extends BaseRepository<Client, ClientQueryDto> {
         return category ?? undefined;
     }
 
+    public async findAmountOrderOfEquiment(id_client: string, tx: Prisma.TransactionClient = this.prisma): Promise<number> {
+        const count = await tx.order.count({
+            where: {
+                equipment: {
+                    id_client: id_client,
+                },
+            },
+        });
+        return count;
+    }
+    public async updateClientType(id_client:string, id_client_type:string, tx: Prisma.TransactionClient = this.prisma){
+        await tx.client.update({
+            where: { id_client },
+            data: { id_client_type }
+        });
+    }
     public async create(item: Client): Promise<Client> {
         const client = await this.prisma.client.create({
             data: {
@@ -111,13 +129,11 @@ export class ClientRepository extends BaseRepository<Client, ClientQueryDto> {
     }
 
     public async update(id: string, item: Partial<Client>): Promise<Client | undefined> {
+        const { client_type, id_client, ...data } = item;
+
         const client = await this.prisma.client.update({
-            where: {
-                id_client: id,
-            },
-            data: {
-                ...item,
-            },
+            where: { id_client: id },
+            data,
         });
 
         return this.toDomain(client);
@@ -134,9 +150,15 @@ export class ClientRepository extends BaseRepository<Client, ClientQueryDto> {
             id: client.id_client,
         };
     }
+    public async findByEmail(email: string) {
+        return this.prisma.client.findFirst({ where: { clientEmail: email } });
+    }
+    public async findByCuit(cuit: string) {
+        return this.prisma.client.findFirst({ where: { cuit: cuit } });
+    }
 
-    private toDomain(client: Client_P): Client {
-        return new Client(
+    private toDomain(client: ClientRow): Client {
+        const domain = new Client(
             client.clientName,
             client.clientEmail,
             client.clientPhone,
@@ -146,5 +168,7 @@ export class ClientRepository extends BaseRepository<Client, ClientQueryDto> {
             client.dateOfRegistration,
             client.status,
         );
+        if (client.client_type) domain.client_type = client.client_type;
+        return domain;
     }
 }

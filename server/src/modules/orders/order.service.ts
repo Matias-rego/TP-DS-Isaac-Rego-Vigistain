@@ -4,8 +4,10 @@ import type { OrderQueryDto } from "./order.schema.js";
 import type { OrderRepository } from "./order.repository.js";
 import type { Order } from "./order.entity.js";
 import type { StatusService } from "@/modules/status/status.service.js";
+import type { ClientService } from "@/modules/clients/client.service.js";
 import type { RegisterOrderDto } from "./order.schema.js";
 import { v7 as uuidv7 } from "uuid";
+import { BadRequestError } from "@/shared/http-errors.js";
 
 type CreateOrderInput = Omit<RegisterOrderDto, "estimatedDate"> & {
     status: Order["status"];
@@ -18,6 +20,7 @@ export class OrderService {
         private prisma: PrismaClient,
         private repo: OrderRepository,
         private statusService: StatusService,
+        private clientService: ClientService,
     ) { }
     findAll(query?: OrderQueryDto): Promise<PaginatedResult<Order>> {
         return this.repo.findAll(query);
@@ -45,7 +48,7 @@ export class OrderService {
                     where: { id_equipment: equipment.id_equipment, id_client },
                 });
                 if (!existing) {
-                    throw new Error(
+                    throw new BadRequestError(
                         "El equipo no existe o no pertenece al cliente seleccionado"
                     );
                 }
@@ -99,6 +102,10 @@ export class OrderService {
                     order.status!,
                     tx, // <-- requiere que este método acepte un client transaccional
                 );
+            }
+            // 5, Actualizamos la cat del cliente
+            if(id_client){
+                await this.clientService.updateClientType(id_client, tx);
             }
 
             return id_order;

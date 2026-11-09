@@ -3,11 +3,12 @@ import DetailModal from "@/components/Modals/DetailModal";
 import type { DetailFieldConfig, DetailItemConfig } from "@/components/Modals/DetailModal";
 import styles from './ClientDetailModal.module.css';
 import { eventBus } from "@/lib/eventBus";
-import { BACKEND_URL } from "@/lib/config";
 import type { Equipment as EquipmentBase } from "@/types/types";
 import type { Client as BaseClient } from "@/types/types";
 import EquipmentDetailModal from "@/components/EquipmentComponent/EquipmentDetailModal/EquipmentDetailModal";
 import ConfirmDialog from "@/components/Common/ConfirmDialog/ConfirmDialog";
+import { api, getFieldErrors, notifyIfNeeded } from "@/api/client";
+import { notifier } from '@/notifications/notifier';
 
 // Extendemos la interfaz BaseClient para agregar la propiedad aplanada
 interface Client extends BaseClient {
@@ -21,7 +22,7 @@ const clientFields: DetailFieldConfig<Client>[] = [
   { name: 'clientName', label: 'Nombre Completo' },
   { name: 'clientEmail', label: 'Email' },
   { name: 'cuit', label: 'CUIT' },
-  { name: 'clientTypeName', label: 'Categoría' },
+  { name: 'client_type.clientTypeName', label: 'Categoría' },
   { name: 'clientPhone', label: 'Teléfono' },
   {
     name: 'dateOfRegistration',
@@ -75,20 +76,16 @@ const ClientDetailModal = ({
 
     const searchEquipments = async () => {
       try {
-        const response = await fetch(
-          `${BACKEND_URL}/api/equipments/equipmentForClient/${client.id_client}`,
+        const response = await api<Equipment[]>(
+          `/api/equipments/equipmentForClient/${client.id_client}`,
           {
             method: 'GET',
             credentials: 'include',
           }
         );
-
-        if (!response.ok) throw new Error('Error al obtener equipos');
-
-        const data: Equipment[] = await response.json();
-        setEquipments(data);
+        setEquipments(response);
       } catch (e) {
-        console.error('Error fetching equipments:', e);
+        notifyIfNeeded(e, 'No se pudieron cargar los equipos asociados al cliente');
         setEquipments([]);
       }
     };
@@ -100,7 +97,7 @@ const ClientDetailModal = ({
     if (!open) setIsEditing(false);
   }, [open]);
 
-  const handleEdit = async (data: Client): Promise<boolean> => {
+  const handleEdit = async (data: Client)=> {
     try {
       const payload = {
         clientName: data.clientName,
@@ -109,33 +106,26 @@ const ClientDetailModal = ({
         cuit: data.cuit,
       };
 
-      const response = await fetch(
-        `${BACKEND_URL}/api/clients/${data.id_client}`,
+      const updated = await api<Client>(
+        `/api/clients/${data.id_client}`,
         {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
           body: JSON.stringify(payload), 
-          credentials: 'include',
         }
       );
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Error del servidor: ${response.status}`);
+      if (entityEvent) eventBus.emit(entityEvent, updated)
+      if(updated){
+        notifier.success("Cliente actualizado con exito");
       }
-
-      const result = await response.json();
-      console.log('Cliente editado con éxito:', result);
-
-      if (entityEvent) eventBus.emit(entityEvent, result);
-
       return true;
     } catch (error) {
-      console.error('Error al editar cliente:', error);
-      alert(error instanceof Error ? error.message : 'Ocurrió un error inesperado');
-      return false;
+      const fields = getFieldErrors(error);
+      if(Object.keys(fields).length > 0){
+        notifier.error(Object.values(fields).join('. '));
+      }else{
+        notifyIfNeeded(error, 'No se pudo guardar el cliente');
+      }
     }
   };
 
@@ -154,42 +144,30 @@ const ClientDetailModal = ({
   const doBaja = async () => {
     setConfirmBaja(false);
     try {
-      const response = await fetch(
-        `${BACKEND_URL}/api/clients/${client.id_client}`,
-        { method: 'DELETE', credentials: 'include' }
+      const response = await api<Client>(
+        `/api/clients/${client.id_client}`,
+        { method: 'DELETE'}
       );
-      if (!response.ok) {
-        const err = await response.json().catch(() => ({}));
-        throw new Error(err.message || 'No se pudo dar de baja el cliente');
-      }
-      const result = await response.json();
-      if (entityEvent) eventBus.emit(entityEvent, result);
+      if (entityEvent) eventBus.emit(entityEvent, response);
       onClose();
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'Ocurrió un error inesperado');
+      notifyIfNeeded(error, 'No se pudo dar de baja el cliente');
     }
   };
 
   const doReactivar = async () => {
     try {
-      const response = await fetch(
-        `${BACKEND_URL}/api/clients/${client.id_client}`,
+      const response = await api<Client>(
+        `/api/clients/${client.id_client}`,
         {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ status: true }),
-          credentials: 'include',
         }
       );
-      if (!response.ok) {
-        const err = await response.json().catch(() => ({}));
-        throw new Error(err.message || 'No se pudo reactivar el cliente');
-      }
-      const result = await response.json();
-      if (entityEvent) eventBus.emit(entityEvent, result);
+      if (entityEvent) eventBus.emit(entityEvent, response);
       onClose();
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'Ocurrió un error inesperado');
+      notifyIfNeeded(error, 'No se pudo reactivar el cliente');
     }
   };
 
