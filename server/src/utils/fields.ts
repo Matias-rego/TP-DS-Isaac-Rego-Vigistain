@@ -17,7 +17,7 @@ export function enumSchema( values: readonly string[] | EnumLike,label: string):
   const options = Array.isArray(values) ? values : Object.values(values);
 
   return z.enum(values as [string, ...string[]], {
-    error: `${label} must be one of: ${options.join(", ")}`,
+    error: `${label} debe ser uno de: ${options.join(", ")}`,
   });
 }
 
@@ -26,81 +26,82 @@ export const toBoolean = (name: string) =>
         truthy: ["1"],
         falsy: ["0"],
         case: "sensitive",
-        error: `${name} must be "1" or "0"`,
+        error: `${name} debe ser "1" o "0"`,
     });
 
 
-export const paymentMethod = enumSchema($Enums.EnumPaymentMethod, "Payment method");
+export const paymentMethod = enumSchema($Enums.EnumPaymentMethod, "El método de pago");
 
-export const typeOfPayment = enumSchema($Enums.EnumPaymentType, "Type of payment");
+export const typeOfPayment = enumSchema($Enums.EnumPaymentType, "El tipo de pago");
 
-export const tipo_equipment = enumSchema($Enums.EnumEquipmentType, "Equipment type");
+export const tipo_equipment = enumSchema($Enums.EnumEquipmentType, "El tipo de equipo");
 
-export const EnumRol = enumSchema($Enums.EnumRol, "Role");
+export const EnumRol = enumSchema($Enums.EnumRol, "El rol");
 
-export const EnumOrderStatus = enumSchema($Enums.EnumOrderStatus, "Order status");
+export const EnumOrderStatus = enumSchema($Enums.EnumOrderStatus, "El estado de la orden");
 
-export const EnumBudgetStatus = enumSchema($Enums.EnumBudgetStatus, "Budget status");
+export const EnumBudgetStatus = enumSchema($Enums.EnumBudgetStatus, "El estado del presupuesto");
 
-export const EnumFailureStatus = enumSchema($Enums.EnumFailureStatus, "Failure status");
+export const EnumFailureStatus = enumSchema($Enums.EnumFailureStatus, "El estado de la falla");
 
-export const sortOrder = enumSchema(["asc", "desc"], "sortOrder" );
+export const sortOrder = enumSchema(["asc", "desc"], "El orden" );
 
 export const username = z
     .string({
         error: (issue) => {
-            if (issue.code === "invalid_type") return "Username must be a string";
-            return "Username is required";
+            if (issue.code === "invalid_type") return "El nombre de usuario debe ser texto";
+            return "El nombre de usuario es obligatorio";
         },
     })
     .trim()
-    .min(3, "Username must be at least 3 characters long")
-    .max(30, "Username cannot be longer than 30 characters");
+    .min(3, "El nombre de usuario debe tener al menos 3 caracteres")
+    .max(30, "El nombre de usuario no puede superar los 30 caracteres");
 
 export const password = z
     .string({
         error: (issue) => {
-            if (issue.code === "invalid_type") return "Password must be a string";
-            return "Password is required";
+            if (issue.code === "invalid_type") return "La contraseña debe ser texto";
+            return "La contraseña es obligatoria";
         },
     })
-    .min(6, "Password must be at least 6 characters long")
-    .max(100, "Password cannot be longer than 100 characters");
+    .min(6, "La contraseña debe tener al menos 6 caracteres")
+    .max(100, "La contraseña no puede superar los 100 caracteres");
 
 export const email = z
     .email({
         error: (issue) => {
-            if (issue.code === "invalid_type") return "Email must be a string";
-            if (issue.code === "invalid_format") return "Email must be a valid email address";
-            return "Email is required";
+            if (issue.code === "invalid_type") return "El email debe ser texto";
+            if (issue.code === "invalid_format") return "El email no tiene un formato válido";
+            return "El email es obligatorio";
         },
     });
 
 export const name = z
     .string({
         error: (issue) => {
-            if (issue.code === "invalid_type") return "Name must be a string";
-            return "Name is required";
+            if (issue.code === "invalid_type") return "El nombre debe ser texto";
+            return "El nombre es obligatorio";
         },
     })
     .trim()
-    .min(3, "Name must be at least 3 characters long")
-    .max(100, "Name cannot be longer than 100 characters");
+    .min(3, "El nombre debe tener al menos 3 caracteres")
+    .max(100, "El nombre no puede superar los 100 caracteres");
 
-export const isActiveQuery = toBoolean("Is active");
+export const isActiveQuery = toBoolean("El estado activo");
 
 export const cuit = z
     .string({
         error: (issue) => {
-            if (issue.code === "invalid_type") return "CUIT must be a string";
-            return "CUIT is required";
+            if (issue.code === "invalid_type") return "El CUIT debe ser texto";
+            return "El CUIT es obligatorio";
         },
     })
     .trim()
     // Acepta "20-12345678-9" o "20123456789" y lo normaliza a solo dígitos
     .transform((val) => val.replace(/[-\s]/g, ""))
     .refine((val) => /^\d{11}$/.test(val), {
-        error: "CUIT must contain 11 numeric digits",
+        error: "El CUIT debe tener 11 dígitos numéricos",
+        abort: true, // si el formato falla, no evalúa el dígito verificador (evita dos mensajes)
     })
     .refine((val) => {
         // Algoritmo de módulo 11 para el dígito verificador
@@ -115,13 +116,14 @@ export const cuit = z
         if (verificadorEsperado === 10) return false;
         return verificadorEsperado === digitos[10];
     }, {
-        error: "CUIT is invalid",
+        error: "El CUIT no es válido",
     });
 
 export const phone = z.e164({
     error: (issue) => {
-        if (issue.code === "invalid_type") return "Phone must be a string";
-        return "Phone is required";
+        if (issue.code === "invalid_type") return "El teléfono debe ser texto";
+        if (issue.code === "invalid_format") return "El teléfono debe estar en formato internacional (ej: +5493415551234)";
+        return "El teléfono es obligatorio";
     },
 });
 
@@ -129,77 +131,77 @@ export const cant_s = (name: string) => z
     .number({
         error: (issue) => {
             if (issue.code === "invalid_type") {
-                return `${name} must be a number`;
+                return `${name} debe ser un número`;
             }
 
-            return `${name} is required`;
+            return `${name} es obligatorio`;
         },
     })
     .int({
-        error: `${name} must be an integer`,
+        error: `${name} debe ser un número entero`,
     })
     .nonnegative({
-        error: `${name} must be zero or greater`,
+        error: `${name} debe ser cero o mayor`,
     });
 
 export const cant_n = (name: string) => z.coerce
     .number({
         error: (issue) => {
             if (issue.code === "invalid_type") {
-                return `${name} must be a number`;
+                return `${name} debe ser un número`;
             }
 
-            return `${name} is required`;
+            return `${name} es obligatorio`;
         },
     })
     .int({
-        error: `${name} must be an integer`,
+        error: `${name} debe ser un número entero`,
     })
     .nonnegative({
-        error: `${name} must be zero or greater`,
+        error: `${name} debe ser cero o mayor`,
     });
 
 export const page = z.coerce
     .number({
         error: (issue) => {
             if (issue.code === "invalid_type") {
-                return "Page must be a number";
+                return "La página debe ser un número";
             }
 
-            return "Page is required";
+            return "La página es obligatoria";
         },
     })
     .int({
-        error: "Page must be an integer",
+        error: "La página debe ser un número entero",
     })
     .positive({
-        error: "Page must be greater than 0",
+        error: "La página debe ser mayor a 0",
     });
 
 export const limit = z.coerce
     .number({
         error: (issue) => {
             if (issue.code === "invalid_type") {
-                return "Limit must be a number";
+                return "El límite debe ser un número";
             }
 
-            return "Limit is required";
+            return "El límite es obligatorio";
         },
     })
     .int({
-        error: "Limit must be an integer",
+        error: "El límite debe ser un número entero",
     })
     .positive({
-        error: "Limit must be greater than 0",
+        error: "El límite debe ser mayor a 0",
     })
-    .max(1000, "Limit cannot be greater than 1000");
+    .max(1000, "El límite no puede ser mayor a 1000");
 
 export const id = z
     .uuidv7({
         error: (issue) => {
-            if (issue.code === "invalid_type") return "Id must be a string";
-            if (issue.code === "invalid_format") return "Id must be a valid UUID v7";
-            return "Id is required";
+            if (issue.code === "invalid_type") return "El id debe ser texto";
+            if (issue.code === "invalid_format") return "El id no es un UUID v7 válido";
+            return "El id es obligatorio";
         },
     })
 
@@ -207,89 +209,89 @@ export const id = z
 export const percentage = z
     .number({
         error: (issue) => {
-            if (issue.code === "invalid_type") return "Percentage must be a number";
-            return "Percentage is required";
+            if (issue.code === "invalid_type") return "El porcentaje debe ser un número";
+            return "El porcentaje es obligatorio";
         },
     })
-    .min(0, "Percentage must be at least 0")
-    .max(100, "Percentage cannot be greater than 100");
+    .min(0, "El porcentaje debe ser al menos 0")
+    .max(100, "El porcentaje no puede ser mayor a 100");
 
 
 export const brand = z
     .string({
         error: (issue) => {
-            if (issue.code === "invalid_type") return "Brand must be a string";
-            return "Brand is required";
+            if (issue.code === "invalid_type") return "La marca debe ser texto";
+            return "La marca es obligatoria";
         },
     })
     .trim()
-    .min(1, "Brand must be at least 1 character long")
-    .max(100, "Brand cannot be longer than 100 characters");
+    .min(1, "La marca debe tener al menos 1 caracter")
+    .max(100, "La marca no puede superar los 100 caracteres");
 
 export const model = z
     .string({
         error: (issue) => {
-            if (issue.code === "invalid_type") return "Model must be a string";
-            return "Model is required";
+            if (issue.code === "invalid_type") return "El modelo debe ser texto";
+            return "El modelo es obligatorio";
         },
     })
     .trim()
-    .min(1, "Model must be at least 1 character long")
-    .max(100, "Model cannot be longer than 100 characters");
+    .min(1, "El modelo debe tener al menos 1 caracter")
+    .max(100, "El modelo no puede superar los 100 caracteres");
 
 export const observations = z
     .string({
         error: (issue) => {
-            if (issue.code === "invalid_type") return "Observations must be a string";
-            return "Observations is required";
+            if (issue.code === "invalid_type") return "Las observaciones deben ser texto";
+            return "Las observaciones son obligatorias";
         },
     })
     .trim()
-    .min(1, "Observations must be at least 1 character long")
-    .max(500, "Observations cannot be longer than 500 characters");
+    .min(1, "Las observaciones deben tener al menos 1 caracter")
+    .max(500, "Las observaciones no pueden superar los 500 caracteres");
 
 export const description = z
     .string({
         error: (issue) => {
-            if (issue.code === "invalid_type") return "Description must be a string";
-            return "Description is required";
+            if (issue.code === "invalid_type") return "La descripción debe ser texto";
+            return "La descripción es obligatoria";
         },
     })
     .trim()
-    .min(1, "Description must be at least 1 character long")
-    .max(500, "Description cannot be longer than 500 characters");
+    .min(1, "La descripción debe tener al menos 1 caracter")
+    .max(500, "La descripción no puede superar los 500 caracteres");
 
 export const date = z.iso.date({
     error: (issue) => {
-        if (issue.code === "invalid_type") return "Date must be a string";
-        if (issue.code === "invalid_format") return "Date must be a valid date in YYYY-MM-DD format";
-        return "Date is required";
+        if (issue.code === "invalid_type") return "La fecha debe ser texto";
+        if (issue.code === "invalid_format") return "La fecha debe tener el formato AAAA-MM-DD";
+        return "La fecha es obligatoria";
     },
 });
 
 export const url = z.url({
     error: (issue) => {
-        if (issue.code === "invalid_type") return "URL must be a string";
-        if (issue.code === "invalid_format") return "URL must be a valid URL";
-        return "URL is required";
+        if (issue.code === "invalid_type") return "La URL debe ser texto";
+        if (issue.code === "invalid_format") return "La URL no es válida";
+        return "La URL es obligatoria";
     },
 });
 
 export const price = z
     .number({
         error: (issue) => {
-            if (issue.code === "invalid_type") return "Price must be a number";
-            return "Price is required";
+            if (issue.code === "invalid_type") return "El precio debe ser un número";
+            return "El precio es obligatorio";
         },
     })
     .nonnegative({
-        error: "Price must be zero or greater",
+        error: "El precio debe ser cero o mayor",
     });
 
 export const isActive = z.boolean({
     error: (issue) => {
-        if (issue.code === "invalid_type") return "Is active must be a boolean";
-        return "Is active is required";
+        if (issue.code === "invalid_type") return "El estado activo debe ser verdadero o falso";
+        return "El estado activo es obligatorio";
     },
 });
 
@@ -297,12 +299,12 @@ export const search = z
     .string({
         error: (issue) => {
             if (issue.code === "invalid_type") {
-                return "Search must be a string";
+                return "La búsqueda debe ser texto";
             }
 
-            return "Search is required";
+            return "La búsqueda es obligatoria";
         },
     })
     .trim()
-    .min(1, "Search cannot be empty")
-    .max(100, "Search cannot be longer than 100 characters");
+    .min(1, "La búsqueda no puede estar vacía")
+    .max(100, "La búsqueda no puede superar los 100 caracteres");

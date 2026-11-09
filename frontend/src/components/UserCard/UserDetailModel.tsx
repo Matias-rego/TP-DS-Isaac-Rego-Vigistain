@@ -3,12 +3,12 @@ import DetailModal from "../Modals/DetailModal";
 import type { DetailFieldConfig, DetailItemConfig } from "../Modals/DetailModal";
 import styles from './UserDetailModal.module.css';
 import { eventBus } from "@/lib/eventBus";
-import { BACKEND_URL } from "@/lib/config";
 import ActionButton from "../Common/Buttons/ActionButton";
 import ConfirmDialog from "../Common/ConfirmDialog/ConfirmDialog";
 import type { User as UserBase } from '@/features/users/types';
 import AlertSuccess from '@/components/Alert/AlertSuccess';
-
+import { api, getFieldErrors, notifyIfNeeded } from "@/api/client";
+import { notifier } from '@/notifications/notifier';
 interface User extends UserBase {
   onClick?: (id: string) => void;
 }
@@ -73,37 +73,29 @@ const UserDetailModal = ({
     }
   }, [open]);
 
-  const handleEdit = async (updatedUser: User): Promise<boolean> => {
+  const handleEdit = async (updatedUser: User)=> {
     try {
-      // Excluimos las propiedades que el esquema del backend prohíbe explícitamente
       const { id_user, status, ...payload } = updatedUser;
 
-      const response = await fetch(
-        `${BACKEND_URL}/api/users/${id_user}`,
+      const updated = await api<User>(
+        `/api/users/${id_user}`,
         {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
           body: JSON.stringify(payload),
-          credentials: 'include',
         }
       );
-
-      if (!response.ok) {
-        const errorValidate = await response.json().catch(() => ({}));
-        throw new Error(errorValidate.message || `Error del servidor: ${response.status}`);
+      if (entityEvent) eventBus.emit(entityEvent, updated);
+      if(updated){
+        notifier.success("Usuario actualizado con exito");
       }
-
-      const result = await response.json();
-
-      if (entityEvent) eventBus.emit(entityEvent, result);
-
       return true;
     } catch (error) {
-      console.error('Error al editar usuario:', error);
-      alert(error instanceof Error ? error.message : 'Ocurrió un error inesperado');
-      return false;
+      const fieldErrors = getFieldErrors(error);
+      if(Object.keys(fieldErrors).length > 0){
+        notifier.error(Object.values(fieldErrors).join('. '));
+      }else{
+        notifyIfNeeded(error, "No se pudo actualizar el usuario");
+      }
     }
   };
 
@@ -123,19 +115,14 @@ const UserDetailModal = ({
   const doBaja = async () => {
     setConfirmBaja(false);
     try {
-      const response = await fetch(
-        `${BACKEND_URL}/api/users/${user.id_user}`,
-        { method: 'DELETE', credentials: 'include' }
+      const response = await api<User>(
+        `/api/users/${user.id_user}`,
+        { method: 'DELETE' }
       );
-      if (!response.ok) {
-        const err = await response.json().catch(() => ({}));
-        throw new Error(err.message || 'No se pudo dar de baja el usuario');
-      }
-      const result = await response.json();
-      if (entityEvent) eventBus.emit(entityEvent, result);
+      if (entityEvent) eventBus.emit(entityEvent, response);
       onClose();
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'Ocurrió un error inesperado');
+      notifyIfNeeded(error, "No se pudo dar de baja al usuario");
     }
   };
 

@@ -14,7 +14,6 @@ import CautionIcon from "@/assets/caution.svg";
 import ClipboardCheck from "@/assets/clipboardCheck.svg";
 import FallaForm, { type NuevaFalla } from "@/components/Failure/FailureForm/FailureForm";
 import VisualProof from "@/components/ImagesAdd/VisualProof";
-import { BACKEND_URL } from "@/lib/config";
 import { useNavigate } from "react-router-dom";
 import FeedbackModal from "@/components/Modals/FeadbackModal/FeadbackModal";
 import EquimentDetailModal from "@/components/EquipmentComponent/EquipmentDetailModal/EquipmentDetailModal";
@@ -22,6 +21,8 @@ import MonitorIcon from '@/assets/MonitorIcono.svg'
 import { type Equipment } from "@/types/types";
 import { useAuth } from "@/lib/AuthContext";
 import type { Client as BaseClient, PaginatedResponse } from "@/types/types";
+import { api, ApiError, getFieldErrors } from "@/api/client";
+
 
 interface Client extends BaseClient {
   categoryClientName?: string;
@@ -89,7 +90,7 @@ const WorkOrder = () => {
   ];
   const puedeAvanzar = pasos[step].valido;
   const avanzar = () => { if (puedeAvanzar && step < pasos.length - 1) setStep(step + 1); };
-  const retroceder = () => { if (step > 0) setStep(step - 1); };
+  const retroceder = () => { if (step > 0) { setSubmitError(null); setStep(step - 1); } };
   const { user } = useAuth();
   const handleSelectClient = (client: Client) => {
     setSelectedClient(client);
@@ -188,43 +189,32 @@ const WorkOrder = () => {
 
     setSubmitting(true);
 
-    try {
-      const response = await fetch(`${BACKEND_URL}/api/orders`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(orderPayload),
-        credentials: "include",
-      });
+   try {
+    await api(`/api/orders`, {
+      method: "POST",
+      body: JSON.stringify(orderPayload),
+      silent: true, 
+    });
 
-      if (!response.ok) {
-        const errorBody = await response.json().catch(() => ({}));
+    setSubmitSuccess(true);
+  } catch (error) {
+    console.error("Error al registrar la orden:", error);
 
-        throw new Error(
-          errorBody.message ||
-          `Error ${response.status} al registrar la orden`
-        );
-      }
+    if (error instanceof ApiError && error.notified) return;
 
-      const order = await response.json();
-
-      console.log("Orden creada:", order);
-
-      setSubmitSuccess(true);
-
-    } catch (error) {
-      console.error("Error al registrar la orden:", error);
-
-      setSubmitError(
-        error instanceof Error
-          ? error.message
-          : "Ocurrió un error al registrar la orden."
-      );
-    } finally {
-      setSubmitting(false);
+    const fields = getFieldErrors(error);
+    if (Object.keys(fields).length > 0) {
+      setSubmitError(Object.values(fields).join('. '));   
+    } else if (error instanceof ApiError) {
+      setSubmitError(error.message);                      
+    } else {
+      setSubmitError("Ocurrió un error al registrar la orden.");
     }
+  } finally {
+    setSubmitting(false);
   }
+};
+  
   useEffect(() => {
     if (submitSuccess) {
       const timer = setTimeout(() => {

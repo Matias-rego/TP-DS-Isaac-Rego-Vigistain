@@ -97,7 +97,14 @@ export class ClientTypeRepository extends BaseRepository<ClientType, ClientTypeQ
             id: clientType.id_client_type,
         };
     }
-
+    public async countClientsByType(id:string): Promise<number>{
+        const count = await this.prisma.client.count({
+            where:{
+                id_client_type: id
+            }
+        })
+        return count;
+    }
     private toDomain(clientType: Client_Type): ClientType {
         return new ClientType(
             clientType.clientTypeName,

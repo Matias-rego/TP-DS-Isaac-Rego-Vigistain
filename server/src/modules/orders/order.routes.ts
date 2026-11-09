@@ -9,14 +9,18 @@ import { OrderRepository } from './order.repository.js';
 import { StatusService } from '@/modules/status/status.service.js';
 import { StatusHistoryRepository } from '@/modules/status/status.repository.js';
 import { BudgetRepository } from '../budgets/budget.repository.js';
+import { ClientService } from '@/modules/clients/client.service.js';
+import { ClientRepository } from '@/modules/clients/client.repository.js';
 
 const orderRepo = new OrderRepository(prisma);
 const statusRepo = new StatusHistoryRepository(prisma);
 const budgetRepo = new BudgetRepository(prisma);
+const clientRepo = new ClientRepository(prisma);
 const statusService = new StatusService(statusRepo, orderRepo, budgetRepo);
+const clientService = new ClientService(clientRepo);
 
 const ctrl = new OrderController(
-  new OrderService(prisma, orderRepo, statusService)   // ✅
+  new OrderService(prisma, orderRepo, statusService, clientService)   // ✅
 );
 
 const router = Router();
