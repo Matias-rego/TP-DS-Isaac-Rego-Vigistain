@@ -4,7 +4,7 @@ import { BACKEND_URL } from "@/lib/config";
 import { useAuth } from "@/lib/AuthContext";
 import type { Failure_Type } from "@/types/types";
 import ActionButton from "@/components/Common/Buttons/ActionButton";
-import AltaTipoFalla from "@/pages/TipoFalla/AltaTipoFalla";
+import AltaTipoFalla from "@/features/failureTypes/TipoFalla/AltaTipoFalla";
 import { eventBus, EVENTS } from "@/lib/eventBus";
 
 export interface NuevaFalla {

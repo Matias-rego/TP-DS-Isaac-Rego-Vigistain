@@ -1,33 +1,58 @@
 import styles from "./EditorPerfil.module.css";
-import { useEffect, useState } from "react";
-import Nav from "../../components/layout/Nav/Nav";
-import type { User } from '@/features/users/types';
+import { useCallback, useEffect, useState } from "react";
+import Nav from "@/components/layout/Nav/Nav";
+import type { User } from "@/features/users/types";
 import { Dialog, DialogContent, DialogHeader, DialogDescription, DialogTitle, DialogPortal } from "@/components/ui/dialog";
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Button } from "@/components/ui/button";
-import AlertSuccess from "@/components/Alert/AlertSuccess";
-import Alert from "@/components/Alert/Alert";
-import { useNavigate } from "react-router-dom";
-import { BACKEND_URL } from '@/lib/config';
-import { uploadFoto } from '@/lib/upload';
 import ActionButton from "@/components/Common/Buttons/ActionButton";
+import { api, getFieldErrors, notifyIfNeeded } from "@/api/client";
+import { notifier } from "@/notifications/notifier";
+import { useAuth } from "@/lib/AuthContext";
+import { uploadFoto } from "@/lib/upload";
 
 const EditorPerfil = () => {
+  const { refetchUser } = useAuth();
+
   const [usuario, setUsuario] = useState<User | null>(null);
+  const [form, setForm] = useState({ userName: "", email: "" });
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [saving, setSaving] = useState(false);
+
   const [modalPic, setModalPic] = useState<boolean>(false);
   const [preview, setPreview] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
   const [foto, setFoto] = useState<File | null>(null);
 
-  // Cambio de contraseña (mismo patrón que tenía Login)
   const [showForgot, setShowForgot] = useState<boolean>(false);
-  const [resetEmail, setResetEmail] = useState<string>('');
+  const [resetEmail, setResetEmail] = useState<string>("");
   const [resetEmailError, setResetEmailError] = useState<string | null>(null);
   const [resetSubmitting, setResetSubmitting] = useState<boolean>(false);
-  const [resetSuccess, setResetSuccess] = useState<string | null>(null);
 
-  const navigate = useNavigate();
+  const loadProfile = useCallback(async () => {
+    try {
+      const data = await api<User>("/api/auth/me");
+      setUsuario(data);
+      setForm({ userName: data.userName, email: data.email });
+    } catch (e) {
+      notifyIfNeeded(e, "No se pudo cargar el perfil");
+    }
+  }, []);
+
+  useEffect(() => {
+    loadProfile();
+  }, [loadProfile]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+    if (fieldErrors[name]) {
+      setFieldErrors((prev) => {
+        const next = { ...prev };
+        delete next[name];
+        return next;
+      });
+    }
+  };
 
   const handleFoto = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -38,134 +63,89 @@ const EditorPerfil = () => {
 
   const removePhoto = () => {
     setPreview(null);
+    setFoto(null);
   };
 
   const handleSaveChanges = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!usuario) return;
 
-    setError(null);
-    setSuccess(null);
+    setFieldErrors({});
+    setSaving(true);
 
     try {
-      let urlPicture = usuario?.urlPicture;
+      let urlPicture = usuario.urlPicture;
 
-      // 1. Si hay una foto nueva, primero la subimos
       if (foto) {
         const uploadResult = await uploadFoto(foto);
         urlPicture = uploadResult.url;
       }
 
-      // 2. Ahora actualizamos el usuario
-      const response = await fetch(
-        `${BACKEND_URL}/api/users/${usuario?.id_user}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            userName: (
-              document.getElementById("username") as HTMLInputElement
-            ).value,
+      await api(`/api/users/${usuario.id_user}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          userName: form.userName.trim(),
+          email: form.email.trim(),
+          urlPicture,
+        }),
+        silent: true,
+      });
 
-            email: (
-              document.getElementById("email") as HTMLInputElement
-            ).value,
-
-            urlPicture,
-          }),
-        }
-      );
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          result.message || "Error al guardar cambios"
-        );
-      }
-
-      setUsuario(result.user);
-      setSuccess(result.success);
+      notifier.success("Perfil actualizado correctamente");
       setFoto(null);
+      setPreview(null);
 
+      await loadProfile();
+      await refetchUser();
     } catch (e) {
-      console.error("Error al guardar cambios:", e);
+      const errors = getFieldErrors(e);
 
-      setError(e instanceof Error ? e.message : "Error desconocido");
+      if (Object.keys(errors).length > 0) {
+        setFieldErrors(errors);
+
+        // Errores de campos que no tienen input en esta pantalla (ej: la foto)
+        const unmatched = Object.entries(errors).filter(
+          ([name]) => name !== "userName" && name !== "email",
+        );
+        if (unmatched.length > 0) {
+          notifier.error(unmatched.map(([, msg]) => msg).join(". "));
+        }
+      } else {
+        notifyIfNeeded(e, e instanceof Error ? e.message : "No se pudieron guardar los cambios");
+      }
+    } finally {
+      setSaving(false);
     }
   };
 
-  // Ojo: NO puede ser un <form onSubmit>, porque ya está anidado
-  // dentro del <form> principal (handleSaveChanges). Se dispara
-  // directo desde el onClick del botón.
   const handleForgotSubmit = async () => {
-    setResetSuccess(null);
-
-    if (!resetEmail.trim() || !/^\S+@\S+\.\S+$/.test(resetEmail)) {
-      setResetEmailError('Ingresá un email válido');
+    if (!/^\S+@\S+\.\S+$/.test(resetEmail.trim())) {
+      setResetEmailError("Ingresá un email válido");
       return;
     }
     setResetEmailError(null);
 
     setResetSubmitting(true);
     try {
-      const response = await fetch(`${BACKEND_URL}/api/auth/forgot-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      await api("/api/auth/forgot-password", {
+        method: "POST",
         body: JSON.stringify({ email: resetEmail.trim() }),
       });
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        setError(result.message || 'No pudimos procesar la solicitud');
-        return;
-      }
-
-      setResetSuccess('Si el email existe, te enviamos un link para restablecer tu contraseña.');
-      setResetEmail('');
-    } catch (err) {
-      console.error('Error:', err);
-      setError('Error al conectar con el servidor');
+      notifier.success("Si el email existe, te enviamos un link para restablecer tu contraseña.");
+      setResetEmail("");
+      setShowForgot(false);
+    } catch (e) {
+      notifyIfNeeded(e, "No pudimos procesar la solicitud");
     } finally {
       setResetSubmitting(false);
     }
-  };
-
-  useEffect(() => {
-    const cargarPerfil = async () => {
-      try {
-
-        const response = await fetch(`${BACKEND_URL}/api/auth/me`,
-          { credentials: 'include' });
-
-        if (!response.ok) throw new Error(`Error ${response.status}`);
-
-        const data: User = await response.json();
-        if (!data) throw new Error('Usuario no encontrado');
-
-        setUsuario(data);
-      } catch (e) {
-        console.error('Error al cargar perfil:', e);
-      }
-    };
-
-    cargarPerfil();
-  }, []);
-
-  const changeModalPic = () => {
-    setModalPic(true);
   };
 
   return (
     <><Nav />
       <div className={styles.container}>
         <div className={styles.card}>
-          {success && <AlertSuccess message={success} />}
-          {success && <button type="button" className={styles.confirmButton} onClick={() => navigate('/home')}>Inicio</button>}
-          {error && <Alert message={error} />}
           <h1 className={styles.title}>Edicion de Perfil</h1>
           <form onSubmit={handleSaveChanges}>
             <div className={styles.cardForm}>
@@ -176,7 +156,9 @@ const EditorPerfil = () => {
                   alt={usuario?.userName}
                   className={styles.avatarRoot}
                 />
-                <button type="button" className={styles.button2} onClick={changeModalPic}>Cambiar foto</button>
+                <button type="button" className={styles.button2} onClick={() => setModalPic(true)}>
+                  Cambiar foto
+                </button>
               </div>
             </div>
 
@@ -194,7 +176,7 @@ const EditorPerfil = () => {
                   </DialogHeader>
 
                   <div className={styles.group}>
-                    <label className={styles.label} style={{ textAlign: 'center' }}>
+                    <label className={styles.label} style={{ textAlign: "center" }}>
                       Foto de perfil
                     </label>
 
@@ -240,13 +222,37 @@ const EditorPerfil = () => {
 
             <div className={styles.cardForm}>
               <div className={styles.group}>
-                <label className={styles.subtitle} style={{ fontSize: '1.2rem' }}>
+                <label className={styles.subtitle} style={{ fontSize: "1.2rem" }}>
                   Datos personales
                 </label>
-                <label className={styles.label}>Nombre de usuario</label>
-                <input type="text" id="username" className={styles.input} defaultValue={usuario?.userName} />
-                <label className={styles.label}>Correo electrónico</label>
-                <input type="email" id="email" className={styles.input} defaultValue={usuario?.email} />
+
+                <label className={styles.label} htmlFor="userName">Nombre de usuario</label>
+                <input
+                  type="text"
+                  id="userName"
+                  name="userName"
+                  className={styles.input}
+                  value={form.userName}
+                  onChange={handleChange}
+                  disabled={saving}
+                />
+                {fieldErrors.userName && (
+                  <span className={styles.errorText}>{fieldErrors.userName}</span>
+                )}
+
+                <label className={styles.label} htmlFor="email">Correo electrónico</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  className={styles.input}
+                  value={form.email}
+                  onChange={handleChange}
+                  disabled={saving}
+                />
+                {fieldErrors.email && (
+                  <span className={styles.errorText}>{fieldErrors.email}</span>
+                )}
 
                 {!showForgot ? (
                   <ActionButton
@@ -255,14 +261,11 @@ const EditorPerfil = () => {
                     variant="ghost"
                     onClick={() => {
                       setShowForgot(true);
-                      setResetSuccess(null);
                       setResetEmailError(null);
                     }}
                   />
                 ) : (
                   <div className={styles.group}>
-                    {resetSuccess && <AlertSuccess message={resetSuccess} />}
-
                     <label htmlFor="resetEmail" className={styles.label}>
                       Confirmá tu email para restablecer la contraseña
                     </label>
@@ -287,7 +290,7 @@ const EditorPerfil = () => {
                       disabled={resetSubmitting}
                       onClick={handleForgotSubmit}
                     >
-                      {resetSubmitting ? 'Enviando…' : 'Enviar link de recuperación'}
+                      {resetSubmitting ? "Enviando…" : "Enviar link de recuperación"}
                     </button>
 
                     <ActionButton
@@ -296,9 +299,8 @@ const EditorPerfil = () => {
                       variant="ghost"
                       onClick={() => {
                         setShowForgot(false);
-                        setResetEmail('');
+                        setResetEmail("");
                         setResetEmailError(null);
-                        setResetSuccess(null);
                       }}
                     />
                   </div>
@@ -306,13 +308,19 @@ const EditorPerfil = () => {
               </div>
             </div>
 
-            <Button className={styles.button2} style={{ marginTop: '20px' }} type="submit">
-              Guardar cambios
+            <Button
+              className={styles.button2}
+              style={{ marginTop: "20px" }}
+              type="submit"
+              disabled={saving || !usuario}
+            >
+              {saving ? "Guardando…" : "Guardar cambios"}
             </Button>
           </form>
         </div>
       </div>
     </>
-  )
-}
+  );
+};
+
 export default EditorPerfil;

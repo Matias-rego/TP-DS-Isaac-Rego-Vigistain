@@ -1,0 +1,115 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  min-width: 0;
+  border: 1px solid var(--tf-border);
+  border-radius: var(--radius-md, 14px);
+  background: var(--tf-card);
+  box-shadow: var(--shadow-soft);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--tf-border);
+}
+
+.headerIcon {
+  color: var(--tf-primary);
+}
+
+.title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--tf-text);
+}
+
+/* --- Campos --- */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.label {
+  font-size: 12px;
+  color: var(--tf-muted);
+}
+
+.box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid var(--tf-border);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--tf-primary) 4%, var(--tf-card));
+}
+
+.text {
+  font-size: 14px;
+  color: var(--tf-text);
+  overflow-wrap: anywhere;
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--tf-text);
+  overflow-wrap: anywhere;
+}
+
+.ok {
+  flex-shrink: 0;
+  color: var(--tf-success);
+}
+
+.iconBtn {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--tf-muted);
+  cursor: pointer;
+}
+
+.iconBtn:hover {
+  background: var(--tf-primary-soft);
+  color: var(--tf-text);
+}
+
+.iconBtn:focus-visible {
+  outline: 2px solid var(--tf-primary);
+  outline-offset: 1px;
+}
+
+/* --- Teléfono y fecha en dos columnas --- */
+.pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 16px;
+  }
+
+  .pair {
+    grid-template-columns: 1fr;
+  }
+}
