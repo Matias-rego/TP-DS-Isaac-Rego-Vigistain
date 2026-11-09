@@ -1,10 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { type ReactNode } from "react";
 import Home from "../Home/Home";
-import Login from "../Login/Login";
-import Register from "../Register/Register";
-import Perfil from "../Perfil/Perfil";
-import EditorPerfil from "../EditorPerfil/EditorPerfil";
+import Login from "../../features/auth/pages/Login/Login";
+import Register from "../../features/auth/pages/Register/Register";
 import ForgotPassword from "@/components/Password/ForgotPasswor";
 import ResetPassword from "@/components/Password/ResetPassword";
 import Gestion from "../Gestion/Gestion";
@@ -16,10 +14,12 @@ import OrderDirectory from "../../features/orders/pages/OrderDirectory/OrderDire
 import ManageOrder from "@/features/orders/pages/ManageOrder/ManageOrder";
 import BudgetPdfPreview from "@/components/PDF/BudgetPdfPreview";
 import AppLayout from "@/components/layout/AppLayout";
-import BudgetResponse from "@/pages/Budget/BudgetResponse/BudgetResponse";
+import BudgetResponse from "@/features/budgets/pages/BudgetResponse/BudgetResponse";
 import UsersManagement from "@/features/users/pages/UserManagement";
 import ClientsManagement from "@/features/clients/pages/ClientsManagement";
 import { NotificationProvider } from "@/notifications/NotificationProvider";
+import Perfil from "@/features/users/pages/Perfil/Perfil";
+import EditorPerfil from "@/features/users/pages/EditorPerfil/EditorPerfil";
 export const capitalize = (text: string): string => {
   if (!text) return "";
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
@@ -80,14 +80,13 @@ const App = () => {
           <Route path="/editor-perfil" element={<RutaPrivada><EditorPerfil /></RutaPrivada>} />
           <Route path="/createOrder" element={<RutaPrivada><WorkOrder /></RutaPrivada>} />
           <Route path="/manageOrder" element={<RutaPrivada><OrderDirectory /></RutaPrivada>} />
-          <Route path="/manageOrder" element={<RutaPrivada><OrderDirectory /></RutaPrivada>} />
           <Route path="/manageOrder/:id_order" element={<RutaPrivada><ManageOrder /></RutaPrivada>} />
           <Route path="/showBudget/:id_budget" element={<RutaPrivada><BudgetPdfPreview /></RutaPrivada>} />
 
           <Route element={<AppLayout />}>
             <Route path="/userManagement" element={<RutaPrivada><UsersManagement /></RutaPrivada>} />
             <Route path="/gestion" element={<RutaPrivada><Gestion /></RutaPrivada>} />
-            <Route path="/perfil" element={<RutaPrivada><Perfil /></RutaPrivada>} />
+            <Route path="/perfil" element={<RutaPrivada><Perfil/></RutaPrivada>} /> 
             <Route path="/clientManagement" element={<RutaPrivada><ClientsManagement /></RutaPrivada>} />
           </Route>
         </Route>

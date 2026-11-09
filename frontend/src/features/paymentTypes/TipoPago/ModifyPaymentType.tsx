@@ -1,6 +1,6 @@
-import ModForm from '../CRUDS/Modify/ModForm';
-import type { FieldConfig } from '../CRUDS/Alta/AltaForm';
-import { EVENTS } from '../../lib/eventBus';
+import ModForm from '../../../pages/CRUDS/Modify/ModForm';
+import type { FieldConfig } from '../../../pages/CRUDS/Alta/AltaForm';
+import { EVENTS } from '../../../lib/eventBus';
 import type {Payment_Type} from '@/types/types';
 const PAYMENT_OPTIONS = [
   { value: 'DEBITO',  label: 'Débito' },

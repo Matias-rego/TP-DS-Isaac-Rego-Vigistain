@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import styles from './Login.module.css';
-import Home from '../Home/Home';
-import Alert from '../../components/Alert/Alert';
+import Home from '../../../../pages/Home/Home';
+import Alert from '../../../../components/Alert/Alert';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import AlertSuccess from '../../components/Alert/AlertSuccess';
+import AlertSuccess from '../../../../components/Alert/AlertSuccess';
 import { BACKEND_URL } from '@/lib/config';
 import { PasswordInput } from '@/components/ui/PasswordInput';
 import ActionButton from '@/components/Common/Buttons/ActionButton';
