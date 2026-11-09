@@ -129,13 +129,11 @@ export class ClientRepository extends BaseRepository<Client, ClientQueryDto> {
     }
 
     public async update(id: string, item: Partial<Client>): Promise<Client | undefined> {
+        const { client_type, id_client, ...data } = item;
+
         const client = await this.prisma.client.update({
-            where: {
-                id_client: id,
-            },
-            data: {
-                ...item,
-            },
+            where: { id_client: id },
+            data,
         });
 
         return this.toDomain(client);

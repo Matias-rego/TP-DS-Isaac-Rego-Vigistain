@@ -43,11 +43,9 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--tf-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
 }
-
 .value {
   font-size: 26px;
   font-weight: 800;

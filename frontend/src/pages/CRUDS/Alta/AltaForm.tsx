@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { eventBus } from './../../../lib/eventBus';
-import { BACKEND_URL } from '@/lib/config';
 import styles from './AltaForm.module.css';
 import { api, ApiError } from '@/api/client';
 import { notifier } from '@/notifications/notifier';

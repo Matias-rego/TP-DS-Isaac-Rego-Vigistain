@@ -6,6 +6,8 @@ import { ConflictError } from "@/shared/http-errors.js";
 import type { Prisma } from "@/generated/prisma/client.js";
 
 type Tx = Parameters<ClientRepository["findAmountOrderOfEquiment"]>[1];
+type CreateClientInput = Omit<Client, "id_client" | "id_client_type" | "client_type">;
+
 
 export class ClientService {
     constructor(private repo: ClientRepository) { }
@@ -17,7 +19,7 @@ export class ClientService {
     findById(id: string): Promise<Client | undefined> {
         return this.repo.findById(id);
     }
-   async create(input: Omit<Client, "id_client">): Promise<Client | undefined> {
+    async create(input: CreateClientInput): Promise<Client | undefined>{
         const category = await this.repo.findDefaultCategoryForOrderCount(0);
 
         if (!category) {

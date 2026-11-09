@@ -43,7 +43,6 @@ const ManageOrder = () => {
       try {
         const order = await api<Order>(`/api/orders/${id_order}`, {
           method: "GET",
-          signal,
         });
 
         setOrder(order);
