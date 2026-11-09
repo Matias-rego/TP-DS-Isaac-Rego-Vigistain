@@ -1,10 +1,10 @@
 import styles from "./Register.module.css";
 import { useState } from "react";
-import Alert from "../../components/Alert/Alert";
-import AlertSuccess from "../../components/Alert/AlertSuccess";
+import Alert from "../../../../components/Alert/Alert";
+import AlertSuccess from "../../../../components/Alert/AlertSuccess";
 import { BACKEND_URL } from '@/lib/config';
-import CustomButton1 from "../../components/Common/Buttons/Button1";
-import { PasswordInput } from "../../components/ui/PasswordInput";
+import CustomButton1 from "../../../../components/Common/Buttons/Button1";
+import { PasswordInput } from "../../../../components/ui/PasswordInput";
 import { X, Camera } from "lucide-react";
 import { uploadFoto } from "@/lib/upload";
 

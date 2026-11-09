@@ -1,6 +1,6 @@
-import BajaForm from "../CRUDS/Baja/BajaForm";
-import type { DetailFieldConfig } from "../CRUDS/Baja/BajaForm";
-import { EVENTS } from "../../lib/eventBus";
+import BajaForm from "../../../pages/CRUDS/Baja/BajaForm";
+import type { DetailFieldConfig } from "../../../pages/CRUDS/Baja/BajaForm";
+import { EVENTS } from "../../../lib/eventBus";
 import type { Client_Type } from "@/types/types";
 const FIELDS: DetailFieldConfig[] = [
   {

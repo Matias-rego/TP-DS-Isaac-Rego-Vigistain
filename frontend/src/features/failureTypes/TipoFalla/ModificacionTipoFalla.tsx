@@ -1,6 +1,6 @@
-import ModForm from './../CRUDS/Modify/ModForm';
-import type { FieldConfig } from './../CRUDS/Alta/AltaForm';
-import { EVENTS } from '../../lib/eventBus';
+import ModForm from '../../../pages/CRUDS/Modify/ModForm';
+import type { FieldConfig } from '../../../pages/CRUDS/Alta/AltaForm';
+import { EVENTS } from '../../../lib/eventBus';
 
 interface FailureType {
   id_failure_type: number;

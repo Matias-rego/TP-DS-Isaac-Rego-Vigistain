@@ -29,7 +29,7 @@ async function enviarMailResetPassword(direccionEmail: string, resetToken: strin
 function crearMailResetPassword(resetToken: string) {
     const dataToken = parseJwt(resetToken);
     const resetUrl = `${config.FRONTEND_URL}/reset-password/${resetToken}`;
-    const username = dataToken ? dataToken.username : "Usuario";
+    const userName = dataToken ? dataToken.userName : "Usuario";
     return `
     <!DOCTYPE html>
     <html>
@@ -68,7 +68,7 @@ function crearMailResetPassword(resetToken: string) {
                         </tr>
                         <tr>
                             <td style="color: #475569; font-size: 15px; line-height: 24px; text-align: center; padding-bottom: 32px;">
-                                Hola, <strong>${username}</strong>.<br><br>
+                                Hola, <strong>${userName}</strong>.<br><br>
                                 Recibimos una solicitud para restablecer la contraseña de tu cuenta.<br>
                                 Si fuiste vos, hacé clic en el botón de abajo. Si no fuiste vos, podés ignorar este mensaje.
                             </td>
